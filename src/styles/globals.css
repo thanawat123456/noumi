@@ -11,15 +11,17 @@ html {
 body {
   color: rgb(var(--foreground-rgb));
   font-family: 'Prompt', sans-serif;
-  background: linear-gradient(
-      to bottom,
+  background: linear-gradient(to bottom,
       transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+      rgb(var(--background-end-rgb))) rgb(var(--background-start-rgb));
   min-height: 100vh;
+  .pb-20 {
+    padding-bottom: calc(var(--spacing) * 14);
+  }
 }
 
-input, select, button {
+input,
+select,
+button {
   font-family: 'Prompt', sans-serif;
 }
