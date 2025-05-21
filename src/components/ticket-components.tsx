@@ -10,6 +10,8 @@ interface Ticket {
   image: string;
   description: string;
   isFree: boolean;
+  qrCodeUrl?: string; 
+  barcode?: string; 
 }
 
 interface TicketHeaderProps {
@@ -42,7 +44,8 @@ interface TicketConfirmationProps {
 interface TicketQRCodeProps {
   ticket: Ticket;
   amount: number;
-  onDownload: () => void;
+  onUpload: (file: File) => void;
+  onConfirmPayment: () => void;
 }
 
 interface TicketSuccessProps {
@@ -94,7 +97,7 @@ export const TicketHeader: React.FC<TicketHeaderProps> = ({
       </div>
       
       {/* ชื่อหน้า */}
-      <div className="flex items-center justify-center mb-2">
+      <div className="flex items-center justify-center relative mb-2">
         <button onClick={onBackClick} className="absolute left-4">
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -128,7 +131,7 @@ export const TicketList: React.FC<TicketListProps> = ({
   onTabChange 
 }) => {
   const scrollContainer = useRef<HTMLDivElement>(null);
-  
+
   // กรองตั๋วตาม tab ที่เลือก
   const filteredTickets = tickets.filter(ticket => {
     if (activeTab === 'all') return true;
@@ -136,66 +139,30 @@ export const TicketList: React.FC<TicketListProps> = ({
     if (activeTab === 'paid') return !ticket.isFree;
     return true;
   });
-  
-  const scroll = (direction: 'left' | 'right') => {
-    if (scrollContainer.current) {
-      const { current } = scrollContainer;
-      const scrollAmount = 200;
-      if (direction === 'left') {
-        current.scrollLeft -= scrollAmount;
-      } else {
-        current.scrollLeft += scrollAmount;
-      }
-    }
-  };
-  
+
   return (
-    <div className="p-4">
+    <div className="p-4 pb-20">
       {/* Tabs */}
-      <div className="relative mb-6">
-        <button 
-          className="absolute left-0 top-1/2 transform -translate-y-1/2 bg-white rounded-full w-8 h-8 shadow flex items-center justify-center z-10"
-          onClick={() => scroll('left')}
+      <div className="flex mb-6 justify-center">
+        <button
+          className={`px-16 py-3 rounded-full text-sm font-medium whitespace-nowrap ${
+            activeTab === 'all' 
+              ? 'bg-pink-400 text-white' 
+              : 'bg-gray-200 text-gray-600'
+          }`}
+          onClick={() => onTabChange('all')}
         >
-          <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-          </svg>
+          คนไทย
         </button>
-        
-        <div 
-          className="flex space-x-2 overflow-x-auto scrollbar-hide px-6" 
-          ref={scrollContainer}
-          style={{ scrollBehavior: 'smooth' }}
+        <button
+          className={`px-16 py-3 rounded-full text-sm font-medium whitespace-nowrap ml-2 ${
+            activeTab === 'free' 
+              ? 'bg-pink-400 text-white' 
+              : 'bg-gray-200 text-gray-600'
+          }`}
+          onClick={() => onTabChange('free')}
         >
-          <button
-            className={`px-8 py-2 rounded-full text-sm font-medium whitespace-nowrap ${
-              activeTab === 'all' 
-                ? 'bg-pink-400 text-white' 
-                : 'bg-gray-200 text-gray-600'
-            }`}
-            onClick={() => onTabChange('all')}
-          >
-            คนไทย
-          </button>
-          <button
-            className={`px-8 py-2 rounded-full text-sm font-medium whitespace-nowrap ${
-              activeTab === 'free' 
-                ? 'bg-pink-400 text-white' 
-                : 'bg-gray-200 text-gray-600'
-            }`}
-            onClick={() => onTabChange('free')}
-          >
-            TOURIST
-          </button>
-        </div>
-        
-        <button 
-          className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-white rounded-full w-8 h-8 shadow flex items-center justify-center z-10"
-          onClick={() => scroll('right')}
-        >
-          <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-          </svg>
+          TOURIST
         </button>
       </div>
       
@@ -252,8 +219,8 @@ export const TicketDetail: React.FC<TicketDetailProps> = ({
   ];
 
   return (
-    <div className="p-4 bg-orange-500 rounded-t-3xl h-full">
-      <h2 className="text-white text-2xl font-semibold mb-8">{ticket.templeName}</h2>
+    <div className="p-4 bg-orange-500 h-full flex flex-col">
+      <h2 className="text-white text-2xl font-semibold mb-6">{ticket.templeName}</h2>
       <p className="text-white mb-2">{ticket.isFree ? 'ฟรี หรือ บริจาคตามศรัทธา' : `${ticket.price} บาท`}</p>
       
       {/* ตัวเลือกจำนวนเงิน */}
@@ -301,7 +268,7 @@ export const TicketConfirmation: React.FC<TicketConfirmationProps> = ({
   onConfirm 
 }) => {
   return (
-    <div className="p-4 bg-orange-500 rounded-t-3xl h-full flex flex-col items-center">
+    <div className="p-4 bg-orange-500 h-full flex flex-col items-center">
       <div className="bg-pink-100 rounded-3xl p-6 w-full max-w-md">
         <h2 className="text-center text-orange-500 text-2xl font-semibold mb-2">ยืนยันการซื้อตั๋ว</h2>
         <p className="text-center text-orange-500 mb-6">{ticket.templeName}</p>
@@ -323,25 +290,60 @@ export const TicketConfirmation: React.FC<TicketConfirmationProps> = ({
 };
 
 /**
- * คอมโพเนนต์แสดง QR Code สำหรับชำระเงิน
+ * คอมโพเนนต์แสดง QR Code สำหรับชำระเงินและอัพโหลดสลิป
  */
 export const TicketQRCode: React.FC<TicketQRCodeProps> = ({ 
   ticket, 
   amount, 
-  onDownload 
+  onUpload,
+  onConfirmPayment
 }) => {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      const file = e.target.files[0];
+      setSelectedFile(file);
+      
+      // สร้าง URL สำหรับแสดงรูปภาพ
+      const fileUrl = URL.createObjectURL(file);
+      setPreviewUrl(fileUrl);
+      
+      onUpload(file);
+    }
+  };
+
+  // ล้าง URL เมื่อคอมโพเนนต์ถูกทำลาย
+  useEffect(() => {
+    return () => {
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl);
+      }
+    };
+  }, [previewUrl]);
+
+  const handleUploadClick = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  };
+
   return (
-    <div className="p-4 bg-orange-500 rounded-t-3xl h-full flex flex-col items-center">
+    <div className="p-4 bg-orange-500 h-full flex flex-col items-center">
       <div className="bg-pink-100 rounded-3xl p-6 w-full max-w-md">
         <h2 className="text-center text-xl font-semibold mb-6">สแกนผ่าน QR</h2>
         
         {/* QR Code */}
         <div className="flex justify-center mb-4">
-          <img 
-            src="/api/placeholder/200/200" 
-            alt="QR Code for payment" 
-            className="w-48 h-48"
-          />
+          <div className="bg-white p-4 rounded-lg">
+            <img 
+              src="/api/placeholder/200/200" 
+              alt="QR Code for payment" 
+              className="w-40 h-40"
+            />
+          </div>
         </div>
         
         <div className="text-center mb-6">
@@ -350,12 +352,43 @@ export const TicketQRCode: React.FC<TicketQRCodeProps> = ({
           <p className="text-sm">ชื่อบัญชี {ticket.templeName}</p>
         </div>
         
+        {/* แสดงรูปภาพที่อัพโหลด */}
+        {previewUrl && (
+          <div className="mb-4">
+            <p className="text-center mb-2 font-medium">สลิปที่อัพโหลด:</p>
+            <div className="flex justify-center">
+              <img 
+                src={previewUrl} 
+                alt="Uploaded slip" 
+                className="max-w-full max-h-64 rounded-lg border-2 border-white"
+              />
+            </div>
+          </div>
+        )}
+        
+        <input 
+          type="file" 
+          ref={fileInputRef} 
+          onChange={handleFileChange} 
+          accept="image/*" 
+          className="hidden" 
+        />
+        
         <button 
           className="w-full bg-white text-orange-500 py-3 rounded-full font-medium"
-          onClick={onDownload}
+          onClick={handleUploadClick}
         >
-          อัพโหลดไฟล์
+          {selectedFile ? 'เปลี่ยนไฟล์' : 'อัพโหลดไฟล์'}
         </button>
+        
+        {selectedFile && (
+          <button 
+            className="w-full bg-green-500 text-white py-3 rounded-full font-medium mt-2"
+            onClick={onConfirmPayment}
+          >
+            ยืนยันการชำระเงิน
+          </button>
+        )}
       </div>
     </div>
   );
@@ -371,48 +404,50 @@ export const TicketSuccess: React.FC<TicketSuccessProps> = ({ ticket }) => {
         <h2 className="text-center text-white text-2xl font-semibold mb-4">ตั๋วของคุณ</h2>
         
         <div className="bg-white rounded-xl p-4 mb-4">
-          <div className="flex justify-between mb-2">
-            <span className="text-sm">THAILAND</span>
-          </div>
-          
-          <h3 className="text-center text-xl font-bold mb-2">{ticket.templeName.toUpperCase()}</h3>
-          
-          {/* Barcode */}
-          <div className="flex justify-center mb-2">
-            <svg className="w-full h-16" viewBox="0 0 100 20">
-              {/* Simple barcode representation */}
-              {[...Array(20)].map((_, i) => (
-                <rect 
-                  key={i} 
-                  x={i * 5} 
-                  y={0} 
-                  width={2} 
-                  height={20} 
-                  fill="black"
-                />
-              ))}
-            </svg>
-          </div>
-          
-          <div className="text-center text-sm mb-4">
-            <span>9 789870 254652</span>
-          </div>
-          
-          <div className="border-t border-dashed border-gray-300 pt-4 mb-4"></div>
-          
-          {/* QR Code */}
-          <div className="flex justify-center mb-4">
-            <img 
-              src="/api/placeholder/120/120" 
-              alt="QR Code for ticket" 
-              className="w-32 h-32"
-            />
-          </div>
-          
-          <div className="flex justify-center">
-            <button className="bg-pink-200 text-pink-600 px-6 py-2 rounded-full">
-              มูลคัลฉัน
-            </button>
+          <div className="bg-yellow-100 rounded-lg p-2">
+            <div className="flex justify-end mb-2">
+              <span className="text-xs px-2 py-1 bg-yellow-300 rounded-lg text-black font-medium">THAILAND</span>
+            </div>
+            
+            <h3 className="text-center text-xl font-bold mb-2">{ticket.templeName.toUpperCase()}</h3>
+            
+            {/* Barcode */}
+            <div className="flex justify-center mb-2">
+              <svg className="w-full h-12" viewBox="0 0 100 20">
+                {/* Simple barcode representation */}
+                {[...Array(20)].map((_, i) => (
+                  <rect 
+                    key={i} 
+                    x={i * 5} 
+                    y={0} 
+                    width={2} 
+                    height={20} 
+                    fill="black"
+                  />
+                ))}
+              </svg>
+            </div>
+            
+            <div className="text-center text-sm mb-4">
+              <span>{ticket.barcode || '9 789870 254652'}</span>
+            </div>
+            
+            <div className="border-t border-dashed border-gray-300 pt-4 mb-4"></div>
+            
+            {/* QR Code */}
+            <div className="flex justify-center mb-4">
+              <img 
+                src={ticket.qrCodeUrl || "/api/placeholder/120/120"} 
+                alt="QR Code for ticket" 
+                className="w-32 h-32"
+              />
+            </div>
+            
+            <div className="flex justify-center">
+              <button className="bg-pink-200 text-pink-600 px-6 py-2 rounded-full">
+                มูลคัลฉัน
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -429,7 +464,7 @@ export const TicketScreen: React.FC<TicketScreenProps> = ({
   onBackClick 
 }) => {
   const router = useRouter();
-  
+
   // สถานะต่างๆ
   const [activeTab, setActiveTab] = useState(initialTab);
   const [tickets, setTickets] = useState<Ticket[]>([]);
@@ -438,7 +473,8 @@ export const TicketScreen: React.FC<TicketScreenProps> = ({
   const [selectedTicket, setSelectedTicket] = useState<Ticket | null>(null);
   const [selectedAmount, setSelectedAmount] = useState<number>(0);
   const [customAmount, setCustomAmount] = useState<string>('');
-  
+  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+
   // ดึงข้อมูลตั๋ว
   useEffect(() => {
     // จำลองข้อมูล
@@ -472,7 +508,7 @@ export const TicketScreen: React.FC<TicketScreenProps> = ({
     setTickets(mockTickets);
     setLoading(false);
   }, []);
-  
+
   const handleBackClick = () => {
     if (step === 'list') {
       if (onBackClick) {
@@ -490,36 +526,50 @@ export const TicketScreen: React.FC<TicketScreenProps> = ({
       setStep('list');
     }
   };
-  
+
   const handleTicketClick = (ticket: Ticket) => {
     setSelectedTicket(ticket);
     setSelectedAmount(ticket.isFree ? 0 : ticket.price as number);
+    setCustomAmount(ticket.isFree ? '0' : (ticket.price as number).toString());
     setStep('detail');
   };
-  
+
   const handleSelectAmount = (amount: number) => {
     setSelectedAmount(amount);
     setCustomAmount(amount.toString());
   };
-  
+
   const handleCustomAmount = (amount: number) => {
     setSelectedAmount(amount);
     setCustomAmount(amount.toString());
   };
-  
+
   const handleConfirm = () => {
     setStep('confirm');
   };
-  
+
   const handleProceedToPayment = () => {
     setStep('qrcode');
   };
-  
-  const handleDownload = () => {
-    // ในแอพจริง นี่อาจจะเป็นการอัพโหลดใบเสร็จหรือหลักฐานการชำระเงิน
+
+  const handleFileUpload = (file: File) => {
+    setUploadedFile(file);
+    // จำลองการส่งไฟล์ไปยังเซิร์ฟเวอร์และรับ QR Code URL กับ Barcode กลับมา
+    if (selectedTicket) {
+      const updatedTicket: Ticket = {
+        ...selectedTicket,
+        qrCodeUrl: `/api/qrcode/${selectedTicket.id}`, // จำลอง URL ของ QR Code
+        barcode: `9 789870 ${Math.floor(Math.random() * 1000000)}` // จำลอง Barcode
+      };
+      setSelectedTicket(updatedTicket);
+    }
+  };
+
+  const handleConfirmPayment = () => {
+    // ส่งข้อมูลการชำระเงินและไฟล์ไปยังเซิร์ฟเวอร์ (จำลอง)
     setStep('success');
   };
-  
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -530,13 +580,13 @@ export const TicketScreen: React.FC<TicketScreenProps> = ({
       </div>
     );
   }
-  
+
   return (
     <div className="min-h-screen bg-white">
       {/* ส่วนหัว */}
       <TicketHeader 
         onBackClick={handleBackClick}
-        title="ซื้อตั๋ว"
+        title={step === 'success' ? 'ตั๋วของคุณ' : 'ซื้อตั๋ว'}
         userName={userName}
       />
       
@@ -583,7 +633,8 @@ export const TicketScreen: React.FC<TicketScreenProps> = ({
         <TicketQRCode 
           ticket={selectedTicket}
           amount={selectedAmount}
-          onDownload={handleDownload}
+          onUpload={handleFileUpload}
+          onConfirmPayment={handleConfirmPayment}
         />
       )}
       

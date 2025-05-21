@@ -7,13 +7,13 @@ import BottomNavigation from '@/components/BottomNavigation';
 
 // ข้อมูลธาตุประจำวันเกิด
 const elementsData = {
-  'Monday': { name: 'ธาตุน้ำ', color: '#3498db', bgGradient: 'linear-gradient(to bottom right, #d6eaf8, #85c1e9)' },
-  'Tuesday': { name: 'ธาตุไฟ', color: '#e74c3c', bgGradient: 'linear-gradient(to bottom right, #fadbd8, #e74c3c)' },
-  'Wednesday': { name: 'ธาตุลม', color: '#f1c40f', bgGradient: 'linear-gradient(to bottom right, #fcf3cf, #f1c40f)' },
-  'Thursday': { name: 'ธาตุไม้', color: '#2ecc71', bgGradient: 'linear-gradient(to bottom right, #d5f5e3, #2ecc71)' },
-  'Friday': { name: 'ธาตุดิน', color: '#d35400', bgGradient: 'linear-gradient(to bottom right, #f8d9c0, #d35400)' },
-  'Saturday': { name: 'ธาตุทอง', color: '#9b59b6', bgGradient: 'linear-gradient(to bottom right, #e8daef, #9b59b6)' },
-  'Sunday': { name: 'ธาตุทอง', color: '#f39c12', bgGradient: 'linear-gradient(to bottom right, #fdebd0, #f39c12)' },
+  'Monday': { name: 'ธาตุน้ำ', color: '#3498db', bgColor: '#d6eaf8' },
+  'Tuesday': { name: 'ธาตุไฟ', color: '#e74c3c', bgColor: '#fadbd8' },
+  'Wednesday': { name: 'ธาตุลม', color: '#f1c40f', bgColor: '#fcf3cf' },
+  'Thursday': { name: 'ธาตุไม้', color: '#2ecc71', bgColor: '#d5f5e3' },
+  'Friday': { name: 'ธาตุดิน', color: '#d35400', bgColor: '#b8a99a' }, // สีดินตามภาพ
+  'Saturday': { name: 'ธาตุทอง', color: '#9b59b6', bgColor: '#e8daef' },
+  'Sunday': { name: 'ธาตุทอง', color: '#f39c12', bgColor: '#fdebd0' },
 };
 
 // ข้อมูลสถานที่ท่องเที่ยวประจำวันเกิด
@@ -192,7 +192,7 @@ export default function Profile() {
       // ตั้งค่าพื้นหลังตามวันเกิด
       const elementInfo = elementsData[birthDayOfWeek as keyof typeof elementsData];
       setBgStyles({
-        gradient: elementInfo?.bgGradient || elementsData['Monday'].bgGradient,
+        gradient: elementInfo?.bgColor || elementsData['Monday'].bgColor,
         textColor: elementInfo?.color || elementsData['Monday'].color
       });
       
@@ -280,6 +280,7 @@ export default function Profile() {
             background: bgStyles.gradient 
           }}
         >
+          
           {/* Profile Section */}
           <div className="relative flex flex-col items-center pt-8 pb-4">
             {/* Edit Profile Button */}
