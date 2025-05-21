@@ -624,7 +624,7 @@ const InformationPage: React.FC<InformationProps> = ({ type, id }) => {
                   title: 'คำบูชาพระพุทธรูป',
                   text: 'นะโม ตัสสะ ภะคะวะโต อะระหะโต สัมมาสัมพุทธัสสะ (3 จบ)',
                   transliteration: 'Namo tassa bhagavato arahato sammāsambuddhassa (3 times)'
-                },
+                }as ChantItem ,
                 {
                   title: 'คำขอพรเฉพาะ',
                   text: 'ข้าพเจ้าขอน้อมบูชาพระพุทธรูปศักดิ์สิทธิ์องค์นี้ ด้วยเครื่องสักการะทั้งหลายเหล่านี้ ขอให้ข้าพเจ้าและครอบครัว จงประสบแต่ความสุข ความเจริญ'
@@ -769,7 +769,7 @@ const InformationPage: React.FC<InformationProps> = ({ type, id }) => {
                   title: 'คำบูชาพระรัตนตรัย',
                   text: 'อิมินา สักกาเรนะ, พุทธัง ปูเชมิ ฯ\nอิมินา สักกาเรนะ, ธัมมัง ปูเชมิ ฯ\nอิมินา สักกาเรนะ, สังฆัง ปูเชมิ ฯ',
                   transliteration: 'Iminā sakkārena, buddhaṃ pūjemi ฯ\nIminā sakkārena, dhammaṃ pūjemi ฯ\nIminā sakkārena, saṅghaṃ pūjemi ฯ'
-                }
+                }as ChantItem
               ]
             },
             offerings: {
@@ -1260,216 +1260,6 @@ const InformationPage: React.FC<InformationProps> = ({ type, id }) => {
               }
             };
             
-            if (buddhaData[Number(id)]) {
-              setInformation(buddhaData[Number(id)]);
-            } else {
-              setInformation({
-                id: Number(id),
-                name: `พระพุทธรูปสำคัญ #${id}`,
-                image: '/api/placeholder/400/500',
-                location: 'วัดสุทัศน์เทพวราราม',
-                openHours: '08.00 - 20.00 น.',
-                type: 'ภาพรวม / ทั่วไป',
-                description: 'พระพุทธรูปสำคัญประจำวัด ที่มีความเก่าแก่และศักดิ์สิทธิ์',
-                worshipGuide: {
-                  title: 'ลำดับการไหว้',
-                  steps: [
-                    'จุดธูปเทียน 3 ดอก เทียน 2 เล่ม',
-                    'ตั้งจิตอธิษฐาน กล่าวคำบูชา',
-                    'กราบ 3 ครั้ง',
-                    'ปักธูปเทียนในที่ที่จัดไว้',
-                    'นั่งสมาธิสักครู่ก่อนลุกออกไป'
-                  ]
-                },
-                chants: {
-                  title: 'บทสวด',
-                  items: [
-                    {
-                      title: 'คำบูชาพระพุทธรูป',
-                      text: 'นะโม ตัสสะ ภะคะวะโต อะระหะโต สัมมาสัมพุทธัสสะ (3 จบ)',
-                      transliteration: 'Namo tassa bhagavato arahato sammāsambuddhassa (3 times)'
-                    },
-                    {
-                      title: 'คำขอพรเฉพาะ',
-                      text: 'ข้าพเจ้าขอน้อมบูชาพระพุทธรูปศักดิ์สิทธิ์องค์นี้ ด้วยเครื่องสักการะทั้งหลายเหล่านี้ ขอให้ข้าพเจ้าและครอบครัว จงประสบแต่ความสุข ความเจริญ'
-                    }
-                  ]
-                },
-                offerings: {
-                  title: 'ของไหว้',
-                  items: [
-                    {
-                      name: 'ดอกไม้',
-                      description: 'ดอกบัว หรือดอกไม้สีขาว',
-                      image: '/api/placeholder/100/100'
-                    },
-                    {
-                      name: 'ธูปเทียน',
-                      description: 'ธูป 3 ดอก เทียน 2 เล่ม',
-                      image: '/api/placeholder/100/100'
-                    },
-                    {
-                      name: 'ผลไม้',
-                      description: 'ผลไม้ตามความเหมาะสม',
-                      image: '/api/placeholder/100/100'
-                    }
-                  ]
-                },
-                guidelines: {
-                  title: 'ข้อห้าม / ข้อแนะนำ',
-                  dress: {
-                    title: 'การแต่งกาย',
-                    description: 'แต่งกายสุภาพ ไม่ควรนุ่งสั้น และไม่ควรสวมเสื้อผ้าบางเปิดเผยร่างกาย ไม่สมควรใส่กางเกงขาสั้น',
-                    image: '/api/placeholder/300/200'
-                  },
-                  behavior: {
-                    title: 'การวางตัว',
-                    description: 'สำรวมกาย วาจา ใจ ไม่ส่งเสียงดัง ไม่พูดคุยเสียงดัง ไม่ส่งเสียงรบกวนผู้อื่น',
-                    image: '/api/placeholder/300/200'
-                  },
-                  photography: {
-                    title: 'การถ่ายรูป',
-                    description: 'ไม่ควรถ่ายภาพในบริเวณที่มีป้ายห้ามหรือในพื้นที่ศักดิ์สิทธิ์โดยไม่ได้รับอนุญาต',
-                    image: '/api/placeholder/300/200'
-                  }
-                }
-              });
-            }
-          } else if (type === 'temple') {
-            // ข้อมูลจำลองสำหรับวัด
-            const templeData = {
-              1: {
-                id: 1,
-                name: 'วัดสุทัศน์เทพวราราม',
-                image: '/api/placeholder/400/500',
-                location: 'แขวงวัดราชบพิธ เขตพระนคร กรุงเทพมหานคร',
-                openHours: '08.00 - 20.00 น.',
-                type: 'ภาพรวม / ทั่วไป',
-                description: 'วัดสุทัศน์เทพวรารามเป็นพระอารามหลวงชั้นเอก ชนิดราชวรมหาวิหาร เป็นวัดที่พระบาทสมเด็จพระพุทธยอดฟ้าจุฬาโลกมหาราช รัชกาลที่ 1 โปรดให้สร้างขึ้น',
-                worshipGuide: {
-                  title: 'ลำดับการเข้าวัด',
-                  steps: [
-                    'แต่งกายสุภาพเรียบร้อย',
-                    'เดินเข้าทางประตูวัดอย่างสงบสำรวม',
-                    'กราบพระประธานในพระอุโบสถ',
-                    'เวียนประทักษิณรอบพระอุโบสถ 3 รอบ',
-                    'สักการะพระพุทธรูปสำคัญในวัด'
-                  ]
-                },
-                chants: {
-                  title: 'บทสวด',
-                  items: [
-                    {
-                      title: 'คำบูชาพระรัตนตรัย',
-                      text: 'อิมินา สักกาเรนะ, พุทธัง ปูเชมิ ฯ\nอิมินา สักกาเรนะ, ธัมมัง ปูเชมิ ฯ\nอิมินา สักกาเรนะ, สังฆัง ปูเชมิ ฯ',
-                      transliteration: 'Iminā sakkārena, buddhaṃ pūjemi ฯ\nIminā sakkārena, dhammaṃ pūjemi ฯ\nIminā sakkārena, saṅghaṃ pūjemi ฯ'
-                    }
-                  ]
-                },
-                offerings: {
-                  title: 'ของไหว้',
-                  items: [
-                    {
-                      name: 'ดอกไม้',
-                      description: 'ดอกบัว ดอกกุหลาบ ดอกดาวเรือง',
-                      image: '/api/placeholder/100/100'
-                    },
-                    {
-                      name: 'ธูปเทียน',
-                      description: 'ธูป 3 ดอก เทียน 2 เล่ม',
-                      image: '/api/placeholder/100/100'
-                    }
-                  ]
-                },
-                guidelines: {
-                  title: 'ข้อห้าม / ข้อแนะนำ',
-                  dress: {
-                    title: 'การแต่งกาย',
-                    description: 'แต่งกายสุภาพ ไม่ควรนุ่งสั้น และไม่ควรสวมเสื้อผ้าบางเปิดเผยร่างกาย ไม่สมควรใส่กางเกงขาสั้น',
-                    image: '/api/placeholder/300/200'
-                  },
-                  behavior: {
-                    title: 'การวางตัว',
-                    description: 'สำรวมกาย วาจา ใจ ไม่ส่งเสียงดัง ไม่พูดคุยเสียงดัง ไม่ส่งเสียงรบกวนผู้อื่น',
-                    image: '/api/placeholder/300/200'
-                  },
-                  photography: {
-                    title: 'การถ่ายรูป',
-                    description: 'ไม่ควรถ่ายภาพในบริเวณที่มีป้ายห้ามหรือในพื้นที่ศักดิ์สิทธิ์โดยไม่ได้รับอนุญาต',
-                    image: '/api/placeholder/300/200'
-                  }
-                }
-              }
-            };
-            
-            // ตรวจสอบว่ามีข้อมูลวัดที่ ID นี้หรือไม่
-            if (templeData[Number(id)]) {
-              setInformation(templeData[Number(id)]);
-            } else {
-              // กรณีไม่พบข้อมูล ใช้ข้อมูลเริ่มต้น
-              setInformation({
-                id: Number(id),
-                name: `วัด #${id}`,
-                image: '/api/placeholder/400/500',
-                location: 'กรุงเทพมหานคร',
-                openHours: '08.00 - 20.00 น.',
-                type: 'ภาพรวม / ทั่วไป',
-                description: 'วัดที่มีความสำคัญทางประวัติศาสตร์และศิลปวัฒนธรรม',
-                worshipGuide: {
-                  title: 'ลำดับการไหว้',
-                  steps: [
-                    'แต่งกายสุภาพเรียบร้อย',
-                    'เดินเข้าทางประตูวัดอย่างสงบสำรวม',
-                    'กราบพระประธานในพระอุโบสถ',
-                    'เวียนประทักษิณรอบพระอุโบสถ 3 รอบ',
-                    'สักการะพระพุทธรูปสำคัญในวัด'
-                  ]
-                },
-                chants: {
-                  title: 'บทสวด',
-                  items: [
-                    {
-                      title: 'คำบูชาพระรัตนตรัย',
-                      text: 'อิมินา สักกาเรนะ, พุทธัง ปูเชมิ ฯ\nอิมินา สักกาเรนะ, ธัมมัง ปูเชมิ ฯ\nอิมินา สักกาเรนะ, สังฆัง ปูเชมิ ฯ',
-                      transliteration: 'Iminā sakkārena, buddhaṃ pūjemi ฯ\nIminā sakkārena, dhammaṃ pūjemi ฯ\nIminā sakkārena, saṅghaṃ pūjemi ฯ'
-                    }
-                  ]
-                },
-                offerings: {
-                  title: 'ของไหว้',
-                  items: [
-                    {
-                      name: 'ดอกไม้',
-                      description: 'ดอกบัว ดอกกุหลาบ ดอกดาวเรือง',
-                      image: '/api/placeholder/100/100'
-                    },
-                    {
-                      name: 'ธูปเทียน',
-                      description: 'ธูป 3 ดอก เทียน 2 เล่ม',
-                      image: '/api/placeholder/100/100'
-                    }
-                  ]
-                },
-                guidelines: {
-                  title: 'ข้อห้าม / ข้อแนะนำ',
-                  dress: {
-                    title: 'การแต่งกาย',
-                    description: 'แต่งกายสุภาพ ไม่ควรนุ่งสั้น และไม่ควรสวมเสื้อผ้าบางเปิดเผยร่างกาย ไม่สมควรใส่กางเกงขาสั้น',
-                    image: '/api/placeholder/300/200'
-                  },
-                  behavior: {
-                    title: 'การวางตัว',
-                    description: 'สำรวมกาย วาจา ใจ ไม่ส่งเสียงดัง ไม่พูดคุยเสียงดัง ไม่ส่งเสียงรบกวนผู้อื่น',
-                    image: '/api/placeholder/300/200'
-                  },
-                  photography: {
-                    title: 'การถ่ายรูป',
-                    description: 'ไม่ควรถ่ายภาพในบริเวณที่มีป้ายห้ามหรือในพื้นที่ศักดิ์สิทธิ์โดยไม่ได้รับอนุญาต',
-                    image: '/api/placeholder/300/200'
-                  }
-                }
-              });
-            }
           }
           
           setLoading(false);
@@ -1594,9 +1384,9 @@ const InformationPage: React.FC<InformationProps> = ({ type, id }) => {
                   <h4 className="font-medium text-gray-800 mb-2">{chant.title}</h4>
                   <div className="bg-yellow-50 p-4 rounded-lg">
                     <p className="text-gray-700 whitespace-pre-line">{chant.text}</p>
-                    {chant.transliteration && (
+                    {/* {chant.transliteration && (
                       <p className="text-gray-500 text-sm mt-2 italic whitespace-pre-line">{chant.transliteration}</p>
-                    )}
+                    )} */}
                   </div>
                 </div>
               ))}
