@@ -18,6 +18,14 @@ body {
   .pb-20 {
     padding-bottom: calc(var(--spacing) * 14);
   }
+  .hide-scrollbar {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }  
 }
 
 input,

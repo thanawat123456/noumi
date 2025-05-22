@@ -8,8 +8,6 @@ import {
   WishPlacesHeader,
   WishCategoryTabs,
   WishPlacesList,
-  QuickWishOptions,
-  WishPlacesScreen
 } from '@/components/wish-places-components';
 
 // Types
@@ -53,72 +51,72 @@ const WishPlaces: React.FC = () => {
           {
             id: 1,
             name: 'พระศรีศากยมุนี',
-            image: '/api/placeholder/400/300',
+            image: '/images/temple-list/พระศรีศากยมุนี.jpg',
             temple: 'วัดสุทัศน์เทพวราราม',
-            wishType: 'ภาพรวมทั่วไป',
+            wishType: 'ภาพรวม<br />ทั่วไป',
             category: 'overview',
             isFavorite: false
           },
           {
             id: 2,
             name: 'พระสุนทรี วาณี',
-            image: '/api/placeholder/400/300',
+            image: '/images/temple-list/พระสุนทรีวาณี.jpeg',
             temple: 'วัดสุทัศน์เทพวราราม',
-            wishType: 'การงานการเรียน',
+            wishType: 'การงาน<br />การเรียน',
             category: 'work',
             isFavorite: false
           },
           {
             id: 3,
-            name: 'พระพุทธรังสีมุนราชัย',
-            image: '/api/placeholder/400/300',
+            name: 'พระพุทธตรีโลกเชษฐ์',
+            image: '/images/temple-list/พระพุทธตรีโลกเชษฐ์ .jpg',
             temple: 'วัดสุทัศน์เทพวราราม',
-            wishType: 'ความรักคู่ครอง',
+            wishType: 'ความรัก<br />คู่ครอง',
             category: 'love',
             isFavorite: false
           },
           {
             id: 4,
             name: 'ท้าวเวสสุวรรณ',
-            image: '/api/placeholder/400/300',
+            image: '/images/temple-list/ท้าวเวสุวรรณ.jpg',
             temple: 'วัดสุทัศน์เทพวราราม',
-            wishType: 'การเงินธุรกิจ',
+            wishType: 'การเงิน<br />ธุรกิจ',
             category: 'finance',
             isFavorite: true
           },
           {
             id: 5,
-            name: 'พระพุทธรูปปางลีลา',
-            image: '/api/placeholder/400/300',
+            name: 'พระรูปสมเด็จพระสังฆราช',
+            image: '/images/temple-list/พระรูปสมเด็จพระสังฆราช.jpeg',
             temple: 'วัดสุทัศน์เทพวราราม',
-            wishType: 'โชคลาภวาสนา',
+            wishType: 'โชคลาภ<br />วาสนา',
             category: 'fortune',
             isFavorite: false
           },
           {
             id: 6,
-            name: 'พระพุทธชินราช',
-            image: '/api/placeholder/400/300',
+            name: 'พระพุทธเสฏฐมุนี',
+            image: '/images/temple-list/พระพุทธเสฏฐมุนี.jpeg',
             temple: 'วัดสุทัศน์เทพวราราม',
-            wishType: 'โรคภัยไข้เจ็บ',
+            wishType: 'โรคภัย<br />ไข้เจ็บ',
             category: 'health',
             isFavorite: false
           },
           {
             id: 7,
             name: 'ต้นพระศรีมหาโพธิ์',
-            image: '/api/placeholder/400/300',
+            image: '/images/temple-list/ต้นพระศรีมหาโพธิ์.jpeg',
             temple: 'วัดสุทัศน์เทพวราราม',
-            wishType: 'ภาพรวมทั่วไป',
+            wishType: 'ภาพรวม<br />ทั่วไป',
             category: 'overview',
             isFavorite: false
           },
           {
             id: 8,
-            name: 'พระพุทธรูปปางนาคปรก',
-            image: '/api/placeholder/400/300',
+            name: 'พระกริ่งใหญ่',
+            image: '/images/temple-list/พระกริ่งใหญ่.jpeg',
             temple: 'วัดสุทัศน์เทพวราราม',
-            wishType: 'โชคลาภวาสนา',
+            wishType: 'โชคลาภ<br />วาสนา',
             category: 'fortune',
             isFavorite: false
           }
@@ -224,12 +222,6 @@ const WishPlaces: React.FC = () => {
             </div>
           )}
         </div>
-        
-        {/* ตัวเลือกเร็ว */}
-        <QuickWishOptions 
-          activeCategory={activeCategory}
-          onCategoryChange={setActiveCategory}
-        />
         
         <BottomNavigation activePage="profile" />
       </div>

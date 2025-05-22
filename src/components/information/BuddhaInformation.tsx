@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
-import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
 import BottomNavigation from '@/components/BottomNavigation';
 
@@ -38,7 +37,7 @@ interface BuddhaInfo {
 const BuddhaInformation = () => {
   const router = useRouter();
   const { id } = router.query;
-  const { user, isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading } = useAuth();
   const [buddhaInfo, setBuddhaInfo] = useState<BuddhaInfo | null>(null);
   const [loading, setLoading] = useState(true);
   const [expandedSection, setExpandedSection] = useState<string | null>(null);
@@ -439,7 +438,7 @@ const BuddhaInformation = () => {
         </div>
         
         {/* Quick Access Buttons */}
-        <div className="fixed bottom-16 left-0 right-0 bg-white border-t border-gray-200 p-4">
+        {/* <div className="fixed bottom-16 left-0 right-0 bg-white border-t border-gray-200 p-4">
           <div className="flex justify-center space-x-4">
             <button className="flex-1 bg-pink-500 text-white rounded-full py-3 flex items-center justify-center">
               <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -454,7 +453,7 @@ const BuddhaInformation = () => {
               ขอพรออนไลน์
             </button>
           </div>
-        </div>
+        </div> */}
         
         <BottomNavigation activePage="profile" />
       </div>

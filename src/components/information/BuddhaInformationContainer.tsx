@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import Link from 'next/link';
 
 /**
  * Buddha Information components
@@ -247,7 +246,7 @@ export const BuddhaInformationContainer: React.FC = () => {
   const router = useRouter();
   const { id } = router.query;
   const [activeSection, setActiveSection] = useState<string | null>(null);
-  const [buddhaDetails, setBuddhaDetails] = useState({
+  const [buddhaDetails] = useState({
     name: 'พระสุนทรีวาณี',
     temple: 'วัดสุทัศน์เทพวราราม',
     image: '/api/placeholder/400/500',
@@ -432,7 +431,7 @@ export const BuddhaInformationContainer: React.FC = () => {
       </div>
       
       {/* Quick Actions */}
-      <div className="fixed bottom-16 left-0 right-0 bg-white border-t border-gray-200 p-4">
+      {/* <div className="fixed bottom-16 left-0 right-0 bg-white border-t border-gray-200 p-4">
         <div className="flex justify-between space-x-3">
           <button className="flex-1 bg-pink-500 text-white rounded-full py-3 flex items-center justify-center">
             <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -447,7 +446,7 @@ export const BuddhaInformationContainer: React.FC = () => {
             ขอพรออนไลน์
           </button>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 };

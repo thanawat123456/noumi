@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import Head from 'next/head';
-import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
 import { AppProps } from 'next/app';
 import { ComponentType } from 'react'; // Use ComponentType from react
@@ -40,7 +38,7 @@ interface AuthGuardProps {
 
 export function AuthGuard({ children }: AuthGuardProps) {
   const router = useRouter();
-  const { user, isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading } = useAuth();
   const [authorized, setAuthorized] = useState(false);
 
   useEffect(() => {

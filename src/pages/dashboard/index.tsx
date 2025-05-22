@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import Head from "next/head";
-import { useAuth } from "@/contexts/AuthContext";
 import BottomNavigation from "@/components/BottomNavigation";
+import HeaderProfile from "@/components/header-profile/header-profile";
 
 const images = [
   {
@@ -75,20 +75,14 @@ const benefit = [
 ];
 
 export default function Dashboard() {
-  const router = useRouter();
-  const { user, isAuthenticated, isLoading } = useAuth();
-
   // state สำหรับ NewsSection
+  const router = useRouter();
   const [newsCategory, setNewsCategory] = useState<string>("ALL");
 
   const [current, setCurrent] = useState(0);
 
   // เช็คการล็อกอิน (ใช้โค้ดเดิมที่คุณมี)
   useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
-      router.push("/login");
-    }
-
     const slider = document.getElementById("scrollable");
     let isDown = false;
     let startX: number;
@@ -120,7 +114,7 @@ export default function Dashboard() {
       const walk = (x - startX) * 1.5;
       slider.scrollLeft = scrollLeft - walk;
     });
-  }, [isAuthenticated, isLoading, router]);
+  }, []);
 
   // กำหนดประเภทข้อมูลให้ category เป็น string
   const handleCategoryClick = (category: string) => {
@@ -146,18 +140,6 @@ export default function Dashboard() {
     setCurrent(index);
   };
 
-  // แสดงการโหลด
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-orange-500 mx-auto"></div>
-          <p className="mt-4 text-orange-500">กำลังโหลด...</p>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <>
       <Head>
@@ -170,63 +152,8 @@ export default function Dashboard() {
 
       <div className="min-h-screen bg-gray-100 pb-20">
         {/* ส่วนหัว */}
-        <div className="bg-orange-500 text-white p-4 rounded-b-3xl">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center space-x-3">
-              <div className="w-12 h-12 rounded-full overflow-hidden bg-white">
-                <img
-                  src={user?.avatar || "/api/placeholder/48/48"}
-                  alt="Profile"
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <div>
-                <p className="text-white text-sm">สวัสดี,ยินดีต้อนรับ</p>
-                <h3 className="text-white text-xl font-medium">
-                  {user?.fullName || "Praewwy :)"}
-                </h3>
-              </div>
-            </div>
-            <div className="flex space-x-3">
-              <button className="w-10 h-10 rounded-full bg-white flex items-center justify-center">
-                <svg
-                  className="w-6 h-6 text-orange-500"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
-                  />
-                </svg>
-                <span className="absolute top-0 right-0 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
-                  3
-                </span>
-              </button>
-            </Link>
-              <button className="w-10 h-10 rounded-full bg-white flex items-center justify-center">
-                <svg
-                  className="w-6 h-6 text-orange-500"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-                  />
-                </svg>
-              </button>
-            </div>
-          </div>
-
+        <div className="bg-[#FF7A05] text-white p-4 rounded-br-[140px]">
+          <HeaderProfile />
           <div className="mt-4">
             <h2 className="text-white text-lg">
               Nummu นำใจ นำพาคุณ
@@ -277,170 +204,172 @@ export default function Dashboard() {
           </div>
 
           {/* Categories */}
-          <div className="mt-8 grid grid-cols-5 gap-3 pb-4">
-            <button
-              className="flex flex-col items-center justify-center bg-white rounded-full py-4 px-2"
-              onClick={() => handleCategoryClick("sacred")}
-            >
-              <div className="mb-2">
-                <svg
-                  className="w-10 h-10 text-orange-200"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                  />
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                  />
-                </svg>
-              </div>
-              <p className="text-orange-500 text-center text-xs font-medium">
-                สถานที่ศักดิ์สิทธิ์
-              </p>
-            </button>
+          <div className="mt-8 overflow-x-auto pb-4">
+            <div className="flex gap-3 px-2">
+              <button
+                className="flex flex-col items-center justify-center bg-white rounded-full py-4 px-2"
+                onClick={() => handleCategoryClick("sacred")}
+              >
+                <div className="mb-2">
+                  <svg
+                    className="w-10 h-10 text-orange-200"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                    />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                    />
+                  </svg>
+                </div>
+                <p className="text-orange-500 text-center text-xs font-medium">
+                  สถานที่ศักดิ์สิทธิ์
+                </p>
+              </button>
 
-            <button
-              className="flex flex-col items-center justify-center bg-white rounded-full py-4 px-2"
-              onClick={() => handleCategoryClick("wish")}
-            >
-              <div className="mb-2">
-                <svg
-                  className="w-10 h-10 text-orange-200"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"
-                  />
-                </svg>
-              </div>
-              <p className="text-orange-500 text-center text-xs font-medium">
-                สถานที่ขอดวงพร
-              </p>
-            </button>
+              <button
+                className="flex flex-col items-center justify-center bg-white rounded-full py-4 px-2"
+                onClick={() => handleCategoryClick("wish")}
+              >
+                <div className="mb-2">
+                  <svg
+                    className="w-10 h-10 text-orange-200"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"
+                    />
+                  </svg>
+                </div>
+                <p className="text-orange-500 text-center text-xs font-medium">
+                  สถานที่ขอดวงพร
+                </p>
+              </button>
 
-            <button
-              className="flex flex-col items-center justify-center bg-white rounded-full py-4 px-2"
-              onClick={() => handleCategoryClick("ceremony")}
-            >
-              <div className="mb-2">
-                <svg
-                  className="w-10 h-10 text-orange-200"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                >
-                  <path
-                    d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"
-                    strokeWidth={2}
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              </div>
-              <p className="text-orange-500 text-center text-xs font-medium">
-                สถานที่พิธีกรรม
-              </p>
-            </button>
+              <button
+                className="flex flex-col items-center justify-center bg-white rounded-full py-4 px-2"
+                onClick={() => handleCategoryClick("ceremony")}
+              >
+                <div className="mb-2">
+                  <svg
+                    className="w-10 h-10 text-orange-200"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                  >
+                    <path
+                      d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"
+                      strokeWidth={2}
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                </div>
+                <p className="text-orange-500 text-center text-xs font-medium">
+                  สถานที่พิธีกรรม
+                </p>
+              </button>
 
-            <button
-              className="flex flex-col items-center justify-center bg-white rounded-full py-4 px-2"
-              onClick={() => handleCategoryClick("activity")}
-            >
-              <div className="mb-2">
-                <svg
-                  className="w-10 h-10 text-orange-200"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                >
-                  <path
-                    d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"
-                    strokeWidth={2}
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                  <circle
-                    cx="9"
-                    cy="7"
-                    r="4"
-                    strokeWidth={2}
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                  <path
-                    d="M23 21v-2a4 4 0 00-3-3.87"
-                    strokeWidth={2}
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                  <path
-                    d="M16 3.13a4 4 0 010 7.75"
-                    strokeWidth={2}
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              </div>
-              <p className="text-orange-500 text-center text-xs font-medium">
-                สถานที่กิจกรรม
-              </p>
-            </button>
+              <button
+                className="flex flex-col items-center justify-center bg-white rounded-full py-4 px-2"
+                onClick={() => handleCategoryClick("activity")}
+              >
+                <div className="mb-2">
+                  <svg
+                    className="w-10 h-10 text-orange-200"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                  >
+                    <path
+                      d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"
+                      strokeWidth={2}
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                    <circle
+                      cx="9"
+                      cy="7"
+                      r="4"
+                      strokeWidth={2}
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                    <path
+                      d="M23 21v-2a4 4 0 00-3-3.87"
+                      strokeWidth={2}
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                    <path
+                      d="M16 3.13a4 4 0 010 7.75"
+                      strokeWidth={2}
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                </div>
+                <p className="text-orange-500 text-center text-xs font-medium">
+                  สถานที่กิจกรรม
+                </p>
+              </button>
 
-            {/* เพิ่มปุ่มซื้อตั๋ว */}
-            <button
-              className="flex flex-col items-center justify-center bg-white rounded-full py-4 px-2"
-              onClick={() => handleCategoryClick("ticket")}
-            >
-              <div className="mb-2">
-                <svg
-                  className="w-10 h-10 text-orange-200"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                >
-                  <path
-                    d="M20 12v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-6"
-                    strokeWidth={2}
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                  <path
-                    d="M8 10V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v6"
-                    strokeWidth={2}
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                  <rect
-                    x="4"
-                    y="10"
-                    width="16"
-                    height="4"
-                    strokeWidth={2}
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              </div>
-              <p className="text-orange-500 text-center text-xs font-medium">
-                ซื้อตั๋ว
-              </p>
-            </button>
+              {/* เพิ่มปุ่มซื้อตั๋ว */}
+              <button
+                className="flex flex-col items-center justify-center bg-white rounded-full py-4 px-2"
+                onClick={() => handleCategoryClick("ticket")}
+              >
+                <div className="mb-2">
+                  <svg
+                    className="w-10 h-10 text-orange-200"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                  >
+                    <path
+                      d="M20 12v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-6"
+                      strokeWidth={2}
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                    <path
+                      d="M8 10V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v6"
+                      strokeWidth={2}
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                    <rect
+                      x="4"
+                      y="10"
+                      width="16"
+                      height="4"
+                      strokeWidth={2}
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                </div>
+                <p className="text-orange-500 text-center text-xs font-medium">
+                  ซื้อตั๋ว
+                </p>
+              </button>
+            </div>
           </div>
         </div>
 
@@ -527,6 +456,7 @@ export default function Dashboard() {
               </div>
             </div>
 
+            {/* รวมสถานที่ยอดฮิต */}
             <div className="flex items-center justify-between mb-4 pt-4">
               <h2 className="text-2xl font-bold text-orange-500">
                 รวมสถานที่ยอดฮิต
@@ -534,8 +464,8 @@ export default function Dashboard() {
             </div>
             <div className="relative w-full overflow-hidden">
               <div
-                id="scrollable"
-                className="overflow-x-hidden cursor-grab scroll-smooth"
+                id="scrollable-popular"
+                className="overflow-x-auto cursor-grab scroll-smooth hide-scrollbar"
               >
                 <div className="flex space-x-4 w-max snap-x snap-mandatory">
                   {newsData.map((item, index) => (
@@ -574,6 +504,7 @@ export default function Dashboard() {
               </div>
             </div>
 
+            {/* รวมสถานที่แก้ปีชง */}
             <div className="flex items-center justify-between mb-4 pt-4">
               <h2 className="text-2xl font-bold text-orange-500">
                 รวมสถานที่แก้ปีชง
@@ -581,8 +512,8 @@ export default function Dashboard() {
             </div>
             <div className="relative w-full overflow-hidden">
               <div
-                id="scrollable"
-                className="overflow-x-hidden cursor-grab scroll-smooth"
+                id="scrollable-chinese-zodiac"
+                className="overflow-x-auto cursor-grab scroll-smooth hide-scrollbar"
               >
                 <div className="flex space-x-4 w-max snap-x snap-mandatory">
                   {newsData2.map((item, index) => (
