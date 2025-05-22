@@ -168,7 +168,7 @@ export default function Dashboard() {
           <div className="mt-6 relative">
             <div className="flex items-center bg-white rounded-full px-4 py-2">
               <svg
-                className="w-6 h-6 text-orange-500"
+                className="w-6 h-6 [#FF7A05]"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -187,7 +187,7 @@ export default function Dashboard() {
                 className="flex-1 bg-transparent border-none focus:outline-none px-3 text-gray-700"
               />
               <svg
-                className="w-6 h-6 text-orange-500"
+                className="w-6 h-6 [#FF7A05]"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -232,7 +232,7 @@ export default function Dashboard() {
                     />
                   </svg>
                 </div>
-                <p className="text-orange-500 text-center text-xs font-medium">
+                <p className="text-[#FF7A05] text-center text-xs font-medium">
                   สถานที่ศักดิ์สิทธิ์
                 </p>
               </button>
@@ -257,7 +257,7 @@ export default function Dashboard() {
                     />
                   </svg>
                 </div>
-                <p className="text-orange-500 text-center text-xs font-medium">
+                <p className="text-[#FF7A05] text-center text-xs font-medium">
                   สถานที่ขอดวงพร
                 </p>
               </button>
@@ -281,7 +281,7 @@ export default function Dashboard() {
                     />
                   </svg>
                 </div>
-                <p className="text-orange-500 text-center text-xs font-medium">
+                <p className="text-[#FF7A05] text-center text-xs font-medium">
                   สถานที่พิธีกรรม
                 </p>
               </button>
@@ -325,7 +325,7 @@ export default function Dashboard() {
                     />
                   </svg>
                 </div>
-                <p className="text-orange-500 text-center text-xs font-medium">
+                <p className="text-[#FF7A05] text-center text-xs font-medium">
                   สถานที่กิจกรรม
                 </p>
               </button>
@@ -365,7 +365,7 @@ export default function Dashboard() {
                     />
                   </svg>
                 </div>
-                <p className="text-orange-500 text-center text-xs font-medium">
+                <p className="text-[#FF7A05] text-center text-xs font-medium">
                   ซื้อตั๋ว
                 </p>
               </button>

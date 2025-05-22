@@ -18,6 +18,7 @@ interface SectionConfig {
   bgColor: string;
   contentBgColor: string;
   textColor: string;
+  zIndex: number;
 }
 
 const InformationPage: React.FC<InformationProps> = ({ type, id }) => {
@@ -139,6 +140,7 @@ const InformationPage: React.FC<InformationProps> = ({ type, id }) => {
       };
     };
   }
+
 
   interface TempleInfo {
     id: number;
@@ -1895,6 +1897,7 @@ const InformationPage: React.FC<InformationProps> = ({ type, id }) => {
       bgColor: "bg-pink-200",
       contentBgColor: "bg-pink-100",
       textColor: "text-pink-800",
+      zIndex: 0
     },
     {
       id: "chants",
@@ -1902,6 +1905,7 @@ const InformationPage: React.FC<InformationProps> = ({ type, id }) => {
       bgColor: "bg-yellow-200",
       contentBgColor: "bg-yellow-100",
       textColor: "text-yellow-800",
+      zIndex: 0
     },
     {
       id: "offerings",
@@ -1909,6 +1913,7 @@ const InformationPage: React.FC<InformationProps> = ({ type, id }) => {
       bgColor: "bg-orange-300",
       contentBgColor: "bg-orange-200",
       textColor: "text-orange-800",
+      zIndex: 0
     },
     {
       id: "guidelines",
@@ -1916,6 +1921,7 @@ const InformationPage: React.FC<InformationProps> = ({ type, id }) => {
       bgColor: "bg-orange-200",
       contentBgColor: "bg-orange-100",
       textColor: "text-orange-800",
+      zIndex: 0
     },
   ];
 
