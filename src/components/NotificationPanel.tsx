@@ -2,7 +2,6 @@ import React from 'react';
 import Link from 'next/link'; 
 import type { JSX } from 'react';
 
-// Define the structure of a notification
 interface Notification {
   id: number;
   date: string;
@@ -101,8 +100,8 @@ const NotificationPanel: React.FC = () => {
   };
 
   return (
-    <div className="w-full max-w-[414px] mx-auto bg-gray-200 min-h-screen">
-      <div className="bg-orange-500 h-[150px]  text-white px-4 pt-4 pb-6 rounded-t-30xl rounded-bl-[40px] flex items-center justify-between relative">
+    <div className="w-full max-w-[414px] mx-auto bg-[#FFF0F4] min-h-screen">
+      <div className="bg-orange-500 h-[150px]  text-white px-4 pt-4 pb-6 rounded-t-30xl rounded-bl-[80px] flex items-center justify-between relative">
         <Link href="/" passHref>
           <button className="w-10 h-8 rounded-fullflex items-center justify-center">
             <svg className="w-10 h-5 text-white-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -112,7 +111,7 @@ const NotificationPanel: React.FC = () => {
         </Link>
         <h2 className="text-xl font-semibold text-center flex-1">การแจ้งเตือน</h2>
       </div>
-      <div className="p-4">
+      <div className="p-4 text-orange-500">
         {Object.entries(
           notifications.reduce((acc: { [key: string]: Notification[] }, notification: Notification) => {
             if (!acc[notification.date]) acc[notification.date] = [];
@@ -121,15 +120,15 @@ const NotificationPanel: React.FC = () => {
           }, {})
         ).map(([date, dateNotifications]: [string, Notification[]]) => (
           <div key={date} className="mb-4">
-            <h3 className="text-gray-600 font-medium mb-2">{date}</h3>
+            <h1 className="mr-6 text-orange-500 ">{date}</h1>
             {dateNotifications.map((notification) => (
               <div
                 key={notification.id}
-                className="bg-pink-50 p-4 mb-2 rounded-lg flex items-start"
+                className="bg-[#FFDCE6] p-4 mb-2 rounded-lg flex items-start"
               >
                 <div className="mr-4 text-orange-500">{getIcon(notification.icon)}</div>
                 <div>
-                  <h4 className="font-medium">{translateTitle(notification.title)}</h4>
+                  <h4 className="font-medium text-orange-500">{translateTitle(notification.title)}</h4>
                   <p className="text-gray-600 text-sm">{notification.description}</p>
                   <span className="text-gray-500 text-xs">{notification.time}</span>
                 </div>

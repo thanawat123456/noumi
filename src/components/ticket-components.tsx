@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
+import BottomNavigation from '@/components/BottomNavigation';
 
 // Types
 interface Ticket {
@@ -10,8 +11,8 @@ interface Ticket {
   image: string;
   description: string;
   isFree: boolean;
-  qrCodeUrl?: string; 
-  barcode?: string; 
+  qrCodeUrl?: string; // เพิ่ม field สำหรับเก็บ QR Code URL
+  barcode?: string; // เพิ่ม field สำหรับเก็บ Barcode
 }
 
 interface TicketHeaderProps {
@@ -124,6 +125,9 @@ export const TicketHeader: React.FC<TicketHeaderProps> = ({
 /**
  * คอมโพเนนต์แสดงรายการตั๋ว
  */
+/**
+ * คอมโพเนนต์แสดงรายการตั๋ว
+ */
 export const TicketList: React.FC<TicketListProps> = ({ 
   tickets, 
   onTicketClick, 
@@ -184,9 +188,16 @@ export const TicketList: React.FC<TicketListProps> = ({
                 {ticket.isFree ? 'ฟรี' : `${ticket.price} บาท`}
               </div>
             </div>
-            <div className="p-4 bg-pink-200">
+            <div className="p-4 bg-pink-300">
               <h3 className="text-lg font-medium">{ticket.templeName}</h3>
-              <p className="text-sm text-gray-600">{ticket.description}</p>
+              <p className="text-sm text-white-600 whitespace-pre-wrap">
+                {ticket.description.split('\n').map((line, index) => (
+                  <span key={index}>
+                    {line.trim()}
+                    {index < ticket.description.split('/').length - 1 && <br />}
+                  </span>
+                ))}
+              </p>
               <button className="w-full mt-4 bg-white text-orange-500 rounded-full py-2 font-medium">
                 {ticket.isFree ? 'ฟรี / บริจาค' : `${ticket.price} บาท`}
               </button>
@@ -219,7 +230,7 @@ export const TicketDetail: React.FC<TicketDetailProps> = ({
   ];
 
   return (
-    <div className="p-4 bg-orange-500 h-full flex flex-col">
+    <div className=" min-h-screen p-4 bg-orange-500 h-full flex flex-col">
       <h2 className="text-white text-2xl font-semibold mb-6">{ticket.templeName}</h2>
       <p className="text-white mb-2">{ticket.isFree ? 'ฟรี หรือ บริจาคตามศรัทธา' : `${ticket.price} บาท`}</p>
       
@@ -242,7 +253,7 @@ export const TicketDetail: React.FC<TicketDetailProps> = ({
       
       {/* ใส่จำนวนเงินเอง */}
       <div className="mb-2">
-        <label className="text-white block mb-2">จำนวนเงิน (บาท)</label>
+        <label className="text-white bg-white-300 block mb-2">จำนวนเงิน (บาท)</label>
         <input 
           type="text"
           value={customAmount}
@@ -250,7 +261,7 @@ export const TicketDetail: React.FC<TicketDetailProps> = ({
             const value = e.target.value.replace(/[^0-9]/g, '');
             onCustomAmount(parseInt(value) || 0);
           }}
-          className="w-full p-3 rounded-full text-right"
+          className="w-full p-3  bg-white rounded-full text-right"
           placeholder="0.00"
         />
       </div>
@@ -268,7 +279,7 @@ export const TicketConfirmation: React.FC<TicketConfirmationProps> = ({
   onConfirm 
 }) => {
   return (
-    <div className="p-4 bg-orange-500 h-full flex flex-col items-center">
+    <div className="p-4 bg-orange-500  h-full flex flex-col items-center">
       <div className="bg-pink-100 rounded-3xl p-6 w-full max-w-md">
         <h2 className="text-center text-orange-500 text-2xl font-semibold mb-2">ยืนยันการซื้อตั๋ว</h2>
         <p className="text-center text-orange-500 mb-6">{ticket.templeName}</p>
@@ -331,15 +342,15 @@ export const TicketQRCode: React.FC<TicketQRCodeProps> = ({
   };
 
   return (
-    <div className="p-4 bg-orange-500 h-full flex flex-col items-center">
+    <div className="min-h-screen p-4 bg-orange-500 h-full flex flex-col items-center">
       <div className="bg-pink-100 rounded-3xl p-6 w-full max-w-md">
-        <h2 className="text-center text-xl font-semibold mb-6">สแกนผ่าน QR</h2>
+        <h2 className="text-center text-xl font-semibold mb-6 text-orange-500" >สแกนผ่าน QR</h2>
         
         {/* QR Code */}
         <div className="flex justify-center mb-4">
           <div className="bg-white p-4 rounded-lg">
             <img 
-              src="/api/placeholder/200/200" 
+              src="/images/ticket/qr2.png" 
               alt="QR Code for payment" 
               className="w-40 h-40"
             />
@@ -347,9 +358,9 @@ export const TicketQRCode: React.FC<TicketQRCodeProps> = ({
         </div>
         
         <div className="text-center mb-6">
-          <p className="text-sm">ธนาคารกรุงไทย</p>
-          <p className="text-sm">เลขบัญชี 123-4-456-8889-87</p>
-          <p className="text-sm">ชื่อบัญชี {ticket.templeName}</p>
+          <p className="text-medium text-orange-500">ธนาคารกรุงไทย</p>
+          <p className="text-medium text-orange-500">เลขบัญชี 123-4-456-8889-87</p>
+          <p className="text-medium text-orange-500">ชื่อบัญชี {ticket.templeName}</p>
         </div>
         
         {/* แสดงรูปภาพที่อัพโหลด */}
@@ -397,64 +408,30 @@ export const TicketQRCode: React.FC<TicketQRCodeProps> = ({
 /**
  * คอมโพเนนต์แสดงตั๋วที่ซื้อสำเร็จ
  */
+/**
+ * คอมโพเนนต์แสดงตั๋วที่ซื้อสำเร็จ
+ */
+/**
+ * คอมโพเนนต์แสดงตั๋วที่ซื้อสำเร็จ
+ */
 export const TicketSuccess: React.FC<TicketSuccessProps> = ({ ticket }) => {
   return (
-    <div className="flex flex-col items-center justify-center h-full bg-yellow-100 p-4">
-      <div className="bg-orange-500 rounded-t-3xl p-6 w-full max-w-md">
-        <h2 className="text-center text-white text-2xl font-semibold mb-4">ตั๋วของคุณ</h2>
+    <div className="min-h-screen bg-yellow-100 flex flex-col p-4">
+      {/* ส่วนบนสีส้ม */}
+      <div className="bg-orange-500 rounded-3xl p-6 w-full max-w-md">
         
-        <div className="bg-white rounded-xl p-4 mb-4">
-          <div className="bg-yellow-100 rounded-lg p-2">
-            <div className="flex justify-end mb-2">
-              <span className="text-xs px-2 py-1 bg-yellow-300 rounded-lg text-black font-medium">THAILAND</span>
-            </div>
-            
-            <h3 className="text-center text-xl font-bold mb-2">{ticket.templeName.toUpperCase()}</h3>
-            
-            {/* Barcode */}
-            <div className="flex justify-center mb-2">
-              <svg className="w-full h-12" viewBox="0 0 100 20">
-                {/* Simple barcode representation */}
-                {[...Array(20)].map((_, i) => (
-                  <rect 
-                    key={i} 
-                    x={i * 5} 
-                    y={0} 
-                    width={2} 
-                    height={20} 
-                    fill="black"
-                  />
-                ))}
-              </svg>
-            </div>
-            
-            <div className="text-center text-sm mb-4">
-              <span>{ticket.barcode || '9 789870 254652'}</span>
-            </div>
-            
-            <div className="border-t border-dashed border-gray-300 pt-4 mb-4"></div>
-            
-            {/* QR Code */}
-            <div className="flex justify-center mb-4">
-              <img 
-                src={ticket.qrCodeUrl || "/api/placeholder/120/120"} 
-                alt="QR Code for ticket" 
-                className="w-32 h-32"
-              />
-            </div>
-            
-            <div className="flex justify-center">
-              <button className="bg-pink-200 text-pink-600 px-6 py-2 rounded-full">
-                มูลคัลฉัน
-              </button>
-            </div>
-          </div>
+        {/* ภาพตั๋วทั้งหมด */}
+        <div className="flex justify-center">
+          <img 
+            src="/images/ticket/AW.png"
+            alt="Ticket" 
+            className="w-full max-w-xs object-contain" // ปรับขนาดให้เหมาะสมกับหน้าจอ
+          />
         </div>
       </div>
     </div>
   );
 };
-
 /**
  * คอมโพเนนต์หลักสำหรับกระบวนการซื้อตั๋ว
  */
@@ -484,7 +461,7 @@ export const TicketScreen: React.FC<TicketScreenProps> = ({
         templeName: 'วัดสุทัศน์เทพวราราม',
         price: 'free',
         isFree: true,
-        image: '/api/placeholder/400/200',
+        image: '/images/ticket/วัดสุทัศน์.jpeg',
         description: 'ฟรี หรือ บริจาคตามศรัทธา'
       },
       {
@@ -492,17 +469,10 @@ export const TicketScreen: React.FC<TicketScreenProps> = ({
         templeName: 'พิพิธภัณฑ์วัดสุทัศน์',
         price: 50,
         isFree: false,
-        image: '/api/placeholder/400/200',
-        description: 'ตั๋วเข้าชมพิพิธภัณฑ์'
+        image: '/images/ticket/พิพิธภัณฑ์ตำหนักสมเด็จพระสังฆราช.jpeg',
+        description: 'ค่าธรรมเนียม : คนไทย 50 บาท/ชาวต่างชาติ 200 บาท \n ยกเว้นค่าเข้าชม : นักเรียน-นักศึกษาปริญญาตรี (แสดงบัตร)/ \n ผู้สูงอายุตั้งแต่ 60 ปีขึ้นไป/พระภิกษุสงฆ์-สามเณร/ผู้พิการ'
       },
-      {
-        id: 3,
-        templeName: 'วัดพระแก้วมรกต',
-        price: 100,
-        isFree: false,
-        image: '/api/placeholder/400/200',
-        description: 'ตั๋วเข้าชมวัดพระแก้ว สำหรับนักท่องเที่ยว'
-      }
+     
     ];
     
     setTickets(mockTickets);
@@ -644,32 +614,7 @@ export const TicketScreen: React.FC<TicketScreenProps> = ({
       
       {/* Navbar ด้านล่าง (แสดงเฉพาะหน้าแรก) */}
       {step === 'list' && (
-        <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 flex justify-around py-3">
-          <Link href="/dashboard" className="flex flex-col items-center text-pink-400">
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-            </svg>
-            <span className="text-xs mt-1">หน้าแรก</span>
-          </Link>
-          <Link href="/merit" className="flex flex-col items-center text-gray-400">
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <span className="text-xs mt-1">ทำบุญ</span>
-          </Link>
-          <Link href="/fortunes" className="flex flex-col items-center text-gray-400">
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
-            </svg>
-            <span className="text-xs mt-1">ดวง</span>
-          </Link>
-          <Link href="/profile" className="flex flex-col items-center text-gray-400">
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-            </svg>
-            <span className="text-xs mt-1">โปรไฟล์</span>
-          </Link>
-        </nav>
+        <BottomNavigation activePage="profile" />
       )}
     </div>
   );

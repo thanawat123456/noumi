@@ -4,6 +4,7 @@ import Head from 'next/head';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
 import BottomNavigation from '@/components/BottomNavigation';
+import { ChevronDown, ChevronUp, Heart, Star, Clock, ArrowLeft, X, Play, Volume2, ShoppingCart, Calendar, Plus } from 'lucide-react';
 
 // Types
 interface InformationProps {
@@ -17,16 +18,14 @@ interface SectionConfig {
   bgColor: string;
   contentBgColor: string;
   textColor: string;
+  zIndex: number;
 }
 
 const InformationPage: React.FC<InformationProps> = ({ type, id }) => {
   const router = useRouter();
   const { user, isAuthenticated, isLoading } = useAuth();
-  const [activeSection, setActiveSection] = useState<string | null>(null);
-  const [sectionAnimation, setSectionAnimation] = useState<'entering' | 'leaving' | null>(null);
+  const [expandedSection, setExpandedSection] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
-  const sectionRef = useRef<HTMLDivElement>(null);
-  
   
   const [information, setInformation] = useState({
     id: 1,
@@ -56,14 +55,12 @@ const InformationPage: React.FC<InformationProps> = ({ type, id }) => {
     }
   });
 
-
   interface ChantItem {
     title: string;
     text: string;
-    transliteration?: string; // Make it optional with the ? symbol
+    transliteration?: string;
   }
-  
-  // 2. Define proper interfaces for your Buddha and Temple information
+
   interface BuddhaInfo {
     id: number;
     name: string;
@@ -78,7 +75,7 @@ const InformationPage: React.FC<InformationProps> = ({ type, id }) => {
     };
     chants: {
       title: string;
-      items: ChantItem[]; // Use the ChantItem interface we defined
+      items: ChantItem[];
     };
     offerings: {
       title: string;
@@ -107,7 +104,7 @@ const InformationPage: React.FC<InformationProps> = ({ type, id }) => {
       };
     };
   }
-  
+
   interface TempleInfo {
     id: number;
     name: string;
@@ -151,19 +148,14 @@ const InformationPage: React.FC<InformationProps> = ({ type, id }) => {
       };
     };
   }
-  
-  // แก้ไขส่วน useEffect สำหรับการโหลดข้อมูล
+
+  // Load data useEffect
   useEffect(() => {
     if (!id || !isAuthenticated) return;
     
     const fetchInformation = async () => {
       try {
-        // ในแอพจริง นี่ควรเป็นการเรียก API
-        // const response = await axios.get(`/api/${type}/${id}`);
-        
-        // ข้อมูลจำลอง
         if (type === 'buddha') {
-          // สร้างข้อมูลจำลองที่แตกต่างกันตาม ID
           const buddhaData: Record<number, BuddhaInfo> = {
             1: {
               id: 1,
@@ -187,13 +179,9 @@ const InformationPage: React.FC<InformationProps> = ({ type, id }) => {
                 title: 'บทสวด',
                 items: [
                   {
-                    title: 'คำบูชาพระพุทธรูป',
-                    text: 'นะโม ตัสสะ ภะคะวะโต อะระหะโต สัมมาสัมพุทธัสสะ (3 จบ)',
+                    title: 'พระสุนทรีวาจ',
+                    text: 'นะโม ติส-ส ภะคะวะโต อะระหะโต สัมมา สัมพุทธัส-ส( 3 จบ )\n\n● ● ● ● ● ● ● ●\n\nหูนันทะ วะกะนันพุชะ\nคัพพะสัมภะวะ สุนทรี ปาณนัง\nสะระณัง วาจนี มัยหัง\nปิฎนะยะตัง',
                     transliteration: 'Namo tassa bhagavato arahato sammāsambuddhassa (3 times)'
-                  },
-                  {
-                    title: 'คำขอพรเฉพาะ',
-                    text: 'ข้าพเจ้าขอน้อมบูชาพระศรีศากยมุนี ด้วยเครื่องสักการะทั้งหลายเหล่านี้ ขอให้ข้าพเจ้าและครอบครัว จงประสบแต่ความสุข ความเจริญ'
                   }
                 ]
               },
@@ -235,632 +223,39 @@ const InformationPage: React.FC<InformationProps> = ({ type, id }) => {
                   image: '/api/placeholder/300/200'
                 }
               }
-            },
-            2: {
-              id: 2,
-              name: 'พระสุนทรีวาณี',
-              image: '/api/placeholder/400/500',
-              location: 'วัดสุทัศน์เทพวราราม',
-              openHours: '08.00 - 20.00 น.',
-              type: 'การเรียน / การงาน',
-              description: 'พระสุนทรีวาณีหรือลอยองค์ องค์นี้ประดิษฐานในพระวิหารหลวงวัดสุทัศน์เทพวราราม โดยพระบาทสมเด็จพระจุลจอมเกล้าเจ้าอยู่หัวโปรดเกล้าฯ ให้เสด็จเป็นประธาน ประกอบพิธีเทกองและพุทธาภิเษก เมื่อวันที่ 7 ตุลาคม พ.ศ.๑๘๙๖ ซึ่งตรงกล่าวเป็นรูปแบบพิเศษครั้งแรก',
-              worshipGuide: {
-                title: 'ลำดับการไหว้',
-                steps: [
-                  'จุดธูปเทียน 3 ดอก เทียน 2 เล่ม',
-                  'ตั้งจิตอธิษฐาน กล่าวคำบูชา',
-                  'กราบ 3 ครั้ง',
-                  'ปักธูปเทียนในที่ที่จัดไว้',
-                  'นั่งสมาธิสักครู่ก่อนลุกออกไป'
-                ]
-              },
-              chants: {
-                title: 'บทสวด',
-                items: [
-                  {
-                    title: 'คำบูชาพระพุทธรูป',
-                    text: 'นะโม ตัสสะ ภะคะวะโต อะระหะโต สัมมาสัมพุทธัสสะ (3 จบ)',
-                    transliteration: 'Namo tassa bhagavato arahato sammāsambuddhassa (3 times)'
-                  },
-                  {
-                    title: 'คำขอพรเฉพาะ',
-                    text: 'ข้าพเจ้าขอน้อมบูชาพระบรมศาสดาสัมมาสัมพุทธเจ้า ด้วยเครื่องสักการะทั้งหลายเหล่านี้ ขอให้ข้าพเจ้าและครอบครัว จงประสบแต่ความสุข ความเจริญ ปราศจากโรคภัยไข้เจ็บทั้งปวง ขอให้มีสติปัญญาเฉียบแหลม และประสบความสำเร็จในการศึกษาและหน้าที่การงาน'
-                  }
-                ]
-              },
-              offerings: {
-                title: 'ของไหว้',
-                items: [
-                  {
-                    name: 'ดอกไม้',
-                    description: 'ดอกบัว หรือดอกไม้สีขาว 9 ดอก',
-                    image: '/api/placeholder/100/100'
-                  },
-                  {
-                    name: 'ธูปเทียน',
-                    description: 'ธูป 3 ดอก เทียน 2 เล่ม',
-                    image: '/api/placeholder/100/100'
-                  },
-                  {
-                    name: 'ผลไม้',
-                    description: 'ผลไม้ 9 อย่าง (นิยมใช้กล้วย, ส้ม, แอปเปิ้ล)',
-                    image: '/api/placeholder/100/100'
-                  }
-                ]
-              },
-              guidelines: {
-                title: 'ข้อห้าม / ข้อแนะนำ',
-                dress: {
-                  title: 'การแต่งกาย',
-                  description: 'แต่งกายสุภาพ ไม่ควรนุ่งสั้น และไม่ควรสวมเสื้อผ้าบางเปิดเผยร่างกาย ไม่สมควรใส่กางเกงขาสั้น',
-                  image: '/api/placeholder/300/200'
-                },
-                behavior: {
-                  title: 'การวางตัว',
-                  description: 'สำรวมกาย วาจา ใจ ไม่ส่งเสียงดัง ไม่พูดคุยเสียงดัง ไม่ส่งเสียงรบกวนผู้อื่น',
-                  image: '/api/placeholder/300/200'
-                },
-                photography: {
-                  title: 'การถ่ายรูป',
-                  description: 'ไม่ควรถ่ายภาพในบริเวณที่มีป้ายห้ามหรือในพื้นที่ศักดิ์สิทธิ์โดยไม่ได้รับอนุญาต',
-                  image: '/api/placeholder/300/200'
-                }
-              }
-            },
-            3: {
-              id: 3,
-              name: 'พระพุทธรังสีมุนราชัย',
-              image: '/api/placeholder/400/500',
-              location: 'วัดสุทัศน์เทพวราราม',
-              openHours: '08.00 - 20.00 น.',
-              type: 'โชคลาภ / วาสนา',
-              description: 'พระพุทธรูปประจำวิหารด้านทิศใต้ เชื่อกันว่าหากมาขอพรด้านโชคลาภจะมีความสำเร็จ มีความศักดิ์สิทธิ์ เป็นที่เคารพนับถือของพุทธศาสนิกชน',
-              worshipGuide: {
-                title: 'ลำดับการไหว้',
-                steps: [
-                  'จุดธูปเทียน 5 ดอก เทียน 1 เล่ม',
-                  'ตั้งจิตอธิษฐาน กล่าวคำบูชา',
-                  'กราบ 3 ครั้ง',
-                  'ปักธูปเทียนในที่ที่จัดไว้',
-                  'นั่งสมาธิสักครู่ก่อนลุกออกไป'
-                ]
-              },
-              chants: {
-                title: 'บทสวด',
-                items: [
-                  {
-                    title: 'คำบูชาพระพุทธรูป',
-                    text: 'นะโม ตัสสะ ภะคะวะโต อะระหะโต สัมมาสัมพุทธัสสะ (3 จบ)',
-                    transliteration: 'Namo tassa bhagavato arahato sammāsambuddhassa (3 times)'
-                  },
-                  {
-                    title: 'คำขอพรเฉพาะ',
-                    text: 'ข้าพเจ้าขอน้อมบูชาพระพุทธรังสีมุนราชัย ด้วยเครื่องสักการะทั้งหลายเหล่านี้ ขอให้ข้าพเจ้าและครอบครัว จงประสบแต่ความสุข ความเจริญ มีโชคลาภวาสนา'
-                  }
-                ]
-              },
-              offerings: {
-                title: 'ของไหว้',
-                items: [
-                  {
-                    name: 'ดอกไม้',
-                    description: 'ดอกบัว หรือดอกไม้สีขาว 5 ดอก',
-                    image: '/api/placeholder/100/100'
-                  },
-                  {
-                    name: 'ธูปเทียน',
-                    description: 'ธูป 5 ดอก เทียน 1 เล่ม',
-                    image: '/api/placeholder/100/100'
-                  },
-                  {
-                    name: 'ผลไม้',
-                    description: 'ผลไม้ 5 อย่าง',
-                    image: '/api/placeholder/100/100'
-                  }
-                ]
-              },
-              guidelines: {
-                title: 'ข้อห้าม / ข้อแนะนำ',
-                dress: {
-                  title: 'การแต่งกาย',
-                  description: 'แต่งกายสุภาพ ไม่ควรนุ่งสั้น และไม่ควรสวมเสื้อผ้าบางเปิดเผยร่างกาย ไม่สมควรใส่กางเกงขาสั้น',
-                  image: '/api/placeholder/300/200'
-                },
-                behavior: {
-                  title: 'การวางตัว',
-                  description: 'สำรวมกาย วาจา ใจ ไม่ส่งเสียงดัง ไม่พูดคุยเสียงดัง ไม่ส่งเสียงรบกวนผู้อื่น',
-                  image: '/api/placeholder/300/200'
-                },
-                photography: {
-                  title: 'การถ่ายรูป',
-                  description: 'ไม่ควรถ่ายภาพในบริเวณที่มีป้ายห้ามหรือในพื้นที่ศักดิ์สิทธิ์โดยไม่ได้รับอนุญาต',
-                  image: '/api/placeholder/300/200'
-                }
-              }
-            },
-            4: {
-              id: 4,
-              name: 'ต้นพระศรีมหาโพธิ์',
-              image: '/api/placeholder/400/500',
-              location: 'วัดสุทัศน์เทพวราราม',
-              openHours: '08.00 - 20.00 น.',
-              type: 'ภาพรวม / ทั่วไป',
-              description: 'ต้นโพธิ์ศักดิ์สิทธิ์ภายในวัด ที่เชื่อกันว่าเป็นต้นโพธิ์ที่นำมาจากพุทธคยา สถานที่ตรัสรู้ของพระพุทธเจ้า',
-              worshipGuide: {
-                title: 'ลำดับการไหว้',
-                steps: [
-                  'จุดธูปเทียน 3 ดอก',
-                  'ตั้งจิตอธิษฐาน กล่าวคำบูชา',
-                  'เดินประทักษิณรอบต้นโพธิ์ 3 รอบ',
-                  'ปักธูปบริเวณโคนต้น',
-                  'นั่งสมาธิสักครู่ก่อนลุกออกไป'
-                ]
-              },
-              chants: {
-                title: 'บทสวด',
-                items: [
-                  {
-                    title: 'คำบูชาต้นพระศรีมหาโพธิ์',
-                    text: 'นะโม ตัสสะ ภะคะวะโต อะระหะโต สัมมาสัมพุทธัสสะ (3 จบ)',
-                    transliteration: 'Namo tassa bhagavato arahato sammāsambuddhassa (3 times)'
-                  },
-                  {
-                    title: 'คำขอพรเฉพาะ',
-                    text: 'ข้าพเจ้าขอนอบน้อมบูชาต้นพระศรีมหาโพธิ์อันศักดิ์สิทธิ์ ขอให้ข้าพเจ้าและครอบครัว จงประสบแต่ความสุข ความเจริญ ปราศจากเภทภัยทั้งปวง'
-                  }
-                ]
-              },
-              offerings: {
-                title: 'ของไหว้',
-                items: [
-                  {
-                    name: 'ดอกไม้',
-                    description: 'ดอกไม้สีขาว',
-                    image: '/api/placeholder/100/100'
-                  },
-                  {
-                    name: 'ธูปเทียน',
-                    description: 'ธูป 3 ดอก',
-                    image: '/api/placeholder/100/100'
-                  },
-                  {
-                    name: 'ผ้าแพร',
-                    description: 'ผ้าแพรสีเหลืองหรือสีขาวพันรอบต้นโพธิ์',
-                    image: '/api/placeholder/100/100'
-                  }
-                ]
-              },
-              guidelines: {
-                title: 'ข้อห้าม / ข้อแนะนำ',
-                dress: {
-                  title: 'การแต่งกาย',
-                  description: 'แต่งกายสุภาพ ไม่ควรนุ่งสั้น และไม่ควรสวมเสื้อผ้าบางเปิดเผยร่างกาย ไม่สมควรใส่กางเกงขาสั้น',
-                  image: '/api/placeholder/300/200'
-                },
-                behavior: {
-                  title: 'การวางตัว',
-                  description: 'สำรวมกาย วาจา ใจ ไม่ส่งเสียงดัง ไม่พูดคุยเสียงดัง ไม่ส่งเสียงรบกวนผู้อื่น',
-                  image: '/api/placeholder/300/200'
-                },
-                photography: {
-                  title: 'การถ่ายรูป',
-                  description: 'ไม่ควรถ่ายภาพในบริเวณที่มีป้ายห้ามหรือในพื้นที่ศักดิ์สิทธิ์โดยไม่ได้รับอนุญาต',
-                  image: '/api/placeholder/300/200'
-                }
-              }
-            },
-            5: {
-              id: 5,
-              name: 'พระศรีอริยเมตไตรย',
-              image: '/api/placeholder/400/500',
-              location: 'วัดสุทัศน์เทพวราราม',
-              openHours: '08.00 - 20.00 น.',
-              type: 'สุขภาพ / โรคภัย',
-              description: 'พระพุทธรูปปางนาคปรก เชื่อกันว่าหากมาขอพรเรื่องสุขภาพจะหายจากโรคภัยไข้เจ็บ',
-              worshipGuide: {
-                title: 'ลำดับการไหว้',
-                steps: [
-                  'จุดธูปเทียน 9 ดอก เทียน 2 เล่ม',
-                  'ตั้งจิตอธิษฐาน กล่าวคำบูชา',
-                  'กราบ 3 ครั้ง',
-                  'ปักธูปเทียนในที่ที่จัดไว้',
-                  'นั่งสมาธิสักครู่ก่อนลุกออกไป'
-                ]
-              },
-              chants: {
-                title: 'บทสวด',
-                items: [
-                  {
-                    title: 'คำบูชาพระพุทธรูป',
-                    text: 'นะโม ตัสสะ ภะคะวะโต อะระหะโต สัมมาสัมพุทธัสสะ (3 จบ)',
-                    transliteration: 'Namo tassa bhagavato arahato sammāsambuddhassa (3 times)'
-                  },
-                  {
-                    title: 'คำขอพรเฉพาะ',
-                    text: 'ข้าพเจ้าขอน้อมบูชาพระศรีอริยเมตไตรย ด้วยเครื่องสักการะทั้งหลายเหล่านี้ ขอให้ข้าพเจ้าและครอบครัว จงหายจากโรคภัยไข้เจ็บทั้งปวง มีสุขภาพแข็งแรงสมบูรณ์'
-                  }
-                ]
-              },
-              offerings: {
-                title: 'ของไหว้',
-                items: [
-                  {
-                    name: 'ดอกไม้',
-                    description: 'ดอกบัว หรือดอกไม้สีขาว 9 ดอก',
-                    image: '/api/placeholder/100/100'
-                  },
-                  {
-                    name: 'ธูปเทียน',
-                    description: 'ธูป 9 ดอก เทียน 2 เล่ม',
-                    image: '/api/placeholder/100/100'
-                  },
-                  {
-                    name: 'ผลไม้',
-                    description: 'ผลไม้ 9 อย่าง',
-                    image: '/api/placeholder/100/100'
-                  }
-                ]
-              },
-              guidelines: {
-                title: 'ข้อห้าม / ข้อแนะนำ',
-                dress: {
-                  title: 'การแต่งกาย',
-                  description: 'แต่งกายสุภาพ ไม่ควรนุ่งสั้น และไม่ควรสวมเสื้อผ้าบางเปิดเผยร่างกาย ไม่สมควรใส่กางเกงขาสั้น',
-                  image: '/api/placeholder/300/200'
-                },
-                behavior: {
-                  title: 'การวางตัว',
-                  description: 'สำรวมกาย วาจา ใจ ไม่ส่งเสียงดัง ไม่พูดคุยเสียงดัง ไม่ส่งเสียงรบกวนผู้อื่น',
-                  image: '/api/placeholder/300/200'
-                },
-                photography: {
-                  title: 'การถ่ายรูป',
-                  description: 'ไม่ควรถ่ายภาพในบริเวณที่มีป้ายห้ามหรือในพื้นที่ศักดิ์สิทธิ์โดยไม่ได้รับอนุญาต',
-                  image: '/api/placeholder/300/200'
-                }
-              }
-            },
-            6: {
-              id: 6,
-              name: 'พระพุทธรูปปางลีลา',
-              image: '/api/placeholder/400/500',
-              location: 'วัดสุทัศน์เทพวราราม',
-              openHours: '08.00 - 20.00 น.',
-              type: 'ความมงคล / ความสำเร็จ',
-              description: 'พระพุทธรูปปางลีลาศิลปะสุโขทัย เป็นพระพุทธรูปที่มีความงดงาม แสดงถึงการก้าวเดินอย่างสง่างาม เชื่อกันว่าหากสักการะแล้วจะประสบความสำเร็จในชีวิต',
-              worshipGuide: {
-                title: 'ลำดับการไหว้',
-                steps: [
-                  'จุดธูปเทียน 5 ดอก เทียน 2 เล่ม',
-                  'ตั้งจิตอธิษฐาน กล่าวคำบูชา',
-                  'กราบ 3 ครั้ง',
-                  'ปักธูปเทียนในที่ที่จัดไว้',
-                  'นั่งสมาธิสักครู่ก่อนลุกออกไป'
-                ]
-              },
-              chants: {
-                title: 'บทสวด',
-                items: [
-                  {
-                    title: 'คำบูชาพระพุทธรูป',
-                    text: 'นะโม ตัสสะ ภะคะวะโต อะระหะโต สัมมาสัมพุทธัสสะ (3 จบ)',
-                    transliteration: 'Namo tassa bhagavato arahato sammāsambuddhassa (3 times)'
-                  },
-                  {
-                    title: 'คำขอพรเฉพาะ',
-                    text: 'ข้าพเจ้าขอน้อมบูชาพระพุทธรูปปางลีลา ด้วยเครื่องสักการะทั้งหลายเหล่านี้ ขอให้ข้าพเจ้าและครอบครัว จงประสบความสำเร็จในหน้าที่การงานและก้าวหน้าในชีวิต'
-                }
-              ]
-            },
-            offerings: {
-              title: 'ของไหว้',
-              items: [
-                {
-                  name: 'ดอกไม้',
-                  description: 'ดอกบัว หรือดอกไม้สีขาว 5 ดอก',
-                  image: '/api/placeholder/100/100'
-                },
-                {
-                  name: 'ธูปเทียน',
-                  description: 'ธูป 5 ดอก เทียน 2 เล่ม',
-                  image: '/api/placeholder/100/100'
-                },
-                {
-                  name: 'ผลไม้',
-                  description: 'ผลไม้ 5 อย่าง',
-                  image: '/api/placeholder/100/100'
-                }
-              ]
-            },
-            guidelines: {
-              title: 'ข้อห้าม / ข้อแนะนำ',
-              dress: {
-                title: 'การแต่งกาย',
-                description: 'แต่งกายสุภาพ ไม่ควรนุ่งสั้น และไม่ควรสวมเสื้อผ้าบางเปิดเผยร่างกาย ไม่สมควรใส่กางเกงขาสั้น',
-                image: '/api/placeholder/300/200'
-              },
-              behavior: {
-                title: 'การวางตัว',
-                description: 'สำรวมกาย วาจา ใจ ไม่ส่งเสียงดัง ไม่พูดคุยเสียงดัง ไม่ส่งเสียงรบกวนผู้อื่น',
-                image: '/api/placeholder/300/200'
-              },
-              photography: {
-                title: 'การถ่ายรูป',
-                description: 'ไม่ควรถ่ายภาพในบริเวณที่มีป้ายห้ามหรือในพื้นที่ศักดิ์สิทธิ์โดยไม่ได้รับอนุญาต',
-                image: '/api/placeholder/300/200'
-              }
             }
+          };
+          
+          const buddhaId = Number(id);
+          if (Object.prototype.hasOwnProperty.call(buddhaData, buddhaId)) {
+            setInformation(buddhaData[buddhaId]);
           }
-        };
-        
-        // ตรวจสอบว่ามีข้อมูลพระพุทธรูปที่ ID นี้หรือไม่
-        const buddhaId = Number(id);
-        if (Object.prototype.hasOwnProperty.call(buddhaData, buddhaId)) {
-          setInformation(buddhaData[buddhaId]);
-        } else {
-          // กรณีไม่พบข้อมูล ให้ใช้ข้อมูลเริ่มต้น
-          setInformation({
-            id: Number(id),
-            name: `พระพุทธรูปสำคัญ #${id}`,
-            image: '/api/placeholder/400/500',
-            location: 'วัดสุทัศน์เทพวราราม',
-            openHours: '08.00 - 20.00 น.',
-            type: 'ภาพรวม / ทั่วไป',
-            description: 'พระพุทธรูปสำคัญประจำวัด ที่มีความเก่าแก่และศักดิ์สิทธิ์',
-            worshipGuide: {
-              title: 'ลำดับการไหว้',
-              steps: [
-                'จุดธูปเทียน 3 ดอก เทียน 2 เล่ม',
-                'ตั้งจิตอธิษฐาน กล่าวคำบูชา',
-                'กราบ 3 ครั้ง',
-                'ปักธูปเทียนในที่ที่จัดไว้',
-                'นั่งสมาธิสักครู่ก่อนลุกออกไป'
-              ]
-            },
-            chants: {
-              title: 'บทสวด',
-              items: [
-                {
-                  title: 'คำบูชาพระพุทธรูป',
-                  text: 'นะโม ตัสสะ ภะคะวะโต อะระหะโต สัมมาสัมพุทธัสสะ (3 จบ)',
-                  transliteration: 'Namo tassa bhagavato arahato sammāsambuddhassa (3 times)'
-                }as ChantItem ,
-                {
-                  title: 'คำขอพรเฉพาะ',
-                  text: 'ข้าพเจ้าขอน้อมบูชาพระพุทธรูปศักดิ์สิทธิ์องค์นี้ ด้วยเครื่องสักการะทั้งหลายเหล่านี้ ขอให้ข้าพเจ้าและครอบครัว จงประสบแต่ความสุข ความเจริญ'
-                }
-              ]
-            },
-            offerings: {
-              title: 'ของไหว้',
-              items: [
-                {
-                  name: 'ดอกไม้',
-                  description: 'ดอกบัว หรือดอกไม้สีขาว',
-                  image: '/api/placeholder/100/100'
-                },
-                {
-                  name: 'ธูปเทียน',
-                  description: 'ธูป 3 ดอก เทียน 2 เล่ม',
-                  image: '/api/placeholder/100/100'
-                },
-                {
-                  name: 'ผลไม้',
-                  description: 'ผลไม้ตามความเหมาะสม',
-                  image: '/api/placeholder/100/100'
-                }
-              ]
-            },
-            guidelines: {
-              title: 'ข้อห้าม / ข้อแนะนำ',
-              dress: {
-                title: 'การแต่งกาย',
-                description: 'แต่งกายสุภาพ ไม่ควรนุ่งสั้น และไม่ควรสวมเสื้อผ้าบางเปิดเผยร่างกาย ไม่สมควรใส่กางเกงขาสั้น',
-                image: '/api/placeholder/300/200'
-              },
-              behavior: {
-                title: 'การวางตัว',
-                description: 'สำรวมกาย วาจา ใจ ไม่ส่งเสียงดัง ไม่พูดคุยเสียงดัง ไม่ส่งเสียงรบกวนผู้อื่น',
-                image: '/api/placeholder/300/200'
-              },
-              photography: {
-                title: 'การถ่ายรูป',
-                description: 'ไม่ควรถ่ายภาพในบริเวณที่มีป้ายห้ามหรือในพื้นที่ศักดิ์สิทธิ์โดยไม่ได้รับอนุญาต',
-                image: '/api/placeholder/300/200'
-              }
-            }
-          });
-        }
-      } else if (type === 'temple') {
-        // ข้อมูลจำลองสำหรับวัด
-        const templeData: Record<number, TempleInfo> = {
-          1: {
-            id: 1,
-            name: 'วัดสุทัศน์เทพวราราม',
-            image: '/api/placeholder/400/500',
-            location: 'แขวงวัดราชบพิธ เขตพระนคร กรุงเทพมหานคร',
-            openHours: '08.00 - 20.00 น.',
-            type: 'ภาพรวม / ทั่วไป',
-            description: 'วัดสุทัศน์เทพวรารามเป็นพระอารามหลวงชั้นเอก ชนิดราชวรมหาวิหาร เป็นวัดที่พระบาทสมเด็จพระพุทธยอดฟ้าจุฬาโลกมหาราช รัชกาลที่ 1 โปรดให้สร้างขึ้น',
-            worshipGuide: {
-              title: 'ลำดับการเข้าวัด',
-              steps: [
-                'แต่งกายสุภาพเรียบร้อย',
-                'เดินเข้าทางประตูวัดอย่างสงบสำรวม',
-                'กราบพระประธานในพระอุโบสถ',
-                'เวียนประทักษิณรอบพระอุโบสถ 3 รอบ',
-                'สักการะพระพุทธรูปสำคัญในวัด'
-              ]
-            },
-            chants: {
-              title: 'บทสวด',
-              items: [
-                {
-                  title: 'คำบูชาพระรัตนตรัย',
-                  text: 'อิมินา สักกาเรนะ, พุทธัง ปูเชมิ ฯ\nอิมินา สักกาเรนะ, ธัมมัง ปูเชมิ ฯ\nอิมินา สักกาเรนะ, สังฆัง ปูเชมิ ฯ',
-                  transliteration: 'Iminā sakkārena, buddhaṃ pūjemi ฯ\nIminā sakkārena, dhammaṃ pūjemi ฯ\nIminā sakkārena, saṅghaṃ pūjemi ฯ'
-                }
-              ]
-            },
-            offerings: {
-              title: 'ของไหว้',
-              items: [
-                {
-                  name: 'ดอกไม้',
-                  description: 'ดอกบัว ดอกกุหลาบ ดอกดาวเรือง',
-                  image: '/api/placeholder/100/100'
-                },
-                {
-                  name: 'ธูปเทียน',
-                  description: 'ธูป 3 ดอก เทียน 2 เล่ม',
-                  image: '/api/placeholder/100/100'
-                }
-              ]
-            },
-            guidelines: {
-              title: 'ข้อห้าม / ข้อแนะนำ',
-              dress: {
-                title: 'การแต่งกาย',
-                description: 'แต่งกายสุภาพ ไม่ควรนุ่งสั้น และไม่ควรสวมเสื้อผ้าบางเปิดเผยร่างกาย ไม่สมควรใส่กางเกงขาสั้น',
-                image: '/api/placeholder/300/200'
-              },
-              behavior: {
-                title: 'การวางตัว',
-                description: 'สำรวมกาย วาจา ใจ ไม่ส่งเสียงดัง ไม่พูดคุยเสียงดัง ไม่ส่งเสียงรบกวนผู้อื่น',
-                image: '/api/placeholder/300/200'
-              },
-              photography: {
-                title: 'การถ่ายรูป',
-                description: 'ไม่ควรถ่ายภาพในบริเวณที่มีป้ายห้ามหรือในพื้นที่ศักดิ์สิทธิ์โดยไม่ได้รับอนุญาต',
-                image: '/api/placeholder/300/200'
-              }
-            }
-          }
-        };
-        
-        // ตรวจสอบว่ามีข้อมูลวัดที่ ID นี้หรือไม่
-        const templeId = Number(id);
-        if (Object.prototype.hasOwnProperty.call(templeData, templeId)) {
-          setInformation(templeData[templeId]);
-        } else {
-          // กรณีไม่พบข้อมูล ใช้ข้อมูลเริ่มต้น
-          setInformation({
-            id: Number(id),
-            name: `วัด #${id}`,
-            image: '/api/placeholder/400/500',
-            location: 'กรุงเทพมหานคร',
-            openHours: '08.00 - 20.00 น.',
-            type: 'ภาพรวม / ทั่วไป',
-            description: 'วัดที่มีความสำคัญทางประวัติศาสตร์และศิลปวัฒนธรรม',
-            worshipGuide: {
-              title: 'ลำดับการไหว้',
-              steps: [
-                'แต่งกายสุภาพเรียบร้อย',
-                'เดินเข้าทางประตูวัดอย่างสงบสำรวม',
-                'กราบพระประธานในพระอุโบสถ',
-                'เวียนประทักษิณรอบพระอุโบสถ 3 รอบ',
-                'สักการะพระพุทธรูปสำคัญในวัด'
-              ]
-            },
-            chants: {
-              title: 'บทสวด',
-              items: [
-                {
-                  title: 'คำบูชาพระรัตนตรัย',
-                  text: 'อิมินา สักกาเรนะ, พุทธัง ปูเชมิ ฯ\nอิมินา สักกาเรนะ, ธัมมัง ปูเชมิ ฯ\nอิมินา สักกาเรนะ, สังฆัง ปูเชมิ ฯ',
-                  transliteration: 'Iminā sakkārena, buddhaṃ pūjemi ฯ\nIminā sakkārena, dhammaṃ pūjemi ฯ\nIminā sakkārena, saṅghaṃ pūjemi ฯ'
-                }as ChantItem
-              ]
-            },
-            offerings: {
-              title: 'ของไหว้',
-              items: [
-                {
-                  name: 'ดอกไม้',
-                  description: 'ดอกบัว ดอกกุหลาบ ดอกดาวเรือง',
-                  image: '/api/placeholder/100/100'
-                },
-                {
-                  name: 'ธูปเทียน',
-                  description: 'ธูป 3 ดอก เทียน 2 เล่ม',
-                  image: '/api/placeholder/100/100'
-                }
-              ]
-            },
-            guidelines: {
-              title: 'ข้อห้าม / ข้อแนะนำ',
-              dress: {
-                title: 'การแต่งกาย',
-                description: 'แต่งกายสุภาพ ไม่ควรนุ่งสั้น และไม่ควรสวมเสื้อผ้าบางเปิดเผยร่างกาย ไม่สมควรใส่กางเกงขาสั้น',
-                image: '/api/placeholder/300/200'
-              },
-              behavior: {
-                title: 'การวางตัว',
-                description: 'สำรวมกาย วาจา ใจ ไม่ส่งเสียงดัง ไม่พูดคุยเสียงดัง ไม่ส่งเสียงรบกวนผู้อื่น',
-                image: '/api/placeholder/300/200'
-              },
-              photography: {
-                title: 'การถ่ายรูป',
-                description: 'ไม่ควรถ่ายภาพในบริเวณที่มีป้ายห้ามหรือในพื้นที่ศักดิ์สิทธิ์โดยไม่ได้รับอนุญาต',
-                image: '/api/placeholder/300/200'
-              }
-            }
-          });
-        }
-      }
-      
-      setLoading(false);
-    } catch (error) {
-      console.error(`Failed to fetch ${type} info:`, error);
-      setLoading(false);
-    }
-  };
-  
-  fetchInformation();
-}, [id, isAuthenticated, type]);
-
-  // Fetch information data
-  useEffect(() => {
-    if (!id || !isAuthenticated) return;
-    
-    const fetchInformation = async () => {
-      try {
-        // ในแอพจริง นี่ควรเป็นการเรียก API
-        // const response = await axios.get(`/api/${type}/${id}`);
-        
-        // ข้อมูลจำลอง
-        if (type === 'buddha') {
-          // สร้างข้อมูลจำลองที่แตกต่างกันตาม ID
-          const buddhaData = {
+        } else if (type === 'temple') {
+          const templeData: Record<number, TempleInfo> = {
             1: {
               id: 1,
-              name: 'พระศรีศากยมุนี',
+              name: 'วัดสุทัศน์เทพวราราม',
               image: '/api/placeholder/400/500',
-              location: 'วัดสุทัศน์เทพวราราม',
+              location: 'แขวงวัดราชบพิธ เขตพระนคร กรุงเทพมหานคร',
               openHours: '08.00 - 20.00 น.',
               type: 'ภาพรวม / ทั่วไป',
-              description: 'พระพุทธรูปประธานในพระอุโบสถ มีความศักดิ์สิทธิ์ เป็นที่เคารพนับถือของพุทธศาสนิกชนทั่วประเทศ',
+              description: 'วัดสุทัศน์เทพวรารามเป็นพระอารามหลวงชั้นเอก ชนิดราชวรมหาวิหาร',
               worshipGuide: {
-                title: 'ลำดับการไหว้',
+                title: 'ลำดับการเข้าวัด',
                 steps: [
-                  'จุดธูปเทียน 3 ดอก เทียน 2 เล่ม',
-                  'ตั้งจิตอธิษฐาน กล่าวคำบูชา',
-                  'กราบ 3 ครั้ง',
-                  'ปักธูปเทียนในที่ที่จัดไว้',
-                  'นั่งสมาธิสักครู่ก่อนลุกออกไป'
+                  'แต่งกายสุภาพเรียบร้อย',
+                  'เดินเข้าทางประตูวัดอย่างสงบสำรวม',
+                  'กราบพระประธานในพระอุโบสถ',
+                  'เวียนประทักษิณรอบพระอุโบสถ 3 รอบ',
+                  'สักการะพระพุทธรูปสำคัญในวัด'
                 ]
               },
               chants: {
                 title: 'บทสวด',
                 items: [
                   {
-                    title: 'คำบูชาพระพุทธรูป',
-                    text: 'นะโม ตัสสะ ภะคะวะโต อะระหะโต สัมมาสัมพุทธัสสะ (3 จบ)',
-                    transliteration: 'Namo tassa bhagavato arahato sammāsambuddhassa (3 times)'
-                  },
-                  {
-                    title: 'คำขอพรเฉพาะ',
-                    text: 'ข้าพเจ้าขอน้อมบูชาพระศรีศากยมุนี ด้วยเครื่องสักการะทั้งหลายเหล่านี้ ขอให้ข้าพเจ้าและครอบครัว จงประสบแต่ความสุข ความเจริญ'
+                    title: 'คำบูชาพระรัตนตรัย',
+                    text: 'อิมินา สักกาเรนะ, พุทธัง ปูเชมิ ฯ\nอิมินา สักกาเรนะ, ธัมมัง ปูเชมิ ฯ\nอิมินา สักกาเรนะ, สังฆัง ปูเชมิ ฯ'
                   }
                 ]
               },
@@ -869,89 +264,13 @@ const InformationPage: React.FC<InformationProps> = ({ type, id }) => {
                 items: [
                   {
                     name: 'ดอกไม้',
-                    description: 'ดอกบัว หรือดอกไม้สีขาว 9 ดอก',
-                    image: '/api/placeholder/100/100'
-                  },
-                  {
-                    name: 'ธูปเทียน',
-                    description: 'ธูป 9 ดอก เทียน 2 เล่ม',
-                    image: '/api/placeholder/100/100'
-                  },
-                  {
-                    name: 'ผลไม้',
-                    description: 'ผลไม้ 9 อย่าง',
-                    image: '/api/placeholder/100/100'
-                  }
-                ]
-              },
-              guidelines: {
-                title: 'ข้อห้าม / ข้อแนะนำ',
-                dress: {
-                  title: 'การแต่งกาย',
-                  description: 'แต่งกายสุภาพ ไม่ควรนุ่งสั้น และไม่ควรสวมเสื้อผ้าบางเปิดเผยร่างกาย ไม่สมควรใส่กางเกงขาสั้น',
-                  image: '/api/placeholder/300/200'
-                },
-                behavior: {
-                  title: 'การวางตัว',
-                  description: 'สำรวมกาย วาจา ใจ ไม่ส่งเสียงดัง ไม่พูดคุยเสียงดัง ไม่ส่งเสียงรบกวนผู้อื่น',
-                  image: '/api/placeholder/300/200'
-                },
-                photography: {
-                  title: 'การถ่ายรูป',
-                  description: 'ไม่ควรถ่ายภาพในบริเวณที่มีป้ายห้ามหรือในพื้นที่ศักดิ์สิทธิ์โดยไม่ได้รับอนุญาต',
-                  image: '/api/placeholder/300/200'
-                }
-              }
-            },
-            2: {
-              id: 2,
-              name: 'พระสุนทรีวาณี',
-              image: '/api/placeholder/400/500',
-              location: 'วัดสุทัศน์เทพวราราม',
-              openHours: '08.00 - 20.00 น.',
-              type: 'การเรียน / การงาน',
-              description: 'พระสุนทรีวาณีหรือลอยองค์ องค์นี้ประดิษฐานในพระวิหารหลวงวัดสุทัศน์เทพวราราม โดยพระบาทสมเด็จพระจุลจอมเกล้าเจ้าอยู่หัวโปรดเกล้าฯ ให้เสด็จเป็นประธาน ประกอบพิธีเทกองและพุทธาภิเษก เมื่อวันที่ 7 ตุลาคม พ.ศ.๑๘๙๖ ซึ่งตรงกล่าวเป็นรูปแบบพิเศษครั้งแรก',
-              worshipGuide: {
-                title: 'ลำดับการไหว้',
-                steps: [
-                  'จุดธูปเทียน 3 ดอก เทียน 2 เล่ม',
-                  'ตั้งจิตอธิษฐาน กล่าวคำบูชา',
-                  'กราบ 3 ครั้ง',
-                  'ปักธูปเทียนในที่ที่จัดไว้',
-                  'นั่งสมาธิสักครู่ก่อนลุกออกไป'
-                ]
-              },
-              chants: {
-                title: 'บทสวด',
-                items: [
-                  {
-                    title: 'คำบูชาพระพุทธรูป',
-                    text: 'นะโม ตัสสะ ภะคะวะโต อะระหะโต สัมมาสัมพุทธัสสะ (3 จบ)',
-                    transliteration: 'Namo tassa bhagavato arahato sammāsambuddhassa (3 times)'
-                  },
-                  {
-                    title: 'คำขอพรเฉพาะ',
-                    text: 'ข้าพเจ้าขอน้อมบูชาพระบรมศาสดาสัมมาสัมพุทธเจ้า ด้วยเครื่องสักการะทั้งหลายเหล่านี้ ขอให้ข้าพเจ้าและครอบครัว จงประสบแต่ความสุข ความเจริญ ปราศจากโรคภัยไข้เจ็บทั้งปวง ขอให้มีสติปัญญาเฉียบแหลม และประสบความสำเร็จในการศึกษาและหน้าที่การงาน'
-                  }
-                ]
-              },
-              offerings: {
-                title: 'ของไหว้',
-                items: [
-                  {
-                    name: 'ดอกไม้',
-                    description: 'ดอกบัว หรือดอกไม้สีขาว 9 ดอก',
+                    description: 'ดอกบัว ดอกกุหลาบ ดอกดาวเรือง',
                     image: '/api/placeholder/100/100'
                   },
                   {
                     name: 'ธูปเทียน',
                     description: 'ธูป 3 ดอก เทียน 2 เล่ม',
                     image: '/api/placeholder/100/100'
-                  },
-                  {
-                    name: 'ผลไม้',
-                    description: 'ผลไม้ 9 อย่าง (นิยมใช้กล้วย, ส้ม, แอปเปิ้ล)',
-                    image: '/api/placeholder/100/100'
                   }
                 ]
               },
@@ -959,498 +278,219 @@ const InformationPage: React.FC<InformationProps> = ({ type, id }) => {
                 title: 'ข้อห้าม / ข้อแนะนำ',
                 dress: {
                   title: 'การแต่งกาย',
-                  description: 'แต่งกายสุภาพ ไม่ควรนุ่งสั้น และไม่ควรสวมเสื้อผ้าบางเปิดเผยร่างกาย ไม่สมควรใส่กางเกงขาสั้น',
+                  description: 'แต่งกายสุภาพ ไม่ควรนุ่งสั้น และไม่ควรสวมเสื้อผ้าบางเปิดเผยร่างกาย',
                   image: '/api/placeholder/300/200'
                 },
                 behavior: {
                   title: 'การวางตัว',
-                  description: 'สำรวมกาย วาจา ใจ ไม่ส่งเสียงดัง ไม่พูดคุยเสียงดัง ไม่ส่งเสียงรบกวนผู้อื่น',
+                  description: 'สำรวมกาย วาจา ใจ ไม่ส่งเสียงดัง ไม่พูดคุยเสียงดัง',
                   image: '/api/placeholder/300/200'
                 },
                 photography: {
                   title: 'การถ่ายรูป',
-                  description: 'ไม่ควรถ่ายภาพในบริเวณที่มีป้ายห้ามหรือในพื้นที่ศักดิ์สิทธิ์โดยไม่ได้รับอนุญาต',
+                  description: 'ไม่ควรถ่ายภาพในบริเวณที่มีป้ายห้ามหรือในพื้นที่ศักดิ์สิทธิ์',
                   image: '/api/placeholder/300/200'
                 }
               }
-            },
-            3: {
-              id: 3,
-              name: 'พระพุทธรังสีมุนราชัย',
-              image: '/api/placeholder/400/500',
-              location: 'วัดสุทัศน์เทพวราราม',
-              openHours: '08.00 - 20.00 น.',
-              type: 'โชคลาภ / วาสนา',
-              description: 'พระพุทธรูปประจำวิหารด้านทิศใต้ เชื่อกันว่าหากมาขอพรด้านโชคลาภจะมีความสำเร็จ มีความศักดิ์สิทธิ์ เป็นที่เคารพนับถือของพุทธศาสนิกชน',
-              worshipGuide: {
-                title: 'ลำดับการไหว้',
-                steps: [
-                  'จุดธูปเทียน 5 ดอก เทียน 1 เล่ม',
-                  'ตั้งจิตอธิษฐาน กล่าวคำบูชา',
-                  'กราบ 3 ครั้ง',
-                  'ปักธูปเทียนในที่ที่จัดไว้',
-                  'นั่งสมาธิสักครู่ก่อนลุกออกไป'
-                ]
-              },
-              chants: {
-                title: 'บทสวด',
-                items: [
-                  {
-                    title: 'คำบูชาพระพุทธรูป',
-                    text: 'นะโม ตัสสะ ภะคะวะโต อะระหะโต สัมมาสัมพุทธัสสะ (3 จบ)',
-                    transliteration: 'Namo tassa bhagavato arahato sammāsambuddhassa (3 times)'
-                  },
-                  {
-                    title: 'คำขอพรเฉพาะ',
-                    text: 'ข้าพเจ้าขอน้อมบูชาพระพุทธรังสีมุนราชัย ด้วยเครื่องสักการะทั้งหลายเหล่านี้ ขอให้ข้าพเจ้าและครอบครัว จงประสบแต่ความสุข ความเจริญ มีโชคลาภวาสนา'
-                  }
-                ]
-              },
-              offerings: {
-                title: 'ของไหว้',
-                items: [
-                  {
-                    name: 'ดอกไม้',
-                    description: 'ดอกบัว หรือดอกไม้สีขาว 5 ดอก',
-                    image: '/api/placeholder/100/100'
-                  },
-                  {
-                    name: 'ธูปเทียน',
-                    description: 'ธูป 5 ดอก เทียน 1 เล่ม',
-                    image: '/api/placeholder/100/100'
-                  },
-                  {
-                    name: 'ผลไม้',
-                    description: 'ผลไม้ 5 อย่าง',
-                    image: '/api/placeholder/100/100'
-                  }
-                ]
-              },
-              guidelines: {
-                title: 'ข้อห้าม / ข้อแนะนำ',
-                dress: {
-                  title: 'การแต่งกาย',
-                  description: 'แต่งกายสุภาพ ไม่ควรนุ่งสั้น และไม่ควรสวมเสื้อผ้าบางเปิดเผยร่างกาย ไม่สมควรใส่กางเกงขาสั้น',
-                  image: '/api/placeholder/300/200'
-                },
-                behavior: {
-                  title: 'การวางตัว',
-                  description: 'สำรวมกาย วาจา ใจ ไม่ส่งเสียงดัง ไม่พูดคุยเสียงดัง ไม่ส่งเสียงรบกวนผู้อื่น',
-                  image: '/api/placeholder/300/200'
-                },
-                photography: {
-                  title: 'การถ่ายรูป',
-                  description: 'ไม่ควรถ่ายภาพในบริเวณที่มีป้ายห้ามหรือในพื้นที่ศักดิ์สิทธิ์โดยไม่ได้รับอนุญาต',
-                  image: '/api/placeholder/300/200'
-                }
-              }
-            },
-            4: {
-              id: 4,
-              name: 'ต้นพระศรีมหาโพธิ์',
-              image: '/api/placeholder/400/500',
-              location: 'วัดสุทัศน์เทพวราราม',
-              openHours: '08.00 - 20.00 น.',
-              type: 'ภาพรวม / ทั่วไป',
-              description: 'ต้นโพธิ์ศักดิ์สิทธิ์ภายในวัด ที่เชื่อกันว่าเป็นต้นโพธิ์ที่นำมาจากพุทธคยา สถานที่ตรัสรู้ของพระพุทธเจ้า',
-              worshipGuide: {
-                title: 'ลำดับการไหว้',
-                steps: [
-                  'จุดธูปเทียน 3 ดอก',
-                  'ตั้งจิตอธิษฐาน กล่าวคำบูชา',
-                  'เดินประทักษิณรอบต้นโพธิ์ 3 รอบ',
-                  'ปักธูปบริเวณโคนต้น',
-                  'นั่งสมาธิสักครู่ก่อนลุกออกไป'
-                ]
-              },
-              chants: {
-                title: 'บทสวด',
-                items: [
-                  {
-                    title: 'คำบูชาต้นพระศรีมหาโพธิ์',
-                    text: 'นะโม ตัสสะ ภะคะวะโต อะระหะโต สัมมาสัมพุทธัสสะ (3 จบ)',
-                    transliteration: 'Namo tassa bhagavato arahato sammāsambuddhassa (3 times)'
-                  },
-                  {
-                    title: 'คำขอพรเฉพาะ',
-                    text: 'ข้าพเจ้าขอนอบน้อมบูชาต้นพระศรีมหาโพธิ์อันศักดิ์สิทธิ์ ขอให้ข้าพเจ้าและครอบครัว จงประสบแต่ความสุข ความเจริญ ปราศจากเภทภัยทั้งปวง'
-                  }
-                ]
-              },
-              offerings: {
-                title: 'ของไหว้',
-                items: [
-                  {
-                    name: 'ดอกไม้',
-                    description: 'ดอกไม้สีขาว',
-                    image: '/api/placeholder/100/100'
-                  },
-                  {
-                    name: 'ธูปเทียน',
-                    description: 'ธูป 3 ดอก',
-                    image: '/api/placeholder/100/100'
-                  },
-                  {
-                    name: 'ผ้าแพร',
-                    description: 'ผ้าแพรสีเหลืองหรือสีขาวพันรอบต้นโพธิ์',
-                    image: '/api/placeholder/100/100'
-                  }
-                ]
-              },
-              guidelines: {
-                title: 'ข้อห้าม / ข้อแนะนำ',
-                dress: {
-                  title: 'การแต่งกาย',
-                  description: 'แต่งกายสุภาพ ไม่ควรนุ่งสั้น และไม่ควรสวมเสื้อผ้าบางเปิดเผยร่างกาย ไม่สมควรใส่กางเกงขาสั้น',
-                  image: '/api/placeholder/300/200'
-                },
-                behavior: {
-                  title: 'การวางตัว',
-                  description: 'สำรวมกาย วาจา ใจ ไม่ส่งเสียงดัง ไม่พูดคุยเสียงดัง ไม่ส่งเสียงรบกวนผู้อื่น',
-                  image: '/api/placeholder/300/200'
-                },
-                photography: {
-                  title: 'การถ่ายรูป',
-                  description: 'ไม่ควรถ่ายภาพในบริเวณที่มีป้ายห้ามหรือในพื้นที่ศักดิ์สิทธิ์โดยไม่ได้รับอนุญาต',
-                  image: '/api/placeholder/300/200'
-                }
-              }
-            },
-            5: {
-              id: 5,
-              name: 'พระศรีอริยเมตไตรย',
-              image: '/api/placeholder/400/500',
-              location: 'วัดสุทัศน์เทพวราราม',
-              openHours: '08.00 - 20.00 น.',
-              type: 'สุขภาพ / โรคภัย',
-              description: 'พระพุทธรูปปางนาคปรก เชื่อกันว่าหากมาขอพรเรื่องสุขภาพจะหายจากโรคภัยไข้เจ็บ',
-              worshipGuide: {
-                title: 'ลำดับการไหว้',
-                steps: [
-                  'จุดธูปเทียน 9 ดอก เทียน 2 เล่ม',
-                  'ตั้งจิตอธิษฐาน กล่าวคำบูชา',
-                  'กราบ 3 ครั้ง',
-                  'ปักธูปเทียนในที่ที่จัดไว้',
-                  'นั่งสมาธิสักครู่ก่อนลุกออกไป'
-                ]
-              },
-              chants: {
-                title: 'บทสวด',
-                items: [
-                  {
-                    title: 'คำบูชาพระพุทธรูป',
-                    text: 'นะโม ตัสสะ ภะคะวะโต อะระหะโต สัมมาสัมพุทธัสสะ (3 จบ)',
-                    transliteration: 'Namo tassa bhagavato arahato sammāsambuddhassa (3 times)'
-                  },
-                  {
-                    title: 'คำขอพรเฉพาะ',
-                    text: 'ข้าพเจ้าขอน้อมบูชาพระศรีอริยเมตไตรย ด้วยเครื่องสักการะทั้งหลายเหล่านี้ ขอให้ข้าพเจ้าและครอบครัว จงหายจากโรคภัยไข้เจ็บทั้งปวง มีสุขภาพแข็งแรงสมบูรณ์'
-                  }
-                ]
-              },
-              offerings: {
-                title: 'ของไหว้',
-                items: [
-                  {
-                    name: 'ดอกไม้',
-                    description: 'ดอกบัว หรือดอกไม้สีขาว 9 ดอก',
-                    image: '/api/placeholder/100/100'
-                  },
-                  {
-                    name: 'ธูปเทียน',
-                    description: 'ธูป 9 ดอก เทียน 2 เล่ม',
-                    image: '/api/placeholder/100/100'
-                  },
-                  {
-                    name: 'ผลไม้',
-                    description: 'ผลไม้ 9 อย่าง',
-                    image: '/api/placeholder/100/100'
-                  }
-                ]
-              },
-              guidelines: {
-                title: 'ข้อห้าม / ข้อแนะนำ',
-                dress: {
-                  title: 'การแต่งกาย',
-                  description: 'แต่งกายสุภาพ ไม่ควรนุ่งสั้น และไม่ควรสวมเสื้อผ้าบางเปิดเผยร่างกาย ไม่สมควรใส่กางเกงขาสั้น',
-                  image: '/api/placeholder/300/200'
-                },
-                behavior: {
-                  title: 'การวางตัว',
-                  description: 'สำรวมกาย วาจา ใจ ไม่ส่งเสียงดัง ไม่พูดคุยเสียงดัง ไม่ส่งเสียงรบกวนผู้อื่น',
-                  image: '/api/placeholder/300/200'
-                },
-                photography: {
-                  title: 'การถ่ายรูป',
-                  description: 'ไม่ควรถ่ายภาพในบริเวณที่มีป้ายห้ามหรือในพื้นที่ศักดิ์สิทธิ์โดยไม่ได้รับอนุญาต',
-                  image: '/api/placeholder/300/200'
-                }
-              }
-            },
-            6: {
-                id: 6,
-                name: 'พระพุทธรูปปางลีลา',
-                image: '/api/placeholder/400/500',
-                location: 'วัดสุทัศน์เทพวราราม',
-                openHours: '08.00 - 20.00 น.',
-                type: 'ความมงคล / ความสำเร็จ',
-                description: 'พระพุทธรูปปางลีลาศิลปะสุโขทัย เป็นพระพุทธรูปที่มีความงดงาม แสดงถึงการก้าวเดินอย่างสง่างาม เชื่อกันว่าหากสักการะแล้วจะประสบความสำเร็จในชีวิต',
-                worshipGuide: {
-                  title: 'ลำดับการไหว้',
-                  steps: [
-                    'จุดธูปเทียน 5 ดอก เทียน 2 เล่ม',
-                    'ตั้งจิตอธิษฐาน กล่าวคำบูชา',
-                    'กราบ 3 ครั้ง',
-                    'ปักธูปเทียนในที่ที่จัดไว้',
-                    'นั่งสมาธิสักครู่ก่อนลุกออกไป'
-                  ]
-                },
-                chants: {
-                  title: 'บทสวด',
-                  items: [
-                    {
-                      title: 'คำบูชาพระพุทธรูป',
-                      text: 'นะโม ตัสสะ ภะคะวะโต อะระหะโต สัมมาสัมพุทธัสสะ (3 จบ)',
-                      transliteration: 'Namo tassa bhagavato arahato sammāsambuddhassa (3 times)'
-                    },
-                    {
-                      title: 'คำขอพรเฉพาะ',
-                      text: 'ข้าพเจ้าขอน้อมบูชาพระพุทธรูปปางลีลา ด้วยเครื่องสักการะทั้งหลายเหล่านี้ ขอให้ข้าพเจ้าและครอบครัว จงประสบความสำเร็จในหน้าที่การงานและก้าวหน้าในชีวิต'
-                    }
-                  ]
-                },
-                offerings: {
-                  title: 'ของไหว้',
-                  items: [
-                    {
-                      name: 'ดอกไม้',
-                      description: 'ดอกบัว หรือดอกไม้สีขาว 5 ดอก',
-                      image: '/api/placeholder/100/100'
-                    },
-                    {
-                      name: 'ธูปเทียน',
-                      description: 'ธูป 5 ดอก เทียน 2 เล่ม',
-                      image: '/api/placeholder/100/100'
-                    },
-                    {
-                      name: 'ผลไม้',
-                      description: 'ผลไม้ 5 อย่าง',
-                      image: '/api/placeholder/100/100'
-                    }
-                  ]
-                },
-                guidelines: {
-                  title: 'ข้อห้าม / ข้อแนะนำ',
-                  dress: {
-                    title: 'การแต่งกาย',
-                    description: 'แต่งกายสุภาพ ไม่ควรนุ่งสั้น และไม่ควรสวมเสื้อผ้าบางเปิดเผยร่างกาย ไม่สมควรใส่กางเกงขาสั้น',
-                    image: '/api/placeholder/300/200'
-                  },
-                  behavior: {
-                    title: 'การวางตัว',
-                    description: 'สำรวมกาย วาจา ใจ ไม่ส่งเสียงดัง ไม่พูดคุยเสียงดัง ไม่ส่งเสียงรบกวนผู้อื่น',
-                    image: '/api/placeholder/300/200'
-                  },
-                  photography: {
-                    title: 'การถ่ายรูป',
-                    description: 'ไม่ควรถ่ายภาพในบริเวณที่มีป้ายห้ามหรือในพื้นที่ศักดิ์สิทธิ์โดยไม่ได้รับอนุญาต',
-                    image: '/api/placeholder/300/200'
-                  }
-                }
-              }
-            };
-            
-          }
+            }
+          };
           
-          setLoading(false);
-        } catch (error) {
-          console.error(`Failed to fetch ${type} info:`, error);
-          setLoading(false);
-        }
-      };
-      
-      fetchInformation();
-    }, [id, isAuthenticated, type]);
-    
-    // Handle section animations with cleanup
-    useEffect(() => {
-      if (sectionAnimation === 'entering' || sectionAnimation === 'leaving') {
-        const timer = setTimeout(() => {
-          if (sectionAnimation === 'leaving') {
-            setActiveSection(null);
+          const templeId = Number(id);
+          if (Object.prototype.hasOwnProperty.call(templeData, templeId)) {
+            setInformation(templeData[templeId]);
           }
-          setSectionAnimation(null);
-        }, 300); // Animation duration
-        
-        return () => clearTimeout(timer);
-      }
-    }, [sectionAnimation]);
-    
-    // Handle click outside to close section
-    useEffect(() => {
-      const handleClickOutside = (event: MouseEvent) => {
-        if (sectionRef.current && !sectionRef.current.contains(event.target as Node) && activeSection) {
-          handleCloseSection();
         }
-      };
-      
-      document.addEventListener('mousedown', handleClickOutside);
-      return () => {
-        document.removeEventListener('mousedown', handleClickOutside);
-      };
-    }, [activeSection]);
-    
-    const handleBackClick = () => {
-      router.back();
-    };
-    
-    const handleOpenSection = (section: string) => {
-      setActiveSection(section);
-      setSectionAnimation('entering');
-      // Prevent scrolling of background content when overlay is active
-      document.body.style.overflow = 'hidden';
-    };
-    
-    const handleCloseSection = () => {
-      setSectionAnimation('leaving');
-      // Re-enable scrolling when overlay is closed
-      document.body.style.overflow = 'auto';
-    };
-    
-    const sectionConfigs: SectionConfig[] = [
-      { 
-        id: 'worshipGuide', 
-        title: 'ลำดับการไหว้', 
-        bgColor: 'bg-pink-200', 
-        contentBgColor: 'bg-pink-100',
-        textColor: 'text-pink-800' 
-      },
-      { 
-        id: 'chants', 
-        title: 'บทสวด', 
-        bgColor: 'bg-yellow-200', 
-        contentBgColor: 'bg-yellow-100',
-        textColor: 'text-yellow-800' 
-      },
-      { 
-        id: 'offerings', 
-        title: 'ของไหว้', 
-        bgColor: 'bg-orange-300', 
-        contentBgColor: 'bg-orange-200',
-        textColor: 'text-orange-800' 
-      },
-      { 
-        id: 'guidelines', 
-        title: 'ข้อห้าม / ข้อแนะนำ', 
-        bgColor: 'bg-orange-200', 
-        contentBgColor: 'bg-orange-100',
-        textColor: 'text-orange-800' 
+        
+        setLoading(false);
+      } catch (error) {
+        console.error(`Failed to fetch ${type} info:`, error);
+        setLoading(false);
       }
-    ];
+    };
     
-    const renderSectionContent = (sectionId: string) => {
-      switch (sectionId) {
-        case 'worshipGuide':
-          return (
-            <div>
-              <ol className="list-decimal pl-6 space-y-3 mb-6">
-                {information.worshipGuide.steps.map((step, index) => (
-                  <li key={index} className="text-gray-700">{step}</li>
-                ))}
-              </ol>
-              
-              <div className="bg-pink-50 p-4 rounded-lg">
-                <div className="flex items-center mb-3">
-                  <svg className="w-6 h-6 text-pink-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                  </svg>
-                  <h3 className="text-pink-700 font-medium">วิดีโอสาธิตการไหว้</h3>
-                </div>
-                <div className="w-full h-48 bg-gray-200 rounded-lg flex items-center justify-center">
-                  <svg className="w-16 h-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                </div>
+    fetchInformation();
+  }, [id, isAuthenticated, type]);
+
+  const handleBackClick = () => {
+    router.back();
+  };
+
+  const toggleSection = (sectionKey: string) => {
+    setExpandedSection(expandedSection === sectionKey ? null : sectionKey);
+  };
+
+  const sectionConfigs: SectionConfig[] = [
+    { 
+      id: 'worshipGuide', 
+      title: 'คำแนะนำการไหว้', 
+      bgColor: 'bg-pink-200', 
+      contentBgColor: 'bg-pink-100',
+      textColor: 'text-pink-800',
+      zIndex: 40
+    },
+    { 
+      id: 'chants', 
+      title: 'บทสวด', 
+      bgColor: 'bg-yellow-300', 
+      contentBgColor: 'bg-yellow-100',
+      textColor: 'text-yellow-800',
+      zIndex: 30
+    },
+    { 
+      id: 'offerings', 
+      title: 'ของไหว้', 
+      bgColor: 'bg-orange-400', 
+      contentBgColor: 'bg-orange-200',
+      textColor: 'text-orange-800',
+      zIndex: 20
+    },
+    { 
+      id: 'guidelines', 
+      title: 'ข้อห้าม / ข้อแนะนำ', 
+      bgColor: 'bg-orange-300', 
+      contentBgColor: 'bg-orange-100',
+      textColor: 'text-orange-800',
+      zIndex: 10
+    }
+  ];
+
+  const renderSectionContent = (sectionId: string) => {
+    switch (sectionId) {
+      case 'worshipGuide':
+        return (
+          <div>
+            <div className="text-center mb-6">
+              <h3 className="text-2xl font-bold text-gray-800 mb-2">คำแนะนำการไหว้</h3>
+              <p className="text-gray-700 text-base">คำแนะนำในการไหว้อย่างถูกต้อง</p>
+              <div className="w-full h-px bg-white bg-opacity-50 my-6"></div>
+            </div>
+            <ol className="list-decimal pl-6 space-y-3 mb-6">
+              {information.worshipGuide.steps.map((step, index) => (
+                <li key={index} className="text-gray-700">{step}</li>
+              ))}
+            </ol>
+            <div className="bg-pink-50 p-4 rounded-lg">
+              <div className="flex items-center mb-3">
+                <Play className="w-6 h-6 text-pink-500 mr-2" />
+                <h3 className="text-pink-700 font-medium">วิดีโอสาธิตการไหว้</h3>
+              </div>
+              <div className="w-full h-48 bg-gray-200 rounded-lg flex items-center justify-center">
+                <Play className="w-16 h-16 text-gray-400" />
               </div>
             </div>
-          );
-        
-        case 'chants':
-          return (
-            <div>
-              {information.chants.items.map((chant, index) => (
-                <div key={index} className="mb-6">
-                  <h4 className="font-medium text-gray-800 mb-2">{chant.title}</h4>
-                  <div className="bg-yellow-50 p-4 rounded-lg">
-                    <p className="text-gray-700 whitespace-pre-line">{chant.text}</p>
-                    {/* {chant.transliteration && (
-                      <p className="text-gray-500 text-sm mt-2 italic whitespace-pre-line">{chant.transliteration}</p>
-                    )} */}
+          </div>
+        );
+      
+      case 'chants':
+        return (
+          <div>
+            <div className="text-center mb-6">
+              <h3 className="text-2xl font-bold text-gray-800 mb-2">พระสุนทรีวาจ</h3>
+              <p className="text-gray-700 text-base">เทพบุตรแห่งปัญญาในพระพุทธศาสนา</p>
+              <div className="w-full h-px bg-white bg-opacity-50 my-6"></div>
+            </div>
+            
+            <div className="mb-8">
+              <p className="text-gray-800 font-bold mb-4 text-lg leading-relaxed">
+                นะโม ติส-ส ภะคะวะโต อะระหะโต สัมมา สัมพุทธัส-ส( 3 จบ )
+              </p>
+              <p className="text-gray-700 text-center mb-6 tracking-widest text-lg">
+                ● ● ● ● ● ● ● ●
+              </p>
+              <div className="space-y-3 text-gray-800 text-lg">
+                <p className="font-semibold">หูนันทะ วะกะนันพุชะ</p>
+                <p className="font-semibold">คัพพะสัมภะวะ สุนทรี ปาณนัง</p>
+                <p className="font-semibold">สะระณัง วาจนี มัยหัง</p>
+                <p className="font-semibold">ปิฎนะยะตัง</p>
+              </div>
+              <div className="w-full h-px bg-white bg-opacity-50 my-6"></div>
+            </div>
+            
+            <div className="text-gray-700 text-base leading-relaxed">
+              "คำถวายพระสุนทรีวาจ" หำถูกรักรอบสำหรับส่งเวจญ์ในปัญญา พระสุทธิให้พูดมังเมื่อแบ่งให้ปรากฏความลู่เสียงใหญ่เหมือนพระอัชฌุม บริกรรมหาครอนี่อีกนิดนึง ที่อะไรทีเก็บเสมาฮอตต่าง
+            </div>
+            
+            <div className="flex justify-center mt-6">
+              <button className="bg-yellow-500 text-white rounded-full px-6 py-2 flex items-center">
+                <Volume2 className="w-5 h-5 mr-2" />
+                ฟังบทสวด
+              </button>
+            </div>
+          </div>
+        );
+      
+      case 'offerings':
+        return (
+          <div>
+            <div className="text-center mb-6">
+              <h3 className="text-2xl font-bold text-gray-800 mb-2">ของไหว้</h3>
+              <p className="text-gray-700 text-base">รายการของไหว้ที่เหมาะสม</p>
+              <div className="w-full h-px bg-white bg-opacity-50 my-6"></div>
+            </div>
+            <div className="grid grid-cols-1 gap-4 mb-6">
+              {information.offerings.items.map((offering, index) => (
+                <div key={index} className="bg-orange-50 p-4 rounded-lg flex items-center">
+                  <div className="w-16 h-16 mr-4">
+                    <img src={offering.image} alt={offering.name} className="w-full h-full object-cover rounded-lg" />
+                  </div>
+                  <div>
+                    <h4 className="font-medium text-orange-800">{offering.name}</h4>
+                    <p className="text-gray-600 text-sm">{offering.description}</p>
                   </div>
                 </div>
               ))}
-              
-              <div className="flex justify-center mt-4">
-                <button className="bg-yellow-500 text-white rounded-full px-6 py-2 flex items-center">
-                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15.536a5 5 0 001.414 1.414m2.828-4.242a1 1 0 010 1.414m2.828-2.828a1 1 0 010 0m-2.828 2.828L9 16m5.414-5.414L15 10m-2.172 2.172L12 13" />
-                  </svg>
-                  ฟังบทสวด
-                </button>
-              </div>
             </div>
-          );
-        
-        case 'offerings':
-          return (
-            <div>
-              <div className="grid grid-cols-1 gap-4 mb-6">
-                {information.offerings.items.map((offering, index) => (
-                  <div key={index} className="bg-orange-50 p-4 rounded-lg flex items-center">
-                    <div className="w-16 h-16 mr-4">
-                      <img src={offering.image} alt={offering.name} className="w-full h-full object-cover rounded-lg" />
-                    </div>
-                    <div>
-                      <h4 className="font-medium text-orange-800">{offering.name}</h4>
-                      <p className="text-gray-600 text-sm">{offering.description}</p>
-                    </div>
+            <div className="mt-6">
+              <button className="w-full bg-orange-500 text-white py-3 rounded-lg flex items-center justify-center">
+                <ShoppingCart className="w-5 h-5 mr-2" />
+                สั่งซื้อของไหว้ออนไลน์
+              </button>
+            </div>
+          </div>
+        );
+      
+      case 'guidelines':
+        return (
+          <div>
+            <div className="text-center mb-8">
+              <div className="relative">
+                <div className="absolute -top-4 -left-4">
+                  <Star className="w-6 h-6 text-white fill-white" />
+                </div>
+                <div className="absolute -top-8 -right-2">
+                  <Star className="w-4 h-4 text-white fill-white" />
+                </div>
+                <div className="absolute -bottom-2 -right-6">
+                  <Star className="w-6 h-6 text-white fill-white" />
+                </div>
+                <div className="absolute -bottom-6 -left-3">
+                  <Star className="w-4 h-4 text-white fill-white" />
+                </div>
+                <div className="absolute top-2 right-8">
+                  <Star className="w-3 h-3 text-white fill-white" />
+                </div>
+                
+                <div className="bg-white rounded-2xl p-6 shadow-xl">
+                  <div className="w-16 h-12 bg-black rounded-t-2xl mb-4 mx-auto relative">
+                    <div className="absolute -top-1 -right-2 w-6 h-6 bg-black transform rotate-45"></div>
+                    <div className="absolute top-2 right-1 w-1 h-6 bg-yellow-400"></div>
                   </div>
-                ))}
-              </div>
-              
-              <div className="mt-6">
-                <button className="w-full bg-orange-500 text-white py-3 rounded-lg flex items-center justify-center">
-                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-                  </svg>
-                  สั่งซื้อของไหว้ออนไลน์
-                </button>
+                  <div className="w-20 h-16 bg-gray-100 rounded-lg shadow-inner mx-auto relative">
+                    <div className="absolute inset-2 bg-white rounded border-l-2 border-gray-300"></div>
+                    <div className="absolute top-4 left-4 right-4 h-px bg-gray-300"></div>
+                    <div className="absolute top-6 left-4 right-4 h-px bg-gray-300"></div>
+                    <div className="absolute top-8 left-4 right-4 h-px bg-gray-300"></div>
+                  </div>
+                </div>
               </div>
             </div>
-          );
-        
-        case 'guidelines':
-          return (
-            <div>
-              <div className="mb-6">
-                <div className="bg-orange-50 p-4 rounded-lg mb-4">
-                  <h4 className="font-medium text-orange-800 mb-3">{information.guidelines.dress.title}</h4>
-                  <img src={information.guidelines.dress.image} alt="การแต่งกาย" className="w-full h-auto rounded-lg mb-3" />
-                  <p className="text-gray-600 text-sm">{information.guidelines.dress.description}</p>
-                </div>
-                
-                <div className="bg-orange-50 p-4 rounded-lg mb-4">
-                  <h4 className="font-medium text-orange-800 mb-3">{information.guidelines.behavior.title}</h4>
-                  <img src={information.guidelines.behavior.image} alt="การวางตัว" className="w-full h-auto rounded-lg mb-3" />
-                  <p className="text-gray-600 text-sm">{information.guidelines.behavior.description}</p>
-                </div>
-                
-                <div className="bg-orange-50 p-4 rounded-lg">
-                  <h4 className="font-medium text-orange-800 mb-3">{information.guidelines.photography.title}</h4>
-                  <img src={information.guidelines.photography.image} alt="การถ่ายรูป" className="w-full h-auto rounded-lg mb-3" />
-                <p className="text-gray-600 text-sm">{information.guidelines.photography.description}</p>
-              </div>
+            
+            <h3 className="text-2xl font-bold text-gray-800 mb-2 text-center">พระสุนทรีวาจ</h3>
+            <p className="text-gray-700 text-base mb-6 text-center">เทพบุตรแห่งปัญญาในพระพุทธศาสนา</p>
+            <div className="w-full h-px bg-white bg-opacity-50 my-6"></div>
+            
+            <div className="text-gray-700 text-base leading-relaxed">
+              เศรษฐีแก่คำแนะนำของไหว้ประทานพระในตำนานสิบบุญ ให้ผู้มาสักการะความยินดีต่อพระเคอสิน มีความจำเป็นเสียก่อน บริกรรมหาครอนี่อีกนิดนึง ที่อะไรทีเก็บเสมาฮอตต่าง
             </div>
           </div>
         );
@@ -1476,51 +516,6 @@ const InformationPage: React.FC<InformationProps> = ({ type, id }) => {
       <Head>
         <title>{information.name} - Nummu App</title>
         <meta name="description" content={`ข้อมูลเกี่ยวกับ${information.name}`} />
-        <style jsx global>{`
-          @keyframes slideUp {
-            from {
-              transform: translateY(100%);
-            }
-            to {
-              transform: translateY(0);
-            }
-          }
-          
-          @keyframes slideDown {
-            from {
-              transform: translateY(0);
-            }
-            to {
-              transform: translateY(100%);
-            }
-          }
-          
-          .animate-slide-in {
-            animation: fadeIn 0.2s ease-out;
-          }
-          
-          .animate-slide-out {
-            animation: fadeOut 0.2s ease-out;
-          }
-          
-          @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-          }
-          
-          @keyframes fadeOut {
-            from { opacity: 1; }
-            to { opacity: 0; }
-          }
-
-          .slide-up {
-            animation: slideUp 0.3s ease-out forwards;
-          }
-          
-          .slide-down {
-            animation: slideDown 0.3s ease-out forwards;
-          }
-        `}</style>
       </Head>
       
       <div className="min-h-screen bg-gray-100 pb-20 max-w-[414px] mx-auto">
@@ -1536,18 +531,18 @@ const InformationPage: React.FC<InformationProps> = ({ type, id }) => {
               onClick={handleBackClick}
               className="w-10 h-10 rounded-full bg-white bg-opacity-70 flex items-center justify-center shadow-md"
             >
-              <svg className="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
+              <ArrowLeft className="w-6 h-6 text-gray-700" />
             </button>
           </div>
           
           <div className="absolute top-4 right-4 z-10">
             <button className="w-10 h-10 rounded-full bg-white bg-opacity-70 flex items-center justify-center shadow-md">
-              <svg className="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-              </svg>
+              <Heart className="w-6 h-6 text-gray-700" />
             </button>
+          </div>
+          
+          <div className="absolute bottom-4 right-4 text-white text-sm bg-black bg-opacity-50 px-2 py-1 rounded">
+            View 360°
           </div>
           
           {/* Overlay gradient for better text readability */}
@@ -1566,13 +561,8 @@ const InformationPage: React.FC<InformationProps> = ({ type, id }) => {
             <div className="text-sm bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full">
               {information.type}
             </div>
-            <div className="text-sm bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full">
-            {information.name}
-            </div>
             <div className="text-sm text-gray-500 flex items-center">
-              <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
+              <Clock className="w-4 h-4 mr-1" />
               {information.openHours}
             </div>
           </div>
@@ -1583,100 +573,74 @@ const InformationPage: React.FC<InformationProps> = ({ type, id }) => {
           
           <div className="mt-3 flex justify-center">
             <button className="text-sm bg-blue-500 text-white px-6 py-2 rounded-full flex items-center">
-              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
+              <ChevronDown className="w-4 h-4 mr-2" />
               อ่านเพิ่มเติม
             </button>
           </div>
         </div>
         
-        {/* Expandable Sections */}
-        <div className="mt-2 px-2">
-          {sectionConfigs.map(section => (
-            <div key={section.id} 
-              className={`${section.bgColor} p-4 flex justify-between items-center cursor-pointer rounded-xl mb-2`}
-              onClick={() => handleOpenSection(section.id)}
-            >
-              <h3 className={`${section.textColor} font-medium`}>{section.title}</h3>
-              <svg 
-                className={`w-5 h-5 ${section.textColor}`} 
-                fill="none" 
-                stroke="currentColor" 
-                viewBox="0 0 24 24" 
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-              </svg>
-            </div>
-          ))}
-        </div>
-        
-        {/* Section Overlay */}
-        {(activeSection || sectionAnimation) && (
-          <div 
-            className={`fixed inset-0 z-50 flex items-end justify-center transition-opacity duration-300 ${
-              sectionAnimation === 'entering' ? 'opacity-100' : 
-              sectionAnimation === 'leaving' ? 'opacity-0' : 'opacity-100'
-            }`}
-            style={{backgroundColor: 'rgba(0, 0, 0, 0.5)'}}
-          >
-            <div 
-              ref={sectionRef}
-              className={`bg-white rounded-t-3xl w-full max-w-[414px] max-h-[85vh] overflow-y-auto ${
-                sectionAnimation === 'entering' ? 'slide-up' : 
-                sectionAnimation === 'leaving' ? 'slide-down' : ''
-              }`}
-            >
-              {/* Section Header */}
-              <div className={`${
-                activeSection === 'worshipGuide' ? 'bg-pink-100' :
-                activeSection === 'chants' ? 'bg-yellow-100' :
-                activeSection === 'offerings' ? 'bg-orange-200' :
-                'bg-orange-100'
-              } p-4 rounded-t-3xl relative`}>
-                <div className="absolute top-4 right-4">
-                  <button 
-                    onClick={handleCloseSection}
-                    className="w-8 h-8 rounded-full bg-white bg-opacity-70 flex items-center justify-center"
-                  >
-                    <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                  </button>
-                </div>
-                <div className="w-12 h-1 bg-gray-300 rounded-full mx-auto mb-4"></div>
-                <h2 className={`text-xl font-medium ${
-                  activeSection === 'worshipGuide' ? 'text-pink-800' :
-                  activeSection === 'chants' ? 'text-yellow-800' :
-                  'text-orange-800'
-                }`}>
-                  {sectionConfigs.find(s => s.id === activeSection)?.title}
-                </h2>
-              </div>
+        {/* Stacked Sections */}
+        <div className="relative min-h-80 -mx-6 px-6">
+          <div className="relative min-h-80 -mx-6">
+            {sectionConfigs.map((section, index) => {
+              const isExpanded = expandedSection === section.id;
+              const isCollapsed = expandedSection && expandedSection !== section.id;
+              const totalSections = sectionConfigs.length;
+              const reverseIndex = totalSections - 1 - index;
+              const scaleX = isExpanded ? 1 : (1 - reverseIndex * 0.06);
               
-              {/* Section Content */}
-              <div className="p-4">
-                {activeSection && renderSectionContent(activeSection)}
-              </div>
-            </div>
+              return (
+                <div
+                  key={section.id}
+                  className={`absolute transition-all duration-500 ease-in-out ${section.bgColor} overflow-hidden`}
+                  style={{
+                    zIndex: isExpanded ? 50 : section.zIndex,
+                    left: '0px',
+                    right: '0px',
+                    top: isCollapsed ? `${index * 16}px` : isExpanded ? '0px' : `${index * 50}px`,
+                    height: isExpanded ? 'auto' : '70px',
+                    minHeight: isExpanded ? '400px' : '70px',
+                    borderRadius: isExpanded ? '16px' : `${50 - reverseIndex * 8}px ${50 - reverseIndex * 8}px 16px 16px`,
+                    transform: `scaleX(${scaleX})`,
+                    transformOrigin: 'center'
+                  }}
+                >
+                  {/* Header Button */}
+                  <button
+                    onClick={() => toggleSection(section.id)}
+                    className="w-full p-4 flex justify-between items-center hover:bg-black hover:bg-opacity-5 transition-colors"
+                    style={{ paddingLeft: '24px', paddingRight: '24px' }}
+                  >
+                    <span className="text-gray-800 font-medium text-lg">{section.title}</span>
+                    {isExpanded ? (
+                      <ChevronUp className="w-6 h-6 text-gray-700" />
+                    ) : (
+                      <ChevronDown className="w-6 h-6 text-gray-700" />
+                    )}
+                  </button>
+
+                  {/* Expanded Content */}
+                  {isExpanded && (
+                    <div className="px-6 pb-6" style={{ marginLeft: '0px', marginRight: '0px' }}>
+                      {renderSectionContent(section.id)}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
-        )}
+        </div>
         
         {/* Quick Buttons */}
         {type === 'buddha' && (
           <div className="fixed bottom-16 left-0 right-0 max-w-[414px] mx-auto bg-white border-t border-gray-200 p-4">
             <div className="flex justify-center space-x-4">
               <button className="flex-1 bg-pink-500 text-white rounded-full py-3 flex items-center justify-center">
-                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
+                <Calendar className="w-5 h-5 mr-2" />
                 จองเวลานัดไหว้
               </button>
               <button className="flex-1 bg-orange-500 text-white rounded-full py-3 flex items-center justify-center">
-                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                </svg>
+                <Plus className="w-5 h-5 mr-2" />
                 ขอพรออนไลน์
               </button>
             </div>

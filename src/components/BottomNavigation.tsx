@@ -46,7 +46,7 @@ const BottomNavigation: React.FC<BottomNavigationProps> = ({ activePage }) => {
 
         {/* Worship */}
         <Link
-          href="/worship"
+          href="/"
           className={`flex flex-col items-center justify-center p-2 ${
             currentPage === 'worship' ? 'text-orange-500' : 'text-gray-400'
           }`}
@@ -71,7 +71,7 @@ const BottomNavigation: React.FC<BottomNavigationProps> = ({ activePage }) => {
 
         {/* Horoscope */}
         <Link
-          href="/horoscope"
+          href="/"
           className={`flex flex-col items-center justify-center p-2 ${
             currentPage === 'horoscope' ? 'text-orange-500' : 'text-gray-400'
           }`}
