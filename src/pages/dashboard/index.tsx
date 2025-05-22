@@ -362,7 +362,7 @@ export default function Dashboard() {
                       strokeWidth={2}
                       strokeLinecap="round"
                       strokeLinejoin="round"
-                    />
+                    /> 
                   </svg>
                 </div>
                 <p className="text-[#FF7A05] text-center text-xs font-medium">
