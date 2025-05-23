@@ -1,6 +1,7 @@
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
+import Link from 'next/link';
 
 export default function HeaderProfile() {
     const router = useRouter();
@@ -29,7 +30,7 @@ export default function HeaderProfile() {
         <div className="flex items-center space-x-3">
           <div className="w-12 h-12 rounded-full overflow-hidden bg-white">
             <img
-              src={user?.avatar || "/api/placeholder/48/48"}
+              src={user?.avatar || "/images/profile/travel/Profile.jpeg"}
               alt="Profile"
               className="w-full h-full object-cover"
             />
@@ -42,6 +43,7 @@ export default function HeaderProfile() {
           </div>
         </div>
         <div className="flex space-x-3">
+        <Link href="/notifications" passHref>
           <button className="w-10 h-10 rounded-full bg-white flex items-center justify-center ml-20">
             <svg
               className="w-6 h-6 text-[#FF7A05]"
@@ -61,6 +63,7 @@ export default function HeaderProfile() {
               3
             </span> */}
           </button>
+          </Link>
         </div>
         <div>
           <button className="w-10 h-10 rounded-full bg-white flex items-center justify-center">
