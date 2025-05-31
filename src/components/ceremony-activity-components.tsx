@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import BottomNavigation from "@/components/BottomNavigation";
+import { useFavoritesActivity } from "@/hooks/useFavoritesActivity";
 
 // Types
 interface CeremonyActivity {
@@ -28,7 +29,9 @@ interface CeremonyActivityScreenProps {
   type: "ceremony" | "activity";
   userName?: string;
   onBackClick?: () => void;
+  showFavoritesOnly?: boolean;
 }
+
 /**
  * คอมโพเนนต์แสดงส่วนหัวของหน้าพิธีกรรมหรือกิจกรรม
  */
@@ -126,22 +129,25 @@ export const CeremonyActivityList: React.FC<CeremonyActivityListProps> = ({
       {items.map((item) => (
         <div
           key={item.id}
-          className="relative rounded-xl overflow-hidden bg-white shadow-md"
+          className="relative rounded-xl overflow-hidden bg-white shadow-md hover:shadow-lg transition-shadow duration-200"
         >
           <div className="relative">
             <img
               src={item.image}
               alt={item.name}
-              className="w-full h-40 object-cover font-bold text-[#FF7A05]"
+              className="w-full h-40 object-cover cursor-pointer"
               onClick={() => onItemClick(item.id)}
             />
             <button
-              className="absolute top-2 right-2 w-8 h-8 rounded-full bg-[#FF7A05] bg-opacity-70 flex items-center justify-center"
-              onClick={() => onToggleFavorite(item.id)}
+              className="absolute top-2 right-2 w-8 h-8 rounded-full bg-white bg-opacity-90 flex items-center justify-center hover:bg-opacity-100 transition-all duration-200 transform hover:scale-110"
+              onClick={(e) => {
+                e.stopPropagation();
+                onToggleFavorite(item.id);
+              }}
             >
               {item.isFavorite ? (
                 <svg
-                  className="w-5 h-5 text-[#FF7A05]"
+                  className="w-5 h-5 text-red-500"
                   fill="currentColor"
                   viewBox="0 0 20 20"
                   xmlns="http://www.w3.org/2000/svg"
@@ -154,7 +160,7 @@ export const CeremonyActivityList: React.FC<CeremonyActivityListProps> = ({
                 </svg>
               ) : (
                 <svg
-                  className="w-5 h-5 text-white"
+                  className="w-5 h-5 text-gray-400 hover:text-red-500 transition-colors duration-200"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -170,7 +176,10 @@ export const CeremonyActivityList: React.FC<CeremonyActivityListProps> = ({
               )}
             </button>
           </div>
-          <div className="p-3" onClick={() => onItemClick(item.id)}>
+          <div 
+            className="p-3 cursor-pointer hover:bg-gray-50 transition-colors duration-200" 
+            onClick={() => onItemClick(item.id)}
+          >
             <h3 className="text-orange-600 font-medium text-center">
               {item.name}
             </h3>
@@ -189,10 +198,14 @@ export const CeremonyActivityList: React.FC<CeremonyActivityListProps> = ({
  */
 export const CeremonyActivityScreen: React.FC<CeremonyActivityScreenProps> = ({
   type,
+  showFavoritesOnly = false,
 }) => {
   const router = useRouter();
   const [items, setItems] = useState<CeremonyActivity[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  
+  // ใช้ custom hook สำหรับจัดการ favorites
+  const { toggleFavorite, updateItemsFavorites, getFavoritesCount, isLoaded } = useFavoritesActivity();
 
   // ดึงข้อมูลพิธีกรรมหรือกิจกรรม
   useEffect(() => {
@@ -208,14 +221,7 @@ export const CeremonyActivityScreen: React.FC<CeremonyActivityScreenProps> = ({
             type: "ceremony",
             isFavorite: false,
           },
-          // {
-          //   id: 2,
-          //   name: 'ยกภูเขาถ่าย',
-          //   image: '/api/placeholder/300/200',
-          //   description: 'เช่น การขึ้นน้ำพุทธ, แก้ปีงาน การรวมเรียม อื่นๆ',
-          //   type: 'ceremony',
-          //   isFavorite: false
-          // }
+         
         ] as CeremonyActivity[];
       } else {
         return [
@@ -255,17 +261,18 @@ export const CeremonyActivityScreen: React.FC<CeremonyActivityScreenProps> = ({
       }
     };
 
-    setItems(getMockData());
+    const mockData = getMockData();
+    // อัปเดตสถานะ favorite จาก localStorage
+    const updatedData = updateItemsFavorites(mockData);
+    
+    // กรองเฉพาะรายการที่เป็น favorites ถ้า showFavoritesOnly = true
+    const finalData = showFavoritesOnly 
+      ? updatedData.filter(item => item.isFavorite)
+      : updatedData;
+    
+    setItems(finalData);
     setLoading(false);
-  }, [type]);
-
-  // const handleBackClick = () => {
-  //   if (onBackClick) {
-  //     onBackClick();
-  //   } else {
-  //     router.push('/dashboard');
-  //   }
-  // };
+  }, [type, updateItemsFavorites, showFavoritesOnly, isLoaded]); // เพิ่ม isLoaded dependency
 
   const handleItemClick = (id: number) => {
     if (type === "ceremony") {
@@ -276,14 +283,25 @@ export const CeremonyActivityScreen: React.FC<CeremonyActivityScreenProps> = ({
   };
 
   const handleToggleFavorite = (id: number) => {
-    setItems((prevItems) =>
-      prevItems.map((item) =>
+    // อัปเดตใน localStorage ผ่าน hook
+    toggleFavorite(id);
+    
+    // อัปเดต state ของ component
+    setItems((prevItems) => {
+      const updatedItems = prevItems.map((item) =>
         item.id === id ? { ...item, isFavorite: !item.isFavorite } : item
-      )
-    );
+      );
+      
+      // ถ้าแสดงเฉพาะ favorites และรายการนี้ถูกยกเลิก favorite ให้ลบออก
+      if (showFavoritesOnly) {
+        return updatedItems.filter(item => item.isFavorite);
+      }
+      
+      return updatedItems;
+    });
   };
 
-  if (loading) {
+  if (loading || !isLoaded) { // รอให้ข้อมูล favorites โหลดเสร็จด้วย
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
@@ -305,32 +323,70 @@ export const CeremonyActivityScreen: React.FC<CeremonyActivityScreenProps> = ({
 
       {/* เนื้อหาหลัก */}
       <div className="relative z-10">
-        {/* ส่วนหัว */}
-        {/* <CeremonyActivityHeader ... /> */}
-
         {/* รายการ */}
         {items.length > 0 ? (
-          <CeremonyActivityList
-            items={items}
-            onItemClick={handleItemClick}
-            onToggleFavorite={handleToggleFavorite}
-          />
+          <>
+            {/* แสดงจำนวนรายการถ้าเป็นหน้า favorites */}
+            {showFavoritesOnly && (
+              <div className="px-4 pt-4 pb-2">
+                <p className="text-gray-600 text-sm text-center">
+                  รายการโปรดของคุณ ({getFavoritesCount()} รายการ)
+                </p>
+              </div>
+            )}
+            
+            <CeremonyActivityList
+              items={items}
+              onItemClick={handleItemClick}
+              onToggleFavorite={handleToggleFavorite}
+            />
+          </>
         ) : (
           <div className="text-center p-10">
-            <svg
-              className="w-16 h-16 text-gray-400 mx-auto"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-            <p className="mt-4 text-gray-500">ไม่พบรายการ</p>
+            {showFavoritesOnly ? (
+              // แสดงเมื่อไม่มีรายการโปรด
+              <>
+                <div className="w-24 h-24 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
+                  <svg
+                    className="w-12 h-12 text-gray-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                    />
+                  </svg>
+                </div>
+                <h3 className="text-xl font-medium text-gray-700 mb-2">
+                  ยังไม่มีรายการโปรด
+                </h3>
+                <p className="text-gray-500 mb-6 max-w-xs mx-auto">
+                  กดปุ่มหัวใจในหน้า{type === "activity" ? "กิจกรรม" : "พิธีกรรม"} เพื่อเพิ่มเข้ารายการโปรด
+                </p>
+              </>
+            ) : (
+              // แสดงเมื่อไม่มีข้อมูลทั่วไป
+              <>
+                <svg
+                  className="w-16 h-16 text-gray-400 mx-auto"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+                <p className="mt-4 text-gray-500">ไม่พบรายการ</p>
+              </>
+            )}
           </div>
         )}
 

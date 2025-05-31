@@ -3,8 +3,13 @@ import { useRouter } from "next/router";
 import { useEffect } from "react";
 import Link from 'next/link';
 
-export default function HeaderProfile() {
-    const router = useRouter();
+// Add interface for props
+interface HeaderProfileProps {
+  onProfileClick?: () => void;
+}
+
+export default function HeaderProfile({ onProfileClick }: HeaderProfileProps) {
+  const router = useRouter();
   const { user, isAuthenticated, isLoading } = useAuth();
 
   useEffect(() => {
@@ -28,13 +33,17 @@ export default function HeaderProfile() {
     <>
       <div className="flex items-center justify-between mb-4 mt-4">
         <div className="flex items-center space-x-3">
-          <div className="w-12 h-12 rounded-full overflow-hidden bg-white">
+          {/* Add onClick handler to the profile image container */}
+          <button 
+            onClick={onProfileClick}
+            className="w-12 h-12 rounded-full overflow-hidden bg-white border-0 p-0 cursor-pointer"
+          >
             <img
               src={user?.avatar || "/images/profile/travel/Profile.jpeg"}
               alt="Profile"
               className="w-full h-full object-cover"
             />
-          </div>
+          </button>
           <div>
             <p className="text-white text-sm">สวัสดี,ยินดีต้อนรับ</p>
             <h3 className="text-white text-xl font-medium">
@@ -43,29 +52,30 @@ export default function HeaderProfile() {
           </div>
         </div>
         <div className="flex space-x-3">
-        <Link href="/notifications" passHref>
-          <button className="w-10 h-10 rounded-full bg-white flex items-center justify-center ml-20">
-            <svg
-              className="w-6 h-6 text-[#FF7A05]"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
-              />
-            </svg>
-            {/* <span className="absolute top-0 right-0 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
-              3
-            </span> */}
-          </button>
+          <Link href="/notifications" passHref>
+            <button className="w-10 h-10 rounded-full bg-white flex items-center justify-center ml-20">
+              <svg
+                className="w-6 h-6 text-[#FF7A05]"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
+                />
+              </svg>
+              {/* <span className="absolute top-0 right-0 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
+                3
+              </span> */}
+            </button>
           </Link>
         </div>
         <div>
+          <Link href="/favorites" passHref>
           <button className="w-10 h-10 rounded-full bg-white flex items-center justify-center">
             <svg
               className="w-6 h-6 text-[#FF7A05]"
@@ -82,6 +92,7 @@ export default function HeaderProfile() {
               />
             </svg>
           </button>
+          </Link>
         </div>
       </div>
     </>

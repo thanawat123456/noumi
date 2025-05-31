@@ -1,8 +1,10 @@
+// wish-places.tsx (Updated)
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
 import { useAuth } from '@/contexts/AuthContext';
 import BottomNavigation from '@/components/BottomNavigation';
+import { useFavorites } from '@/hooks/useFavorites';
 
 import {
   WishPlacesHeader,
@@ -18,7 +20,7 @@ interface WishPlace {
   temple: string;
   wishType: string;
   category: string;
-  isFavorite: boolean;
+  isFavorite: boolean; // เปลี่ยนกลับเป็น required
 }
 
 // หน้าสถานที่ขอตามพร
@@ -32,6 +34,9 @@ const WishPlaces: React.FC = () => {
   const [wishPlaces, setWishPlaces] = useState<WishPlace[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   
+  // ใช้ hook สำหรับจัดการ favorites
+  const { isFavorite, toggleFavorite } = useFavorites(wishPlaces);
+  
   // ตรวจสอบการล็อกอิน
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
@@ -43,11 +48,11 @@ const WishPlaces: React.FC = () => {
   useEffect(() => {
     if (!isAuthenticated) return;
     
-    // ในแอปจริง คุณจะดึงข้อมูลจาก API
     const fetchWishPlaces = async () => {
       try {
-        // จำลองการดึงข้อมูล
+        // จำลองการดึงข้อมูล - แยกตามหมวดหมู่ 6 หมวด
         const mockWishPlaces: WishPlace[] = [
+          // หมวด ภาพรวมทั่วไป
           {
             id: 1,
             name: 'พระศรีศากยมุนี',
@@ -55,51 +60,6 @@ const WishPlaces: React.FC = () => {
             temple: 'วัดสุทัศน์เทพวราราม',
             wishType: 'ภาพรวม<br />ทั่วไป',
             category: 'overview',
-            isFavorite: false
-          },
-          {
-            id: 2,
-            name: 'พระสุนทรี วาณี',
-            image: '/images/temple-list/พระสุนทรีวาณี.jpeg',
-            temple: 'วัดสุทัศน์เทพวราราม',
-            wishType: 'การงาน<br />การเรียน',
-            category: 'work',
-            isFavorite: false
-          },
-          {
-            id: 3,
-            name: 'พระพุทธตรีโลกเชษฐ์',
-            image: '/images/temple-list/พระพุทธตรีโลกเชษฐ์ .jpg',
-            temple: 'วัดสุทัศน์เทพวราราม',
-            wishType: 'ความรัก<br />คู่ครอง',
-            category: 'love',
-            isFavorite: false
-          },
-          {
-            id: 4,
-            name: 'ท้าวเวสสุวรรณ',
-            image: '/images/temple-list/ท้าวเวสุวรรณ.jpg',
-            temple: 'วัดสุทัศน์เทพวราราม',
-            wishType: 'การเงิน<br />ธุรกิจ',
-            category: 'finance',
-            isFavorite: true
-          },
-          {
-            id: 5,
-            name: 'พระรูปสมเด็จพระสังฆราช',
-            image: '/images/temple-list/พระรูปสมเด็จพระสังฆราช.jpeg',
-            temple: 'วัดสุทัศน์เทพวราราม',
-            wishType: 'โชคลาภ<br />วาสนา',
-            category: 'fortune',
-            isFavorite: false
-          },
-          {
-            id: 6,
-            name: 'พระพุทธเสฏฐมุนี',
-            image: '/images/temple-list/พระพุทธเสฏฐมุนี.jpeg',
-            temple: 'วัดสุทัศน์เทพวราราม',
-            wishType: 'โรคภัย<br />ไข้เจ็บ',
-            category: 'health',
             isFavorite: false
           },
           {
@@ -111,6 +71,77 @@ const WishPlaces: React.FC = () => {
             category: 'overview',
             isFavorite: false
           },
+          
+          // หมวด การงาน การเรียน
+          {
+            id: 2,
+            name: 'พระสุนทรี วาณี',
+            image: '/images/temple-list/พระสุนทรีวาณี.jpeg',
+            temple: 'วัดสุทัศน์เทพวราราม',
+            wishType: 'การงาน<br />การเรียน',
+            category: 'work',
+            isFavorite: false
+          },
+          {
+            id: 9,
+            name: 'พระพรหม',
+            image: '/images/temple-list/พระพรหม.jpg',
+            temple: 'วัดสุทัศน์เทพวราราม',
+            wishType: 'การงาน<br />การเรียน',
+            category: 'work',
+            isFavorite: false
+          },
+          
+          // หมวด ความรัก คู่ครอง
+          {
+            id: 3,
+            name: 'พระพุทธตรีโลกเชษฐ์',
+            image: '/images/temple-list/พระพุทธตรีโลกเชษฐ์ .jpg',
+            temple: 'วัดสุทัศน์เทพวราราม',
+            wishType: 'ความรัก<br />คู่ครอง',
+            category: 'love',
+            isFavorite: false
+          },
+          {
+            id: 10,
+            name: 'พระแม่กวนอิม',
+            image: '/images/temple-list/พระแม่กวนอิม.jpg',
+            temple: 'วัดสุทัศน์เทพวราราม',
+            wishType: 'ความรัก<br />คู่ครอง',
+            category: 'love',
+            isFavorite: false
+          },
+          
+          // หมวด การเงิน ธุรกิจ
+          {
+            id: 4,
+            name: 'ท้าวเวสสุวรรณ',
+            image: '/images/temple-list/ท้าวเวสุวรรณ.jpg',
+            temple: 'วัดสุทัศน์เทพวราราม',
+            wishType: 'การเงิน<br />ธุรกิจ',
+            category: 'finance',
+            isFavorite: false
+          },
+          {
+            id: 11,
+            name: 'พระพิฆเนศ',
+            image: '/images/temple-list/พระพิฆเนศ.jpg',
+            temple: 'วัดสุทัศน์เทพวราราม',
+            wishType: 'การเงิน<br />ธุรกิจ',
+            category: 'finance',
+            isFavorite: false
+          },
+          
+          // หมวด โชคลาภ วาสนา
+          {
+            id: 5,
+            name: 'พระรูปสมเด็จพระสังฆราช',
+            image: '/images/temple-list/พระรูปสมเด็จพระสังฆราช.jpeg',
+            temple: 'วัดสุทัศน์เทพวราราม',
+            wishType: 'โชคลาภ<br />วาสนา',
+            category: 'fortune',
+            isFavorite: false
+          },
           {
             id: 8,
             name: 'พระกริ่งใหญ่',
@@ -118,6 +149,26 @@ const WishPlaces: React.FC = () => {
             temple: 'วัดสุทัศน์เทพวราราม',
             wishType: 'โชคลาภ<br />วาสนา',
             category: 'fortune',
+            isFavorite: false
+          },
+          
+          // หมวด สุขภาพ โรคภัย
+          {
+            id: 6,
+            name: 'พระพุทธเสฏฐมุนี',
+            image: '/images/temple-list/พระพุทธเสฏฐมุนี.jpeg',
+            temple: 'วัดสุทัศน์เทพวราราม',
+            wishType: 'สุขภาพ<br />โรคภัย',
+            category: 'health',
+            isFavorite: false
+          },
+          {
+            id: 12,
+            name: 'พระพุทธชินราช',
+            image: '/images/temple-list/พระพุทธชินราช.jpg',
+            temple: 'วัดสุทัศน์เทพวราราม',
+            wishType: 'สุขภาพ<br />โรคภัย',
+            category: 'health',
             isFavorite: false
           }
         ];
@@ -144,6 +195,12 @@ const WishPlaces: React.FC = () => {
     return matchesSearch && place.category === activeCategory;
   });
   
+  // เพิ่ม isFavorite ให้กับ places ที่กรองแล้ว
+  const placesWithFavorites = filteredPlaces.map(place => ({
+    ...place,
+    isFavorite: isFavorite(place.id)
+  }));
+  
   // ฟังก์ชันจัดการการคลิกที่ปุ่มย้อนกลับ
   const handleBackClick = () => {
     router.push('/dashboard');
@@ -153,15 +210,10 @@ const WishPlaces: React.FC = () => {
   const handlePlaceClick = (placeId: number) => {
     router.push(`/information/${placeId}?type=buddha`);
   };
+  
   // ฟังก์ชันจัดการการกดถูกใจ
   const handleToggleFavorite = (placeId: number) => {
-    setWishPlaces(prevPlaces => 
-      prevPlaces.map(place => 
-        place.id === placeId 
-          ? { ...place, isFavorite: !place.isFavorite } 
-          : place
-      )
-    );
+    toggleFavorite(placeId);
   };
   
   // แสดงการโหลด
@@ -175,11 +227,7 @@ const WishPlaces: React.FC = () => {
       </div>
     );
   }
-  
-  // ตัวอย่างวิธีที่ 1: ใช้คอมโพเนนต์หลัก WishPlacesScreen
-  // return <WishPlacesScreen userName={user?.fullName} />;
-  
-  // ตัวอย่างวิธีที่ 2: ประกอบคอมโพเนนต์ย่อยด้วยตัวเอง
+
   return (
     <>
       <Head>
@@ -207,9 +255,9 @@ const WishPlaces: React.FC = () => {
           </div>
           
           {/* รายการสถานที่ */}
-          {filteredPlaces.length > 0 ? (
+          {placesWithFavorites.length > 0 ? (
             <WishPlacesList 
-              places={filteredPlaces}
+              places={placesWithFavorites}
               onPlaceClick={handlePlaceClick}
               onToggleFavorite={handleToggleFavorite}
             />

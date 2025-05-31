@@ -1,8 +1,9 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
 import { useAuth } from '@/contexts/AuthContext';
 import { CeremonyActivityScreen } from '@/components/ceremony-activity-components';
+import { useFavoritesActivity } from '@/hooks/useFavoritesActivity';
 import Link from 'next/link';
 import WhiteHeaderProfile from '@/components/header-profile/white-header';
 
@@ -10,6 +11,8 @@ import WhiteHeaderProfile from '@/components/header-profile/white-header';
 const CeremoniesPage: React.FC = () => {
   const router = useRouter();
   const { user, isAuthenticated, isLoading } = useAuth();
+  const { getFavoritesCount } = useFavoritesActivity();
+  const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
   
   // ฟังก์ชันสำหรับปุ่มย้อนกลับ
   const handleBackClick = () => {
@@ -22,6 +25,12 @@ const CeremoniesPage: React.FC = () => {
       router.push('/login');
     }
   }, [isAuthenticated, isLoading, router]);
+
+  // ตรวจสอบ query parameter สำหรับแสดง favorites
+  useEffect(() => {
+    const { favorites } = router.query;
+    setShowFavoritesOnly(favorites === 'true');
+  }, [router.query]);
 
   // แสดงการโหลด
   if (isLoading) {
@@ -38,42 +47,45 @@ const CeremoniesPage: React.FC = () => {
   return (
     <>
       <Head>
-        <title>พิธีกรรม - Nummu App</title>
-        <meta name="description" content="พิธีกรรมต่างๆ ในพุทธศาสนา" />
+        <title>{showFavoritesOnly ? 'รายการโปรด - พิธีกรรม' : 'พิธีกรรม'} - Nummu App</title>
+        <meta name="description" content={showFavoritesOnly ? 'รายการโปรดของพิธีกรรมในพุทธศาสนา' : 'พิธีกรรมต่างๆ ในพุทธศาสนา'} />
       </Head>
 
       <div className="bg-white text-white rounded-b-3xl">
-          <WhiteHeaderProfile />
-          <div className="bg-[#FF7A05] flex items-center justify-between relative pt-8 pb-20 mt-10 rounded-tl-[50px]">
-            <div className="flex items-center space-x-3">
-              <Link href="/dashboard" className="mr-2">
-                <svg
-                  className="w-6 h-6"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M15 19l-7-7 7-7"
-                  />
-                </svg>
-              </Link>
-            </div>
-            <h2 className="text-3xl font-semibold absolute left-1/2 -translate-x-1/2">
-              พิธีกรรม
-            </h2>
+        <WhiteHeaderProfile />
+        <div className="bg-[#FF7A05] flex items-center justify-between relative pt-8 pb-20 mt-10 rounded-tl-[50px]">
+          <div className="flex items-center space-x-3">
+            <Link href="/dashboard" className="mr-2">
+              <svg
+                className="w-6 h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M15 19l-7-7 7-7"
+                />
+              </svg>
+            </Link>
           </div>
+          <h2 className="text-3xl font-semibold absolute left-1/2 -translate-x-1/2">
+            {showFavoritesOnly ? 'รายการโปรด' : 'พิธีกรรม'}
+          </h2>
+          
+        
         </div>
+      </div>
       
       {/* ใช้คอมโพเนนต์หลัก */}
       <CeremonyActivityScreen 
         type="ceremony"
         userName={user?.fullName}
         onBackClick={handleBackClick}
+        showFavoritesOnly={showFavoritesOnly}
       />
     </>
   );

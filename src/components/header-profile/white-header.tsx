@@ -1,16 +1,40 @@
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
+import { useFavoritesActivity } from "@/hooks/useFavoritesActivity";
 
 export default function WhiteHeaderProfile() {
-    const router = useRouter();
+  const router = useRouter();
   const { user, isAuthenticated, isLoading } = useAuth();
+  const { getFavoritesCount, isLoaded } = useFavoritesActivity();
+
+  // ตรวจสอบว่าอยู่ในโหมด favorites หรือไม่
+  const isInFavoritesMode = router.asPath.includes('favorites=true');
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
       router.push("/login");
     }
   }, [isAuthenticated, isLoading, router]);
+
+  const handleFavoritesClick = () => {
+    if (isInFavoritesMode) {
+      // ถ้าอยู่ในโหมด favorites แล้ว ให้กลับไปดูทั้งหมด
+      const currentPath = router.pathname;
+      router.push(currentPath);
+    } else {
+      // ถ้าไม่ได้อยู่ในโหมด favorites ให้ไปยังหน้าเดียวกันในโหมด favorites
+      const currentPath = router.pathname;
+      
+      // ตรวจสอบว่าอยู่หน้าไหน
+      if (currentPath === '/ceremonies') {
+        router.push("/ceremonies?favorites=true");
+      } else {
+        // default ไปหน้า activities
+        router.push("/activities?favorites=true");
+      }
+    }
+  };
 
   if (isLoading) {
     return (
@@ -62,11 +86,18 @@ export default function WhiteHeaderProfile() {
             </span> */}
           </button>
         </div>
-        <div>
-          <button className="w-10 h-10 rounded-full bg-[#FF7A05] flex items-center justify-center mr-3">
+        <div className="relative">
+          <button 
+            onClick={handleFavoritesClick}
+            className={`w-10 h-10 rounded-full flex items-center justify-center mr-3 transition-colors duration-200 ${
+              isInFavoritesMode 
+                ? 'bg-pink-500 hover:bg-pink-600' 
+                : 'bg-[#FF7A05] hover:bg-orange-600'
+            }`}
+          >
             <svg
               className="w-6 h-6 text-white"
-              fill="none"
+              fill={isInFavoritesMode ? "currentColor" : "none"}
               stroke="currentColor"
               viewBox="0 0 24 24"
               xmlns="http://www.w3.org/2000/svg"
@@ -79,6 +110,8 @@ export default function WhiteHeaderProfile() {
               />
             </svg>
           </button>
+          
+         
         </div>
       </div>
     </>

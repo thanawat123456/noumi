@@ -3,6 +3,7 @@ import { useRouter } from "next/router";
 import Head from "next/head";
 import BottomNavigation from "@/components/BottomNavigation";
 import HeaderProfile from "@/components/header-profile/header-profile";
+import ProfileSlideMenu from '@/components/ProfileSlideMenu';
 
 const images = [
   {
@@ -80,6 +81,7 @@ export default function Dashboard() {
   const [newsCategory, setNewsCategory] = useState<string>("ALL");
 
   const [current, setCurrent] = useState(0);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   // เช็คการล็อกอิน (ใช้โค้ดเดิมที่คุณมี)
   useEffect(() => {
@@ -142,6 +144,7 @@ export default function Dashboard() {
 
   return (
     <>
+    
       <Head>
         <title>หน้าแรก - Nummu App</title>
         <meta
@@ -149,11 +152,12 @@ export default function Dashboard() {
           content="Nummu App - แอพพลิเคชั่นสำหรับการท่องเที่ยววัดและสถานที่ศักดิ์สิทธิ์"
         />
       </Head>
+      
 
       <div className="min-h-screen bg-gray-100 pb-20">
         {/* ส่วนหัว */}
         <div className="bg-[#FF7A05] text-white p-4 rounded-br-[140px]">
-          <HeaderProfile />
+          <HeaderProfile onProfileClick={() => setIsMenuOpen(true)} />
           <div className="mt-4">
             <h2 className="text-white text-lg">
               Nummu นำใจ นำพาคุณ
@@ -574,7 +578,11 @@ export default function Dashboard() {
             086-8514818, 082-7372904
           </div>
         </footer>
-        <BottomNavigation activePage="profile" />
+        <BottomNavigation activePage="home" />
+        <ProfileSlideMenu 
+          isOpen={isMenuOpen} 
+          onClose={() => setIsMenuOpen(false)}
+        />
       </div>
     </>
   );

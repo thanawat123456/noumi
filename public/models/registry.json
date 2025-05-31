@@ -1,0 +1,25 @@
+{
+    "models": [
+      {
+        "id": "CAR001",
+        "name": "รถยนต์สปอร์ต",
+        "file": "19-23389.glb",
+        "category": "ยานพาหนะ",
+        "description": "โมเดลรถสปอร์ตสีแดง ขนาด 1:24"
+      },
+      {
+        "id": "PROD001",
+        "name": "กระเป๋า Luxury",
+        "file": "bag-luxury.glb",
+        "category": "สินค้า",
+        "description": "กระเป๋าหนังแท้ คอลเลกชันใหม่"
+      },
+      {
+        "id": "LOGO3D",
+        "name": "โลโก้บริษัท 3D",
+        "file": "company-logo.glb",
+        "category": "แบรนด์",
+        "description": "โลโก้บริษัท แบบ 3 มิติ"
+      }
+    ]
+  }

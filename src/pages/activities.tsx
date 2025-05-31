@@ -1,8 +1,9 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import Head from "next/head";
 import { useAuth } from "@/contexts/AuthContext";
 import { CeremonyActivityScreen } from "@/components/ceremony-activity-components";
+import { useFavoritesActivity } from "@/hooks/useFavoritesActivity";
 import Link from "next/link";
 import WhiteHeaderProfile from "@/components/header-profile/white-header";
 
@@ -11,16 +12,25 @@ import WhiteHeaderProfile from "@/components/header-profile/white-header";
 const ActivitiesPage: React.FC = () => {
   const router = useRouter();
   const { user, isAuthenticated, isLoading } = useAuth();
+  const { getFavoritesCount } = useFavoritesActivity();
+  const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
 
   const handleBackClick = () => {
     router.push('/dashboard');
   };
+  
   // ตรวจสอบการล็อกอิน
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
       router.push("/login");
     }
   }, [isAuthenticated, isLoading, router]);
+
+  // ตรวจสอบ query parameter สำหรับแสดง favorites
+  useEffect(() => {
+    const { favorites } = router.query;
+    setShowFavoritesOnly(favorites === 'true');
+  }, [router.query]);
 
   // แสดงการโหลด
   if (isLoading) {
@@ -37,8 +47,8 @@ const ActivitiesPage: React.FC = () => {
   return (
     <>
       <Head>
-        <title>กิจกรรม - Nummu App</title>
-        <meta name="description" content="กิจกรรมต่างๆ ในพุทธศาสนา" />
+        <title>{showFavoritesOnly ? 'รายการโปรด - กิจกรรม' : 'กิจกรรม'} - Nummu App</title>
+        <meta name="description" content={showFavoritesOnly ? 'รายการโปรดของกิจกรรมในพุทธศาสนา' : 'กิจกรรมต่างๆ ในพุทธศาสนา'} />
       </Head>
 
       <div className="bg-white text-white rounded-b-3xl">
@@ -63,8 +73,11 @@ const ActivitiesPage: React.FC = () => {
             </Link>
           </div>
           <h2 className="text-3xl font-semibold absolute left-1/2 -translate-x-1/2">
-            กิจกรรม
+            {showFavoritesOnly ? 'รายการโปรด' : 'กิจกรรม'}
           </h2>
+          
+          {/* ปุ่มสลับกลับไปดูทั้งหมด (แสดงเฉพาะเมื่ออยู่ในโหมด favorites) */}
+          
         </div>
       </div>
 
@@ -73,6 +86,7 @@ const ActivitiesPage: React.FC = () => {
         type="activity" 
         userName={user?.fullName}
         onBackClick={handleBackClick}
+        showFavoritesOnly={showFavoritesOnly}
       />
     </>
   );
