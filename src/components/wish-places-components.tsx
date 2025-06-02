@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import HeaderProfile from "./header-profile/header-profile";
 import { WishPlace, WISH_CATEGORIES } from "@/data/wishPlaces";
+import ProfileSlideMenu from '@/components/ProfileSlideMenu';
 
 // Types
 interface WishPlacesHeaderProps {
@@ -32,6 +33,7 @@ interface CategoryButtonProps {
 
 
 const CategoryButton: React.FC<CategoryButtonProps> = ({ category, isActive, onClick }) => {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const getIcon = (iconType: string) => {
     switch (iconType) {
       case "overview":
@@ -311,9 +313,10 @@ export const WishPlacesHeader: React.FC<WishPlacesHeaderProps> = ({
   activeCategory,
   onCategoryChange,
 }) => {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   return (
     <div className="bg-[#FF7A05] text-white p-4 rounded-br-[130px]">
-      <HeaderProfile />
+      <HeaderProfile onProfileClick={() => setIsMenuOpen(true)} />
 
       {/* ชื่อหน้า */}
       <div className="flex items-center justify-between mb-4 relative pt-8 pb-4">
@@ -399,6 +402,10 @@ export const WishPlacesHeader: React.FC<WishPlacesHeaderProps> = ({
           />
         ))}
       </div>
+       <ProfileSlideMenu 
+          isOpen={isMenuOpen} 
+          onClose={() => setIsMenuOpen(false)}
+        />
     </div>
   );
 };
@@ -507,7 +514,9 @@ export const WishPlacesList: React.FC<WishPlacesListProps> = ({
             />
           </div>
         </div>
+        
       ))}
+      
     </div>
   );
 };

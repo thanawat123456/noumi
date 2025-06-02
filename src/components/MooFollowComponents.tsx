@@ -2,9 +2,10 @@ import React, { useState } from 'react';
 import { Heart } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { useFavorites } from '@/hooks/useFavoritesMoo';
+import { useAuth } from '@/contexts/AuthContext';
 import BottomNavigation from '@/components/BottomNavigation';
 import Link from 'next/link';
-
+import ProfileSlideMenu from '@/components/ProfileSlideMenu';
 
 interface MooFollowItem {
   id: number;
@@ -15,9 +16,11 @@ interface MooFollowItem {
 
 const MooFollowScreen: React.FC = () => {
   const router = useRouter();
+  const { user } = useAuth();
   const { isFavorite, toggleFavorite } = useFavorites();
   const [activeTab, setActiveTab] = useState<'story' | 'journey'>('story');
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   // Initial data for story items (links to /place/[id])
   const initialStoryItems: MooFollowItem[] = [
@@ -80,35 +83,40 @@ const MooFollowScreen: React.FC = () => {
         <div className="px-4 pt-6 pb-4">
           <div className="flex items-center mt-8 justify-between">
             <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-200">
-                <img
-                  src="/images/profile/travel/Profile.jpeg"
-                  alt="Profile"
-                  className="w-full h-full object-cover"
+              <button 
+                className="w-15 h-15 rounded-full overflow-hidden bg-gray-200 border-0 p-0"
+                onClick={() => setIsMenuOpen(true)}
+              >
+                <img 
+                  src={user?.avatar || "/images/profile/travel/Profile.jpeg"} 
+                  alt="Profile" 
+                  className="w-full h-full object-cover" 
                 />
-              </div>
+              </button>
               <div>
-                <p className="text-gray-600 text-sm">สวัสดี,ยินดีต้อนรับ</p>
-                <h3 className="text-gray-800 font-medium">Praewwy :)</h3>
+                <p className="text-orange-400 text-sm">สวัสดี, ยินดีต้อนรับ</p>
+                <h3 className="text-orange-400 font-medium">
+                  {user?.fullName || user?.email?.split('@')[0] || 'ผู้ใช้'} :)
+                </h3>
               </div>
             </div>
             <div className="flex space-x-2">
-               <Link href="/notifications" passHref>
-              <button className="w-10 h-10 rounded-full bg-orange-500 flex items-center justify-center">
-                <svg
-                  className="w-5 h-5 text-white"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
-                  />
-                </svg>
-              </button>
+              <Link href="/notifications" passHref>
+                <button className="w-10 h-10 rounded-full bg-orange-500 flex items-center justify-center">
+                  <svg
+                    className="w-5 h-5 text-white"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
+                    />
+                  </svg>
+                </button>
               </Link>
               <button
                 onClick={() => setShowFavoritesOnly(!showFavoritesOnly)}
@@ -123,18 +131,18 @@ const MooFollowScreen: React.FC = () => {
         </div>
 
         {/* Tabs */}
-        <div className="px-4">
+        <div className="px-4 mt-7">
           <div className="flex justify-center space-x-4">
             <div className="relative">
               <button
                 onClick={() => setActiveTab('story')}
                 className={`px-6 py-2 rounded-full font-medium transition-colors ${
                   activeTab === 'story'
-                    ? 'bg-orange-500 text-white'
-                    : 'bg-pink-100 text-gray-600'
+                    ? 'bg-orange-500  text-white'
+                    : 'bg-pink-100  text-pink-600'
                 }`}
               >
-                บูชาเรื่องเล่า
+                มูตามเรื่องเล่า
               </button>
               {activeTab === 'story' && (
                 <div className="absolute bottom-0 left-0 right-0 h-1 bg-orange-500 rounded-full transform translate-y-2"></div>
@@ -145,11 +153,11 @@ const MooFollowScreen: React.FC = () => {
                 onClick={() => setActiveTab('journey')}
                 className={`px-6 py-2 rounded-full font-medium transition-colors ${
                   activeTab === 'journey'
-                    ? 'bg-orange-500 text-white'
-                    : 'bg-pink-100 text-gray-600'
+                    ? 'bg-orange-500 text-sm text-white'
+                    : 'bg-pink-100 text-sm text-pink-600'
                 }`}
               >
-                บูชาเล้นทาง
+                มูตามเรื่องเล่า
               </button>
               {activeTab === 'journey' && (
                 <div className="absolute bottom-0 left-0 right-0 h-1 bg-orange-500 rounded-full transform translate-y-2"></div>
@@ -216,8 +224,11 @@ const MooFollowScreen: React.FC = () => {
       </div>
 
       {/* Bottom Navigation */}
-        <BottomNavigation activePage="moofollow" />
-      
+      <BottomNavigation activePage="moofollow" />
+      <ProfileSlideMenu 
+        isOpen={isMenuOpen} 
+        onClose={() => setIsMenuOpen(false)}
+      />
     </div>
   );
 };

@@ -232,6 +232,14 @@ class SQLiteDatabase {
     return user || null;
   }
 
+public async updateUser(id: number, updates: string[], values: any[]): Promise<void> {
+  await this.init();
+  if (!this.db) throw new Error('Database not initialized');
+  
+  const query = `UPDATE users SET ${updates.join(', ')} WHERE id = ?`;
+  await this.db.run(query, values);
+}
+
   public async getUserByEmailAndPassword(email: string, password: string): Promise<UserType | null> {
     await this.init();
     if (!this.db) throw new Error('Database not initialized');

@@ -15,7 +15,9 @@ const BottomNavigation: React.FC<BottomNavigationProps> = ({ activePage }) => {
     (currentPath === '/' ? 'home' :
      currentPath === '/ar' ? 'ar' :
      currentPath === '/moofollow' ? 'moofollow' : 
-     currentPath === '/profile' ? 'profile' : 'home');
+     currentPath === '/profile' ? 'profile' : 'home'
+    
+    );
 
   return (
     <footer className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-10 max-w-[414px] mx-auto">

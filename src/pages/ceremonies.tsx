@@ -6,15 +6,16 @@ import { CeremonyActivityScreen } from '@/components/ceremony-activity-component
 import { useFavoritesActivity } from '@/hooks/useFavoritesActivity';
 import Link from 'next/link';
 import WhiteHeaderProfile from '@/components/header-profile/white-header';
+import ProfileSlideMenu from '@/components/ProfileSlideMenu';
 
-// หน้าแสดงพิธีกรรม
+
 const CeremoniesPage: React.FC = () => {
   const router = useRouter();
   const { user, isAuthenticated, isLoading } = useAuth();
   const { getFavoritesCount } = useFavoritesActivity();
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
-  
-  // ฟังก์ชันสำหรับปุ่มย้อนกลับ
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
   const handleBackClick = () => {
     router.push('/dashboard');
   };
@@ -52,7 +53,7 @@ const CeremoniesPage: React.FC = () => {
       </Head>
 
       <div className="bg-white text-white rounded-b-3xl">
-        <WhiteHeaderProfile />
+        <WhiteHeaderProfile onProfileClick={() => setIsMenuOpen(true)}/>
         <div className="bg-[#FF7A05] flex items-center justify-between relative pt-8 pb-20 mt-10 rounded-tl-[50px]">
           <div className="flex items-center space-x-3">
             <Link href="/dashboard" className="mr-2">
@@ -80,7 +81,10 @@ const CeremoniesPage: React.FC = () => {
         </div>
       </div>
       
-      {/* ใช้คอมโพเนนต์หลัก */}
+        <ProfileSlideMenu 
+          isOpen={isMenuOpen} 
+          onClose={() => setIsMenuOpen(false)}
+        />
       <CeremonyActivityScreen 
         type="ceremony"
         userName={user?.fullName}

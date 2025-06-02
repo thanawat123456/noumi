@@ -4,6 +4,7 @@ import { useRouter } from 'next/router';
 import { useAuth } from '@/contexts/AuthContext';
 import Link from 'next/link';
 import BottomNavigation from '@/components/BottomNavigation';
+import ProfileSlideMenu from '@/components/ProfileSlideMenu';
 
 // ข้อมูลธาตุประจำราศี (12 ราศี) - ข้อมูลสมบูรณ์
 const zodiacElementsData = {
@@ -410,9 +411,12 @@ const getMonthName = (monthNum: string) => {
   return months[parseInt(monthNum) - 1] || 'JAN';
 };
 
+
+
 export default function Profile() {
   const { user, isAuthenticated, isLoading } = useAuth();
   const router = useRouter();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [luckyNumbers, setLuckyNumbers] = useState<number[]>([]);
   const [luckyColors, setLuckyColors] = useState<string[]>([]);
   const [zodiacSign, setZodiacSign] = useState<string>('');
@@ -489,14 +493,17 @@ export default function Profile() {
       <div className="flex flex-col min-h-screen bg-white">
         {/* Header */}
         <header className="bg-white p-4 flex justify-between items-center shadow-sm relative z-10">
-          <button className=" text-white p-2 rounded-full"
-            style={{ 
-              color: hexToRgba(bgStyles.gradient, 100) 
-            }}>
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
-          </button>
+          <button 
+              onClick={() => setIsMenuOpen(true)}
+              className="text-white p-2 rounded-full"
+              style={{ 
+                color: hexToRgba(bgStyles.gradient, 100) 
+              }}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            </button>
           <div 
             className="font-bold text-xl" 
             style={{ 
@@ -728,6 +735,10 @@ export default function Profile() {
         
         {/* Bottom Navigation Bar */}
         <BottomNavigation activePage="profile" />
+        <ProfileSlideMenu 
+          isOpen={isMenuOpen} 
+          onClose={() => setIsMenuOpen(false)}
+        />
       </div>
     </>
   );

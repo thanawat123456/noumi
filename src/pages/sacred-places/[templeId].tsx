@@ -5,6 +5,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import BottomNavigation from "@/components/BottomNavigation";
 import HeaderProfile from "@/components/header-profile/header-profile";
 import Link from "next/link";
+import ProfileSlideMenu from '@/components/ProfileSlideMenu';
 
 // Types
 interface BuddhaStatue {
@@ -35,7 +36,7 @@ export default function TempleBuddhaStatues() {
   const [temple, setTemple] = useState<Temple | null>(null);
   const [buddhaStatues, setBuddhaStatues] = useState<BuddhaStatue[]>([]);
   const [loading, setLoading] = useState(true);
-
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const tabs = ["ทั้งหมด", "ที่นิยม"];
 
   // Redirect to login if not authenticated
@@ -208,7 +209,7 @@ export default function TempleBuddhaStatues() {
       <div className="min-h-screen bg-gray-100 pb-20">
         {/* Header */}
         <div className="bg-orange-500 text-white p-4 rounded-b-3xl">
-          <HeaderProfile />
+           <HeaderProfile onProfileClick={() => setIsMenuOpen(true)} />
           <div className="flex items-center justify-between mb-4 relative pt-8 pb-4">
             <div className="flex items-center space-x-3">
               <Link href="/dashboard" className="mr-2">
@@ -337,6 +338,10 @@ export default function TempleBuddhaStatues() {
         </div>
 
         <BottomNavigation activePage="profile" />
+         <ProfileSlideMenu 
+          isOpen={isMenuOpen} 
+          onClose={() => setIsMenuOpen(false)}
+        />
       </div>
     </>
   );

@@ -628,7 +628,7 @@ export default function BuddhaStatueInfo() {
                     </div> */}
                 </div>
 
-                <BottomNavigation activePage="profile" />
+                <BottomNavigation activePage="ar" />
             </div>
         </>
     );

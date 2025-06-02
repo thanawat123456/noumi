@@ -214,7 +214,7 @@ export const CeremonyActivityScreen: React.FC<CeremonyActivityScreenProps> = ({
       if (type === "ceremony") {
         return [
           {
-            id: 1,
+            id: 8,
             name: "ขอขมากรรม",
             image: "/images/temple-list/พระพุทธเสฏฐมุนี.jpeg",
             description: "การแก้กรรมอดีต แก้กรรมติดตัวและค้างนาน",
@@ -276,7 +276,7 @@ export const CeremonyActivityScreen: React.FC<CeremonyActivityScreenProps> = ({
 
   const handleItemClick = (id: number) => {
     if (type === "ceremony") {
-      router.push(`/ceremonies/${id}`);
+      router.push(`/information/${id}?type=buddha`);
     } else {
       router.push(`/activities/${id}`);
     }

@@ -3,7 +3,12 @@ import { useRouter } from "next/router";
 import { useEffect } from "react";
 import { useFavoritesActivity } from "@/hooks/useFavoritesActivity";
 
-export default function WhiteHeaderProfile() {
+
+interface HeaderProfileProps {
+  onProfileClick?: () => void;
+}
+
+export default function WhiteHeaderProfile({ onProfileClick }: HeaderProfileProps) {
   const router = useRouter();
   const { user, isAuthenticated, isLoading } = useAuth();
   const { getFavoritesCount, isLoaded } = useFavoritesActivity();
@@ -51,13 +56,16 @@ export default function WhiteHeaderProfile() {
     <>
       <div className="flex items-center justify-between mb-4 pt-8 pl-3">
         <div className="flex items-center space-x-3">
-          <div className="w-12 h-12 rounded-full overflow-hidden bg-white">
+           <button 
+            onClick={onProfileClick}
+            className="w-12 h-12 rounded-full overflow-hidden bg-white border-0 p-0 cursor-pointer"
+          >
             <img
-              src={user?.avatar || "/api/placeholder/48/48"}
+              src={user?.avatar || "/images/profile/travel/Profile.jpeg"}
               alt="Profile"
               className="w-full h-full object-cover"
             />
-          </div>
+          </button>
           <div>
             <p className="text-[#FF7A05] text-sm">สวัสดี,ยินดีต้อนรับ</p>
             <h3 className="text-[#FF7A05] text-xl font-medium">

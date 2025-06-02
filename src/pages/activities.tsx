@@ -6,6 +6,7 @@ import { CeremonyActivityScreen } from "@/components/ceremony-activity-component
 import { useFavoritesActivity } from "@/hooks/useFavoritesActivity";
 import Link from "next/link";
 import WhiteHeaderProfile from "@/components/header-profile/white-header";
+import ProfileSlideMenu from '@/components/ProfileSlideMenu';
 
 // หน้าแสดงกิจกรรม
 
@@ -14,7 +15,8 @@ const ActivitiesPage: React.FC = () => {
   const { user, isAuthenticated, isLoading } = useAuth();
   const { getFavoritesCount } = useFavoritesActivity();
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
-
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  
   const handleBackClick = () => {
     router.push('/dashboard');
   };
@@ -52,7 +54,7 @@ const ActivitiesPage: React.FC = () => {
       </Head>
 
       <div className="bg-white text-white rounded-b-3xl">
-        <WhiteHeaderProfile />
+        <WhiteHeaderProfile onProfileClick={() => setIsMenuOpen(true)}/>
         <div className="bg-[#FF7A05] flex items-center justify-between relative pt-8 pb-20 mt-10 rounded-tl-[50px]">
           <div className="flex items-center space-x-3">
             <Link href="/dashboard" className="mr-2">
@@ -80,7 +82,10 @@ const ActivitiesPage: React.FC = () => {
           
         </div>
       </div>
-
+       <ProfileSlideMenu 
+          isOpen={isMenuOpen} 
+          onClose={() => setIsMenuOpen(false)}
+        />
       {/* ใช้คอมโพเนนต์หลัก */}
       <CeremonyActivityScreen
         type="activity" 
