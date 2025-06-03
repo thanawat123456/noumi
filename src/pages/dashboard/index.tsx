@@ -503,7 +503,7 @@ export default function Dashboard() {
               {images[current] && (
                 <div className="relative rounded-[30px] overflow-hidden">
                   <img
-                    src={images[current].src}
+                    src={images[current].src} 
                     alt={images[current].title}
                     className="w-full h-60 object-cover"
                   />
