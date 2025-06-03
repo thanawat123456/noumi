@@ -120,68 +120,192 @@ class SQLiteDatabase {
     return this.initPromise;
   }
   private async createTables(): Promise<void> {
-    if (!this.db) return;
+  if (!this.db) return;
 
-    // Create users table
-    await this.db.exec(`
-      CREATE TABLE IF NOT EXISTS users (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        email TEXT UNIQUE NOT NULL,
-        password TEXT,
-        phone TEXT,
-        full_name TEXT,
-        birth_date TEXT,
-        day_of_birth TEXT,
-        element_type TEXT,
-        zodiac_sign TEXT,
-        blood_group TEXT,
-        avatar TEXT,
-        created_at TEXT
-      )
-    `);
+  // Create users table
+  await this.db.exec(`
+    CREATE TABLE IF NOT EXISTS users (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      email TEXT UNIQUE NOT NULL,
+      phone TEXT,
+      password TEXT NOT NULL,
+      full_name TEXT NOT NULL,
+      birth_date TEXT NOT NULL,
+      day_of_birth TEXT,
+      element_type TEXT,
+      zodiac_sign TEXT,
+      blood_group TEXT,
+      avatar TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      last_login TEXT,
+      login_count INTEGER DEFAULT 0
+    )
+  `);
 
-    // Create todos table
-    await this.db.exec(`
-      CREATE TABLE IF NOT EXISTS todos (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        title TEXT NOT NULL,
-        completed INTEGER NOT NULL DEFAULT 0,
-        created_at TEXT NOT NULL,
-        user_id INTEGER NOT NULL,
-        FOREIGN KEY (user_id) REFERENCES users (id)
-      )
-    `);
+  await this.db.exec(`
+    CREATE TABLE IF NOT EXISTS appointments (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id INTEGER NOT NULL,
+      service_type TEXT NOT NULL,
+      appointment_date TEXT NOT NULL,
+      appointment_time TEXT NOT NULL,
+      notes TEXT,
+      status TEXT DEFAULT 'pending',
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (user_id) REFERENCES users (id)
+    )
+  `);
 
-    await this.db.exec(`
-      CREATE TABLE IF NOT EXISTS temples (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT NOT NULL,
-        image TEXT,
-        address TEXT,
-        description TEXT,
-        highlighted INTEGER NOT NULL DEFAULT 0,
-        created_at TEXT
-      )
-    `);
-    
-    // Create buddha_statues table
-    await this.db.exec(`
-      CREATE TABLE IF NOT EXISTS buddha_statues (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT NOT NULL,
-        temple_id INTEGER NOT NULL,
-        image TEXT,
-        benefits TEXT,
-        description TEXT,
-        popular INTEGER NOT NULL DEFAULT 0,
-        created_at TEXT,
-        FOREIGN KEY (temple_id) REFERENCES temples (id)
-      )
-    `);
-  }
+  await this.db.exec(`
+    CREATE TABLE IF NOT EXISTS predictions (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id INTEGER NOT NULL,
+      prediction_type TEXT NOT NULL,
+      prediction_date TEXT NOT NULL,
+      content TEXT NOT NULL,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (user_id) REFERENCES users (id)
+    )
+  `);
+
+  // Create todos table
+  await this.db.exec(`
+    CREATE TABLE IF NOT EXISTS todos (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      title TEXT NOT NULL,
+      completed INTEGER NOT NULL DEFAULT 0,
+      created_at TEXT NOT NULL,
+      user_id INTEGER NOT NULL,
+      FOREIGN KEY (user_id) REFERENCES users (id)
+    )
+  `);
+
+  await this.db.exec(`
+    CREATE TABLE IF NOT EXISTS temples (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name TEXT NOT NULL,
+      image TEXT,
+      address TEXT,
+      description TEXT,
+      highlighted INTEGER NOT NULL DEFAULT 0,
+      created_at TEXT
+    )
+  `);
+  
+  // Create buddha_statues table
+  await this.db.exec(`
+    CREATE TABLE IF NOT EXISTS buddha_statues (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name TEXT NOT NULL,
+      temple_id INTEGER NOT NULL,
+      image TEXT,
+      benefits TEXT,
+      description TEXT,
+      popular INTEGER NOT NULL DEFAULT 0,
+      created_at TEXT,
+      FOREIGN KEY (temple_id) REFERENCES temples (id)
+    )
+  `);
+
+  // สร้างตาราง login_history แยกต่างหาก
+  await this.db.exec(`
+    CREATE TABLE IF NOT EXISTS login_history (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id INTEGER NOT NULL,
+      login_at TEXT NOT NULL,
+      ip_address TEXT,
+      user_agent TEXT,
+      FOREIGN KEY (user_id) REFERENCES users (id)
+    )
+  `);
+}
 
   
+ public async recordLogin(userId: number, ipAddress?: string, userAgent?: string): Promise<void> {
+  await this.init();
+  if (!this.db) throw new Error('Database not initialized');
+  
+  try {
+    const now = new Date().toISOString();
+    
+    // ตรวจสอบว่ามี column last_login หรือไม่
+    const columns = await this.db.all(`PRAGMA table_info(users)`);
+    const hasLastLogin = columns.some((col: any) => col.name === 'last_login');
+    
+    if (hasLastLogin) {
+      // อัพเดท last_login
+      await this.db.run(`
+        UPDATE users 
+        SET last_login = ?
+        WHERE id = ?
+      `, [now, userId]);
+    }
+  } catch (error) {
+    console.error('Error recording login:', error);
+  }
+}
 
+
+// Method สำหรับดึงสถิติการเข้าชม
+public async getVisitStats(): Promise<{
+  todayVisits: number;
+  weeklyVisits: number;
+  monthlyVisits: number;
+}> {
+  await this.init();
+  if (!this.db) throw new Error('Database not initialized');
+  
+  try {
+    // ตรวจสอบว่ามี column last_login หรือไม่
+    const columns = await this.db.all(`PRAGMA table_info(users)`);
+    const hasLastLogin = columns.some((col: any) => col.name === 'last_login');
+    
+    if (!hasLastLogin) {
+      // ถ้ายังไม่มี column last_login ให้ return 0 ทั้งหมด
+      return {
+        todayVisits: 0,
+        weeklyVisits: 0,
+        monthlyVisits: 0
+      };
+    }
+    
+    const now = new Date();
+    const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
+    const weekStart = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString();
+    const monthStart = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000).toISOString();
+    
+    const todayResult = await this.db.get<{count: number}>(`
+      SELECT COUNT(*) as count 
+      FROM users 
+      WHERE last_login >= ?
+    `, todayStart);
+    
+    const weekResult = await this.db.get<{count: number}>(`
+      SELECT COUNT(*) as count 
+      FROM users 
+      WHERE last_login >= ?
+    `, weekStart);
+    
+    const monthResult = await this.db.get<{count: number}>(`
+      SELECT COUNT(*) as count 
+      FROM users 
+      WHERE last_login >= ?
+    `, monthStart);
+    
+    return {
+      todayVisits: todayResult?.count || 0,
+      weeklyVisits: weekResult?.count || 0,
+      monthlyVisits: monthResult?.count || 0
+    };
+  } catch (error) {
+    console.error('Error getting visit stats:', error);
+    return {
+      todayVisits: 0,
+      weeklyVisits: 0,
+      monthlyVisits: 0
+    };
+  }
+}
   // Users methods
   public async addUser(user: UserType): Promise<number> {
     await this.init();
@@ -287,6 +411,43 @@ public async updateUser(id: number, updates: string[], values: any[]): Promise<v
     `, id);
   }
 
+  public async getAllUsers(): Promise<any[]> {
+  await this.init();
+  if (!this.db) throw new Error('Database not initialized');
+  
+  try {
+    const users = await this.db.all(`
+      SELECT 
+        id,
+        email,
+        phone,
+        full_name,
+        birth_date,
+        day_of_birth,
+        element_type,
+        zodiac_sign,
+        blood_group,
+        avatar,
+        created_at
+      FROM users 
+      ORDER BY created_at DESC
+    `);
+    
+    return users || [];
+  } catch (error) {
+    console.error('Error getting all users:', error);
+    return [];
+  }
+}
+
+// หรือถ้าต้องการ method ทั่วไปสำหรับ query ใดๆ:
+public async runQuery(query: string, params?: any[]): Promise<any> {
+  await this.init();
+  if (!this.db) throw new Error('Database not initialized');
+  
+  return await this.db.all(query, params);
+}
+
   public async getTodosByUserId(userId: number): Promise<TodoType[]> {
     await this.init();
     if (!this.db) throw new Error('Database not initialized');
@@ -316,5 +477,8 @@ if (typeof window === 'undefined') {
   console.log('Starting database initialization on server...');
   dbService.init().catch(err => console.error('Failed to initialize database:', err));
 }
+
+
+
 
 export default dbService;
