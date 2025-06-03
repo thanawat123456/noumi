@@ -25,9 +25,19 @@ export default async function handler(
 
     const user = await dbService.getUserByEmailAndPassword(email, password);
 
-    if (!user) {
-      return res.status(401).json({ success: false, error: 'Invalid email or password' });
+    if (!user || !user.id) {
+      return res.status(401).json({ 
+        success: false, 
+        error: 'Invalid email or password' 
+      });
     }
+
+    const ipAddress = req.headers['x-forwarded-for'] as string || req.socket.remoteAddress;
+    const userAgent = req.headers['user-agent'];
+    
+    await dbService.recordLogin(user.id, ipAddress, userAgent);
+
+    const { password: _, ...userWithoutPassword } = user;
 
     // สร้าง user object ที่จะส่งกลับไปให้ client
     const userData = {
