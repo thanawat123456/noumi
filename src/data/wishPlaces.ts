@@ -59,7 +59,7 @@ export const WISH_PLACES_DATA: WishPlace[] = [
     isFavorite: false
   },
   {
-    id: 7,
+    id: 4,
     name: 'ต้นพระศรีมหาโพธิ์',
     image: '/images/temple-list/ต้นพระศรีมหาโพธิ์.jpeg',
     temple: 'วัดสุทัศน์เทพวราราม',
@@ -77,39 +77,39 @@ export const WISH_PLACES_DATA: WishPlace[] = [
     category: 'work',
     isFavorite: false
   },
-  {
-    id: 9,
-    name: 'พระพรหม',
-    image: '/images/temple-list/พระพรหม.jpg',
-    temple: 'วัดสุทัศน์เทพวราราม',
-    wishType: 'การงาน<br />การเรียน',
-    category: 'work',
-    isFavorite: false
-  },
+  // {
+  //   id: 9,
+  //   name: 'พระพรหม',
+  //   image: '/images/temple-list/พระพรหม.jpg',
+  //   temple: 'วัดสุทัศน์เทพวราราม',
+  //   wishType: 'การงาน<br />การเรียน',
+  //   category: 'work',
+  //   isFavorite: false
+  // },
   
   // หมวด ความรัก คู่ครอง
-  {
-    id: 3,
-    name: 'พระพุทธตรีโลกเชษฐ์',
-    image: '/images/temple-list/พระพุทธตรีโลกเชษฐ์ .jpg',
-    temple: 'วัดสุทัศน์เทพวราราม',
-    wishType: 'ความรัก<br />คู่ครอง',
-    category: 'love',
-    isFavorite: false
-  },
-  {
-    id: 10,
-    name: 'พระพุทธรังสีมุนราชัย',
-    image: '/images/temple-list/พระพุทธรังสีมุนราชัย.jpeg',
-    temple: 'วัดสุทัศน์เทพวราราม',
-    wishType: 'ความรัก<br />คู่ครอง',
-    category: 'love',
-    isFavorite: false
-  },
+  // {
+  //   id: 3,
+  //   name: 'พระพุทธตรีโลกเชษฐ์',
+  //   image: '/images/temple-list/พระพุทธตรีโลกเชษฐ์ .jpg',
+  //   temple: 'วัดสุทัศน์เทพวราราม',
+  //   wishType: 'ความรัก<br />คู่ครอง',
+  //   category: 'love',
+  //   isFavorite: false
+  // },
+  // {
+  //   id: 10,
+  //   name: 'พระพุทธรังสีมุนราชัย',
+  //   image: '/images/temple-list/พระพุทธรังสีมุนราชัย.jpeg',
+  //   temple: 'วัดสุทัศน์เทพวราราม',
+  //   wishType: 'ความรัก<br />คู่ครอง',
+  //   category: 'love',
+  //   isFavorite: false
+  // },
   
   // หมวด การเงิน ธุรกิจ
   {
-    id: 4,
+    id: 7,
     name: 'ท้าวเวสสุวรรณ',
     image: '/images/temple-list/ท้าวเวสุวรรณ.jpg',
     temple: 'วัดสุทัศน์เทพวราราม',
@@ -117,19 +117,19 @@ export const WISH_PLACES_DATA: WishPlace[] = [
     category: 'finance',
     isFavorite: false
   },
-  {
-    id: 11,
-    name: 'เจ้าแม่กวนอิม',
-    image: '/images/temple-list/เจ้าแม่กวนอิม.jpg',
-    temple: 'วัดสุทัศน์เทพวราราม',
-    wishType: 'การเงิน<br />ธุรกิจ',
-    category: 'finance',
-    isFavorite: false
-  },
+  // {
+  //   id: 11,
+  //   name: 'เจ้าแม่กวนอิม',
+  //   image: '/images/temple-list/เจ้าแม่กวนอิม.jpg',
+  //   temple: 'วัดสุทัศน์เทพวราราม',
+  //   wishType: 'การเงิน<br />ธุรกิจ',
+  //   category: 'finance',
+  //   isFavorite: false
+  // },
   
   // หมวด โชคลาภ วาสนา
   {
-    id: 5,
+    id: 9,
     name: 'พระรูปสมเด็จพระสังฆราช',
     image: '/images/temple-list/พระรูปสมเด็จพระสังฆราช.jpeg',
     temple: 'วัดสุทัศน์เทพวราราม',
@@ -138,7 +138,7 @@ export const WISH_PLACES_DATA: WishPlace[] = [
     isFavorite: false
   },
   {
-    id: 8,
+    id: 6,
     name: 'พระกริ่งใหญ่',
     image: '/images/temple-list/พระกริ่งใหญ่.jpeg',
     temple: 'วัดสุทัศน์เทพวราราม',
@@ -149,7 +149,7 @@ export const WISH_PLACES_DATA: WishPlace[] = [
   
   // หมวด สุขภาพ โรคภัย
   {
-    id: 6,
+    id: 8,
     name: 'พระพุทธเสฏฐมุนี',
     image: '/images/temple-list/พระพุทธเสฏฐมุนี.jpeg',
     temple: 'วัดสุทัศน์เทพวราราม',
@@ -157,15 +157,15 @@ export const WISH_PLACES_DATA: WishPlace[] = [
     category: 'health',
     isFavorite: false
   },
-  {
-    id: 12,
-    name: 'พระพุทธชินราช',
-    image: '/images/temple-list/พระพุทธชินราช.jpg',
-    temple: 'วัดสุทัศน์เทพวราราม',
-    wishType: 'สุขภาพ<br />โรคภัย',
-    category: 'health',
-    isFavorite: false
-  }
+  // {
+  //   id: 12,
+  //   name: 'พระพุทธชินราช',
+  //   image: '/images/temple-list/พระพุทธชินราช.jpg',
+  //   temple: 'วัดสุทัศน์เทพวราราม',
+  //   wishType: 'สุขภาพ<br />โรคภัย',
+  //   category: 'health',
+  //   isFavorite: false
+  // }
 ];
 
 // ฟังก์ชันช่วยสำหรับกรองข้อมูลตามหมวดหมู่

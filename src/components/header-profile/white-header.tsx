@@ -1,9 +1,6 @@
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
-import { useFavoritesActivity } from "@/hooks/useFavoritesActivity";
-
-
 interface HeaderProfileProps {
   onProfileClick?: () => void;
 }
@@ -11,7 +8,6 @@ interface HeaderProfileProps {
 export default function WhiteHeaderProfile({ onProfileClick }: HeaderProfileProps) {
   const router = useRouter();
   const { user, isAuthenticated, isLoading } = useAuth();
-  const { getFavoritesCount, isLoaded } = useFavoritesActivity();
 
   // ตรวจสอบว่าอยู่ในโหมด favorites หรือไม่
   const isInFavoritesMode = router.asPath.includes('favorites=true');

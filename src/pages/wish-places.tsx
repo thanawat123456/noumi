@@ -15,8 +15,6 @@ import {
 import { 
   WishPlace, 
   WISH_PLACES_DATA, 
-  WISH_CATEGORIES,
-  getPlacesByCategory, 
   searchPlaces 
 } from '@/data/wishPlaces';
 

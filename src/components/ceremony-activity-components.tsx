@@ -272,13 +272,15 @@ export const CeremonyActivityScreen: React.FC<CeremonyActivityScreenProps> = ({
     
     setItems(finalData);
     setLoading(false);
-  }, [type, updateItemsFavorites, showFavoritesOnly, isLoaded]); // เพิ่ม isLoaded dependency
+  }, [type, updateItemsFavorites, showFavoritesOnly, isLoaded]);
 
   const handleItemClick = (id: number) => {
+    const selectedItem = items.find(item => item.id === id);
+    
     if (type === "ceremony") {
-      router.push(`/information/${id}?type=buddha`);
+      router.push(`/ceremony/${id}?name=${encodeURIComponent(selectedItem?.name || '')}`);
     } else {
-      router.push(`/activities/${id}`);
+      router.push(`/activity/${id}?name=${encodeURIComponent(selectedItem?.name || '')}`);
     }
   };
 

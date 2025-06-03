@@ -3,7 +3,7 @@ import { useRouter } from "next/router";
 import Head from "next/head";
 import { useAuth } from "@/contexts/AuthContext";
 import { CeremonyActivityScreen } from "@/components/ceremony-activity-components";
-import { useFavoritesActivity } from "@/hooks/useFavoritesActivity";
+// import { useFavoritesActivity } from "@/hooks/useFavoritesActivity";
 import Link from "next/link";
 import WhiteHeaderProfile from "@/components/header-profile/white-header";
 import ProfileSlideMenu from '@/components/ProfileSlideMenu';
@@ -13,7 +13,7 @@ import ProfileSlideMenu from '@/components/ProfileSlideMenu';
 const ActivitiesPage: React.FC = () => {
   const router = useRouter();
   const { user, isAuthenticated, isLoading } = useAuth();
-  const { getFavoritesCount } = useFavoritesActivity();
+  // const { getFavoritesCount } = useFavoritesActivity();
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   

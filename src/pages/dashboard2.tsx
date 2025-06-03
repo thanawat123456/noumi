@@ -1,31 +1,29 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
-import axios from 'axios';
 
 // Dashboard Page (Home screen after login)
 export default function Dashboard2() {
   const router = useRouter();
-  const { user, isAuthenticated, isLoading, logout } = useAuth();
+  const { user, isLoading } = useAuth();
   const [newsCategory, setNewsCategory] = useState('ALL');
-  const [loading, setLoading] = useState(false);
   
   // Redirect to login if not authenticated
   
-  const handleCategoryClick = (category: string) => {
+  const handleCategoryClick = () => {
     router.push(`/sacred-places`);
   };
   
-  const handleLogout = async () => {
-    try {
-      await logout();
-      router.push('/login');
-    } catch (error) {
-      console.error('Logout error:', error);
-    }
-  };
+  // const handleLogout = async () => {
+  //   try {
+  //     await logout();
+  //     router.push('/login');
+  //   } catch (error) {
+  //     console.error('Logout error:', error);
+  //   }
+  // };
   
   if (isLoading) {
     return (
@@ -77,11 +75,11 @@ export default function Dashboard2() {
           </div>
           
           <div className="mt-4">
-            <h2 className="text-white text-lg">
+            <h5 className="text-white">
               Nummu นำใจ นำพาคุณ<br />
               ตามหาแหล่งที่พึ่งพาทางจิตใจและเข้าถึง<br />
               การไหว้พระ ขอพร ที่สะดวก ง่าย ในที่เดียว
-            </h2>
+            </h5>
           </div>
           
           {/* Search Bar */}
@@ -105,7 +103,7 @@ export default function Dashboard2() {
           <div className="mt-8 grid grid-cols-4 gap-4 pb-4">
             <button 
               className="flex flex-col items-center justify-center bg-white rounded-full py-4 px-2"
-              onClick={() => handleCategoryClick('sacred')}
+              onClick={() => handleCategoryClick()}
             >
               <div className="mb-2">
                 <svg className="w-12 h-12 text-orange-200" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
