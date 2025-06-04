@@ -36,8 +36,8 @@ yarn-error.log*
 # vercel
 .vercel
 
-db/noumi-app.db
-db/Nummu-app.db
+# db/noumi-app.db
+# db/Nummu-app.db
 # typescript
 *.tsbuildinfo
 next-env.d.ts
