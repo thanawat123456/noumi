@@ -29,6 +29,14 @@ export default async function handler(
       return res.status(401).json({ success: false, error: 'Invalid email or password' });
     }
 
+    // บันทึกการ login
+    await dbService.recordLogin(
+      user.id!, 
+      req.headers['x-forwarded-for'] as string || req.socket.remoteAddress,
+      req.headers['user-agent'] as string
+    );
+    console.log(`Login recorded for user: ${user.email}`);
+
     // สร้าง user object ที่จะส่งกลับไปให้ client
     const userData = {
       id: user.id,

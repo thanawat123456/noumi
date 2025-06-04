@@ -128,9 +128,9 @@ class SQLiteDatabase {
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       email TEXT UNIQUE NOT NULL,
       phone TEXT,
-      password TEXT NOT NULL,
+      password TEXT NULL,
       full_name TEXT NOT NULL,
-      birth_date TEXT NOT NULL,
+      birth_date TEXT NULL,
       day_of_birth TEXT,
       element_type TEXT,
       zodiac_sign TEXT,
@@ -221,88 +221,96 @@ class SQLiteDatabase {
 }
 
   
- public async recordLogin(userId: number, ipAddress?: string, userAgent?: string): Promise<void> {
+public async recordLogin(userId: number, ipAddress?: string, userAgent?: string): Promise<void> {
   await this.init();
   if (!this.db) throw new Error('Database not initialized');
   
   try {
     const now = new Date().toISOString();
     
-    // ตรวจสอบว่ามี column last_login หรือไม่
-    const columns = await this.db.all(`PRAGMA table_info(users)`);
-    const hasLastLogin = columns.some((col: any) => col.name === 'last_login');
+    // อัพเดท last_login และ login_count ในตาราง users
+    await this.db.run(`
+      UPDATE users 
+      SET last_login = ?,
+          login_count = COALESCE(login_count, 0) + 1
+      WHERE id = ?
+    `, [now, userId]);
     
-    if (hasLastLogin) {
-      // อัพเดท last_login
-      await this.db.run(`
-        UPDATE users 
-        SET last_login = ?
-        WHERE id = ?
-      `, [now, userId]);
-    }
+    // บันทึกใน login_history (ถ้าต้องการ)
+    await this.db.run(`
+      INSERT INTO login_history (user_id, login_at, ip_address, user_agent)
+      VALUES (?, ?, ?, ?)
+    `, [userId, now, ipAddress || null, userAgent || null]);
+    
+    console.log(`Login recorded for user ID: ${userId} at ${now}`);
   } catch (error) {
     console.error('Error recording login:', error);
   }
 }
 
-
-// Method สำหรับดึงสถิติการเข้าชม
+// Method สำหรับดึงสถิติการเข้าชม (แบบละเอียด)
 public async getVisitStats(): Promise<{
   todayVisits: number;
   weeklyVisits: number;
   monthlyVisits: number;
+  totalUsers: number;
+  activeToday: number;
 }> {
   await this.init();
   if (!this.db) throw new Error('Database not initialized');
   
   try {
-    // ตรวจสอบว่ามี column last_login หรือไม่
-    const columns = await this.db.all(`PRAGMA table_info(users)`);
-    const hasLastLogin = columns.some((col: any) => col.name === 'last_login');
-    
-    if (!hasLastLogin) {
-      // ถ้ายังไม่มี column last_login ให้ return 0 ทั้งหมด
-      return {
-        todayVisits: 0,
-        weeklyVisits: 0,
-        monthlyVisits: 0
-      };
-    }
-    
     const now = new Date();
     const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
     const weekStart = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString();
     const monthStart = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000).toISOString();
     
+    // นับการ login จาก login_history
     const todayResult = await this.db.get<{count: number}>(`
+      SELECT COUNT(DISTINCT user_id) as count 
+      FROM login_history 
+      WHERE login_at >= ?
+    `, todayStart);
+    
+    const weekResult = await this.db.get<{count: number}>(`
+      SELECT COUNT(DISTINCT user_id) as count 
+      FROM login_history 
+      WHERE login_at >= ?
+    `, weekStart);
+    
+    const monthResult = await this.db.get<{count: number}>(`
+      SELECT COUNT(DISTINCT user_id) as count 
+      FROM login_history 
+      WHERE login_at >= ?
+    `, monthStart);
+    
+    // นับ total users
+    const totalResult = await this.db.get<{count: number}>(`
+      SELECT COUNT(*) as count FROM users
+    `);
+    
+    // นับ active users วันนี้
+    const activeResult = await this.db.get<{count: number}>(`
       SELECT COUNT(*) as count 
       FROM users 
       WHERE last_login >= ?
     `, todayStart);
     
-    const weekResult = await this.db.get<{count: number}>(`
-      SELECT COUNT(*) as count 
-      FROM users 
-      WHERE last_login >= ?
-    `, weekStart);
-    
-    const monthResult = await this.db.get<{count: number}>(`
-      SELECT COUNT(*) as count 
-      FROM users 
-      WHERE last_login >= ?
-    `, monthStart);
-    
     return {
       todayVisits: todayResult?.count || 0,
       weeklyVisits: weekResult?.count || 0,
-      monthlyVisits: monthResult?.count || 0
+      monthlyVisits: monthResult?.count || 0,
+      totalUsers: totalResult?.count || 0,
+      activeToday: activeResult?.count || 0
     };
   } catch (error) {
     console.error('Error getting visit stats:', error);
     return {
       todayVisits: 0,
       weeklyVisits: 0,
-      monthlyVisits: 0
+      monthlyVisits: 0,
+      totalUsers: 0,
+      activeToday: 0
     };
   }
 }

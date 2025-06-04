@@ -206,7 +206,7 @@ export default function Settings() {
               <div className="flex items-center space-x-4">
                 <div className="relative">
                   <img
-                    src={avatarPreview || '/images/default-avatar.png'}
+                    src={avatarPreview || '/images/profile/travel/Profile.jpeg'}
                     alt="Avatar"
                     className="w-24 h-24 rounded-full object-cover border-4 border-[#FF7A05]/20"
                   />

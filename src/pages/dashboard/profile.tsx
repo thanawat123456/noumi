@@ -546,7 +546,7 @@ export default function Profile() {
                 alt="Profile" 
                 className="w-full h-full object-cover"
                 onError={(e) => {
-                  (e.target as HTMLImageElement).src = '/images/default-avatar.png';
+                  (e.target as HTMLImageElement).src = '/images/profile/travel/Profile.jpeg';
                 }}
               />
             </div>
