@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 import { ArrowLeft, Heart } from "lucide-react";
-import Modal from "react-modal";
 import { useFavorites } from "@/hooks/useFavoritesMoo";
+
+// Import QR Scanner component
+import QRScanner from "@/components/QRScanner";
 
 export interface PlaceDetailProps {
   id: number;
@@ -25,15 +27,15 @@ const PlaceDetailScreen: React.FC<PlaceDetailProps> = ({
   onBack,
 }) => {
   const { isFavorite, toggleFavorite } = useFavorites();
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isQRScannerOpen, setIsQRScannerOpen] = useState(false);
 
   const handleBack = () => {
     if (onBack) onBack();
     else window.history.back();
   };
 
-  const openModal = () => setIsModalOpen(true);
-  const closeModal = () => setIsModalOpen(false);
+  const openQRScanner = () => setIsQRScannerOpen(true);
+  const closeQRScanner = () => setIsQRScannerOpen(false);
 
   return (
     <div className="min-h-screen bg-white pb-20">
@@ -98,68 +100,23 @@ const PlaceDetailScreen: React.FC<PlaceDetailProps> = ({
           <p>{description}</p>
         </div>
 
-        {/* AR Button */}
+        {/* AR QR Scanner Button */}
         <button
-          onClick={openModal}
-          className="w-80 fixed left-1/2 bottom-5 transform -translate-x-1/2 bg-orange-500 text-white py-2 px-6 rounded-full font-medium text-lg flex flex-col items-center justify-center z-50"
+          onClick={openQRScanner}
+          className="w-80 fixed left-1/2 bottom-5 transform -translate-x-1/2 bg-orange-500 text-white py-2 px-6 rounded-full font-medium text-lg flex flex-col items-center justify-center z-50 hover:bg-orange-600 transition-colors"
           style={{ boxShadow: "0 8px 10px rgba(255, 165, 0, 0.3)" }}
         >
           <span className="text-3xl font-bold">AR</span>
-          <span className="text-sm font-normal">เรื่องเล่า</span>
+          <span className="text-sm font-normal">สแกน QR</span>
         </button>
       </div>
 
-      {/* Video Modal */}
-      <Modal
-        isOpen={isModalOpen}
-        onRequestClose={closeModal}
-        style={{
-          content: {
-            top: "50%",
-            left: "50%",
-            right: "auto",
-            bottom: "auto",
-            marginRight: "-50%",
-            transform: "translate(-50%, -50%)",
-            width: "90%",
-            maxWidth: "600px",
-            padding: "0",
-            borderRadius: "12px",
-            overflow: "hidden",
-            background: "black",
-          },
-          overlay: {
-            backgroundColor: "rgba(0, 0, 0, 0.75)",
-          },
-        }}
-      >
-        <div className="bg-black">
-          {/* Modal Header */}
-          <div className="flex items-center justify-between bg-white p-4">
-            <h2 className="text-lg font-medium text-gray-700">{title}</h2>
-            <button onClick={closeModal} className="p-2">
-              <ArrowLeft className="w-6 h-6 text-gray-700" />
-            </button>
-          </div>
-
-          {/* Video Player */}
-          {videoPath ? (
-            <video
-              src={videoPath}
-              controls
-              autoPlay
-              className="w-full h-auto"
-              onError={(e) => console.error("Video playback error:", e)}
-            >
-              Your browser does not support the video tag.
-            </video>
-          ) : (
-            <p className="text-red-500 text-center p-4">
-              ไม่พบวิดีโอสำหรับสถานที่นี้
-            </p>
-          )}
-        </div>
-      </Modal>
+      {/* QR Scanner Modal */}
+      <QRScanner
+        isOpen={isQRScannerOpen}
+        onClose={closeQRScanner}
+        title={title}
+      />
     </div>
   );
 };
