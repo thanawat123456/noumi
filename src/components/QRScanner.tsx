@@ -9,10 +9,10 @@ interface QRScannerProps {
 
 // QR Code mapping - เชื่อมโยงระหว่าง QR result กับไฟล์วิดีโอ
 const QR_VIDEO_MAPPING: Record<string, string> = {
-  'https://youtube.com/shorts/ZMpKFq5615Q?feature=share': '/video/ตำนานผีเปรต.mp4',
+  'https://youtube.com/shorts/ZMpKFq5615Q?feature=share': 'https://youtube.com/shorts/ZMpKFq5615Q?feature=share',
   'https://youtube.com/shorts/R98_ljX3Dx8?feature=share': 'https://youtube.com/shorts/R98_ljX3Dx8?feature=share',
-  'https://youtube.com/shorts/bfN6rJh4KQ8?feature=share': '/video/พระพุทธตรีโลกเชฏฐ์.mp4',
-  'https://youtube.com/shorts/PIlO_HW2U7Y?feature=share': '/video/พระพุทธเสรฏฐมุนี.mp4',
+  'https://youtube.com/shorts/bfN6rJh4KQ8?feature=share': 'https://youtube.com/shorts/bfN6rJh4KQ8?feature=share',
+  'https://youtube.com/shorts/PIlO_HW2U7Y?feature=share': 'https://youtube.com/shorts/PIlO_HW2U7Y?feature=share',
   'https://www.youtube.com/shorts/ZMpKFq5615Q': '/video/ตำนานผีเปรต.mp4',
   'https://www.youtube.com/shorts/R98_ljX3Dx8': '/video/ต้นโพธิ์.mp4',
   'https://www.youtube.com/shorts/bfN6rJh4KQ8': '/video/พระพุทธตรีโลกเชฏฐ์.mp4',
