@@ -9,14 +9,14 @@ interface QRScannerProps {
 
 // QR Code mapping - เชื่อมโยงระหว่าง QR result กับไฟล์วิดีโอ
 const QR_VIDEO_MAPPING: Record<string, string> = {
-  'https://youtube.com/shorts/ZMpKFq5615Q?feature=share': 'https://youtube.com/shorts/ZMpKFq5615Q?feature=share',
-  'https://youtube.com/shorts/R98_ljX3Dx8?feature=share': 'https://youtube.com/shorts/R98_ljX3Dx8?feature=share',
-  'https://youtube.com/shorts/bfN6rJh4KQ8?feature=share': 'https://youtube.com/shorts/bfN6rJh4KQ8?feature=share',
-  'https://youtube.com/shorts/PIlO_HW2U7Y?feature=share': 'https://youtube.com/shorts/PIlO_HW2U7Y?feature=share',
-  'https://www.youtube.com/shorts/ZMpKFq5615Q': '/video/ตำนานผีเปรต.mp4',
-  'https://www.youtube.com/shorts/R98_ljX3Dx8': '/video/ต้นโพธิ์.mp4',
-  'https://www.youtube.com/shorts/bfN6rJh4KQ8': '/video/พระพุทธตรีโลกเชฏฐ์.mp4',
-  'https://www.youtube.com/shorts/PIlO_HW2U7Y': '/video/พระพุทธเสรฏฐมุนี.mp4',
+  'https://youtube.com/shorts/ZMpKFq5615Q?feature=share': 'https://storage.googleapis.com/noumi-3d-models/ต้นโพธิ์.mp4',
+  'https://youtube.com/shorts/R98_ljX3Dx8?feature=share': 'https://storage.googleapis.com/noumi-3d-models/ตำนานผีเปรต.mp4',
+  'https://youtube.com/shorts/bfN6rJh4KQ8?feature=share': 'https://storage.googleapis.com/noumi-3d-models/พระพุทธตรีโลกเชฏฐ์.mp4',
+  'https://youtube.com/shorts/PIlO_HW2U7Y?feature=share': 'https://storage.googleapis.com/noumi-3d-models/พระพุทธเสรฏฐมุนี.mp4',
+  'https://www.youtube.com/shorts/ZMpKFq5615Q': 'https://storage.googleapis.com/noumi-3d-models/ต้นโพธิ์.mp4',
+  'https://www.youtube.com/shorts/R98_ljX3Dx8': 'https://storage.googleapis.com/noumi-3d-models/ตำนานผีเปรต.mp4',
+  'https://www.youtube.com/shorts/bfN6rJh4KQ8': 'https://storage.googleapis.com/noumi-3d-models/พระพุทธตรีโลกเชฏฐ์.mp4',
+  'https://www.youtube.com/shorts/PIlO_HW2U7Y': 'https://storage.googleapis.com/noumi-3d-models/พระพุทธเสรฏฐมุนี.mp4',
 };
 
 // Declare ZXing globally
