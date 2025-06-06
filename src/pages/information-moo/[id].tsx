@@ -606,7 +606,7 @@ export default function BuddhaStatueInfo() {
               >
                 <div className="text-xl font-bold mb-1">AR มูใกล้ฉัน</div>
                 <div className="text-sm opacity-90">
-                  การให้จังหวัดทั่วการบัดใส &quot;สวงและยอพร&quot;
+                  การไหว้อยู่ที่ใจทำจิตใจให้ &quot;สงบและขอพร&quot;
                 </div>
               </button>
             </div>
