@@ -134,9 +134,9 @@ const zodiacTravelDestinationsData = {
     {
       name: 'เทวสถานสำหรับพระนคร ท้าวเวสสุวรรณ ',
       image: '/images/profile/travel/ท้าวเวสุวรรณ.jpeg',
-      mapLink: '',
+      mapLink: '/information/7?type=buddha',
       description: 'ท่านช่วยให้การเริ่มต้นนั้นมีความมั่นคง และปกป้องจากสิ่งไม่ดี เป็นช่วงเวลาที่ดีในการสร้างเสริมความสำเร็จ โดยเฉพาะการเงิน',
-      category: 'การเงินธุรกิจ'
+      category: 'การเงิน ธุรกิจ'
     },
     {
       name: 'เทวสถานสำหรับพระนคร พระพรหม',
@@ -150,7 +150,7 @@ const zodiacTravelDestinationsData = {
     {
       name: 'วัดสุทัศนเทพวราราม พระพุทธศรีศากยมุนี',
       image: '/images/profile/travel/พระศรีศากยมุนี.jpeg',
-      mapLink: '',
+      mapLink: '/information/1?type=buddha',
       description: 'ท่านเป็นองคืพระปรางที่รับความเชื่อว่าช่วยในเรื่องการป้องกันอันตราย และเสริมความเป็นสิริมงคล',
       category: 'ภาพรวมทั่วไป'
     },
@@ -184,14 +184,14 @@ const zodiacTravelDestinationsData = {
     {
       name: 'วัดสุทัศนเทพวราราม ท้าวเวสสุวรรณ',
       image: '/images/profile/travel/ท้าวเวสุวรรณ.jpeg',
-      mapLink: '',
+      mapLink: '/information/7?type=buddha',
       description: 'ท่านช่วยให้การเริ่มต้นนั้นมีความมั่นคง และปกป้องจากสิ่งไม่ดี เป็นช่วงเวลาที่ดีในการสร้างเสริมความสำเร็จ โดยเฉพาะการเงิน',
       category: 'ธุรกิจ\nการเงิน'
     },
     {
       name: 'วัดสุทัศนเทพวราราม พระสุนทรี วาณี',
       image: '/images/profile/travel/พระสุนทรีวาณี.jpeg',
-      mapLink: '',
+      mapLink: '/information/2?type=buddha',
       description: 'เป็นองค์พระประทานที่ช่วยให้พรในด้านการเรียน หากได้กราบไหว้ หรือขอพร จะช่วยทำให้มีความจำ สติปัญญาดี และประสำความสำเร็จ ',
       category: 'การเรียน\nการงาน'
     },
@@ -218,10 +218,11 @@ const zodiacTravelDestinationsData = {
     {
       name: 'วัดสุทัศนเทพวราราม ท้าวเวสสุวรรณ',
       image: '/images/profile/travel/ท้าวเวสุวรรณ.jpeg',
-      mapLink: '',
+      mapLink: '/information/7?type=buddha',
       description: 'ท่านช่วยให้การเริ่มต้นนั้นมีความมั่นคง และปกป้องจากสิ่งไม่ดี เป็นช่วงเวลาที่ดีในการสร้างเสริมความสำเร็จ โดยเฉพาะการเงิน',
       category: 'ธุรกิจ\nการเงิน'
     },
+    
     
    
   ],
@@ -229,7 +230,7 @@ const zodiacTravelDestinationsData = {
     {
       name: 'วัดสุทัศนเทพวราราม พระสุนทรี วาณี',
       image: '/images/profile/travel/พระสุนทรีวาณี.jpeg',
-      mapLink: '',
+      mapLink: '/information/2?type=buddha',
       description: 'เป็นองค์พระประทานที่ช่วยให้พรในด้านการเรียน หากได้กราบไหว้ หรือขอพร จะช่วยทำให้มีความจำ สติปัญญาดี และประสำความสำเร็จ ',
       category: 'การเรียน\nการงาน'
     },
@@ -246,7 +247,7 @@ const zodiacTravelDestinationsData = {
     {
       name: 'วัดสุทัศนเทพวราราม พระกริ่งใหญ่',
       image: '/images/profile/travel/พระกริ่งใหญ่.jpeg',
-      mapLink: '',
+      mapLink: '/information/6?type=buddha',
       description: 'เป็นองค์พระประทานที่ช่วยในด้านสุขภาพ โรคภัย ไข้เจ็บ',
       category: 'สุขภาพ\nโรคภัย'
     },
@@ -257,7 +258,7 @@ const zodiacTravelDestinationsData = {
     {
       name: 'วัดสุทัศนเทพวราราม พระพุทธตรีโลกเชษฐ์',
       image: '/images/profile/travel/พระพุทธตรีโลกเชษฐ์.jpeg',
-      mapLink: '',
+      mapLink: '/information/5?type=buddha',
       description: 'เป็นองค์พระประทานที่ช่วยให้พรในด้านการให้โชคลาภ เรื่องของชื่อเสียงบุญวาสนากับผู้ที่ขอ',
       category: 'โชคลาภ\nวาสนา'
     },
@@ -300,7 +301,7 @@ const zodiacTravelDestinationsData = {
     {
       name: 'วัดสุทัศนเทพวราราม พระพุทธศรีศากยมุนี',
       image: '/images/profile/travel/พระศรีศากยมุนี.jpeg',
-      mapLink: '',
+      mapLink: '/information/1?type=buddha',
       description: 'ท่านเป็นองคืพระปรางที่รับความเชื่อว่าช่วยในเรื่องการป้องกันอันตราย และเสริมความเป็นสิริมงคล',
       category: 'ภาพรวมทั่วไป'
     },
@@ -665,75 +666,87 @@ export default function Profile() {
             </div>
             
             {/* Travel Destinations Section */}
-            <div 
-              className="mb-8 rounded-3xl p-6 shadow-lg"
-              style={{ 
-                backgroundColor: hexToRgba(bgStyles.gradient, 55), // 55%
-                backdropFilter: 'blur(10px)'
+            {/* Travel Destinations Section */}
+<div 
+  className="mb-8 rounded-3xl p-6 shadow-lg"
+  style={{ 
+    backgroundColor: hexToRgba(bgStyles.gradient, 55), // 55%
+    backdropFilter: 'blur(10px)'
+  }}
+>
+  <h3 className="text-white text-lg font-semibold mb-6">
+    สถานที่แนะนำ<br />ประจำราศี
+  </h3>
+  
+  {destinations && destinations.length > 0 ? (
+    <div className="space-y-4">
+      {/* แก้ไข: เปลี่ยนจาก overflow-x-hidden เป็น overflow-x-auto และเพิ่ม flex-nowrap */}
+      <div 
+        className="flex overflow-x-auto space-x-4 pb-4 flex-nowrap" 
+        style={{ 
+          scrollSnapType: 'x mandatory',
+          scrollbarWidth: 'none', // Firefox
+          msOverflowStyle: 'none'  // IE/Edge
+        }}
+      >
+        {/* เพิ่ม CSS เพื่อซ่อน scrollbar ใน WebKit browsers */}
+        <style jsx>{`
+          .flex::-webkit-scrollbar {
+            display: none;
+          }
+        `}</style>
+        
+        {destinations.map((destination: any, index: number) => (
+          <div 
+            key={index} 
+            className="flex-shrink-0 w-80 relative rounded-2xl overflow-hidden"
+            style={{ scrollSnapAlign: 'start' }}
+          >
+            <img 
+              src={destination.image} 
+              alt={destination.name} 
+              className="w-full h-48 object-cover"
+              onError={(e) => {
+                (e.target as HTMLImageElement).src = "/images/profile/travel/default.jpg";
               }}
-            >
-              <h3 className="text-white text-lg font-semibold mb-6">
-                สถานที่แนะนำ<br />ประจำราศี
-              </h3>
-              
-              {destinations && destinations.length > 0 ? (
-                <div className="space-y-4">
-                  <div className="flex overflow-x-hidden space-x-4 pb-4" style={{ scrollSnapType: 'x mandatory' }}>
-                    {destinations.map((destination: any, index: number) => (
-                      <div 
-                        key={index} 
-                        className="flex-shrink-0 w-80 relative"
-                        style={{ scrollSnapAlign: 'start' }}
-                        onClick={() => router.push(`/information/${destination.id}?type=buddha`)}
-                      >
-                        <img 
-                          src={destination.image} 
-                          alt={destination.name} 
-                          className="w-full h-48 object-cover"
-                          onError={(e) => {
-                            (e.target as HTMLImageElement).src = "/images/profile/travel/default.jpg";
-                          }}
-                        />
-                        {/* Content below image instead of overlay */}
-                        <div className="p-4">
-                          <div className="flex justify-between items-start mb-3">
-                            <h4 className="text-lg font-semibold text-white-800">{destination.name}</h4>
-                            <span className="bg-[#40B828] text-white-800 px-3 py-1 rounded-full text-xs font-medium text-center">
-                              {destination.category}
-                            </span>
-                          </div>
-                          <p className="font-medium">
-                            {destination.description}
-                            
-                          </p>
-                          <a 
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                            className="font-medium"
-                          >
-                            Google Map
-                          </a>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                  <div className="flex justify-center space-x-2 mt-4">
-                    {destinations.map((_, index) => (
-                      <div 
-                        key={index}
-                        className={`w-3 h-3 rounded-full ${
-                          index === 0 ? 'bg-yellow-400' : 'bg-white bg-opacity-50'
-                        }`}
-                      />
-                    ))}
-                  </div>
-                </div>
-              ) : (
-                <div className="text-center py-8 text-white opacity-75">
-                  ไม่พบข้อมูลสถานที่ท่องเที่ยว กรุณาระบุวันเกิดในโปรไฟล์
-                </div>
-              )}
+            />
+            {/* Content below image instead of overlay */}
+            <div className="p-4">
+              <div className="flex justify-between items-start mb-3">
+                <Link href={destination.mapLink}>
+                  <h4 className="text-lg font-semibold text-white cursor-pointer hover:text-red-300">
+                    {destination.name}
+                  </h4>
+                </Link>
+                <span className="bg-[#40B828] text-white px-3 py-1 rounded-full text-xs font-medium text-center">
+                  {destination.category.replace(/\n/g, ' ')}
+                </span>
+              </div>
+              <p className="text-white text-sm mb-3">
+                {destination.description}
+              </p>
+            
             </div>
+          </div>
+        ))}
+      </div>
+      
+      {/* Dots indicator - แก้ไขให้แสดงจุดตามจำนวนสถานที่จริง */}
+      <div className="flex justify-center space-x-2 mt-4">
+        {destinations.map((_, index) => (
+          <div 
+            key={index}
+            className="w-2 h-2 rounded-full bg-white bg-opacity-50"
+          />
+        ))}
+      </div>
+    </div>
+  ) : (
+    <div className="text-center py-8 text-white opacity-75">
+      ไม่พบข้อมูลสถานที่ท่องเที่ยว กรุณาระบุวันเกิดในโปรไฟล์
+    </div>
+  )}
+</div>
           </div>
         </div>
         
