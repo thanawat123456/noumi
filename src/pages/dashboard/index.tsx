@@ -136,7 +136,7 @@ export default function Dashboard() {
         {/* ส่วนหัว */}
         <div className="bg-[#FF7A05] text-white p-4 rounded-br-[140px]">
           <HeaderProfile onProfileClick={() => setIsMenuOpen(true)} />
-          <div className="mt-4 flex items-center justify-between flex-wrap gap-4">
+          <div className="mt-4 flex items-center justify-between flex-wrap gap-1">
             <div className="text-white max-w-md text-sm">
               <h5>
                 Nummu นำใจ นำพาคุณ
@@ -146,7 +146,7 @@ export default function Dashboard() {
                 การไหว้พระ ขอพร ที่สะดวก ง่าย ในที่เดียว
               </h5>
             </div>
-            <div className="w-30">
+            <div className="w-27">
               <img
                 src="/images/home-car.png"
                 alt="รถนำทาง"
