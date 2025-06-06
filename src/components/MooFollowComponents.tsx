@@ -29,7 +29,7 @@ const MooFollowScreen: React.FC = () => {
       title: "เปรตวัดสุทัศน์",
       description:
         "ที่มาของเปรตวัดสุทัศน์ แท้จริงมาจากจิตรกรรมฝาผนังวัดสุทัศน์",
-      image: "/images/temple-list/พระรูปสมเด็จพระสังฆราช.jpeg",
+      image: "/images/เปรต.png",
     },
     {
       id: 2,

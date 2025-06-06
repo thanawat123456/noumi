@@ -793,15 +793,22 @@ export const TicketSuccess: React.FC<TicketSuccessProps> = ({
       ></div>
 
       {/* Ticket content */}
-      <div className="relative z-20 pt-16">
+      <div className="relative z-20 pt-12">
         <div className="flex justify-center px-4">
-          <div className="w-full max-w-md">
+          <div className="w-full max-w-md z-30">
             <img
               src={getTicketImage()}
               alt="Ticket"
               className="w-full max-w-[300px] mx-auto object-contain drop-shadow-lg"
             />
           </div>
+        </div>
+        <div className="w-full max-w-md">
+          <img
+            src="/temple-cld.png"
+            alt="Ticket"
+            className="w-full max-w-[500px] mx-auto object-contain drop-shadow-lg -mt-7"
+          />
         </div>
       </div>
     </div>
@@ -825,7 +832,7 @@ export const TicketScreen: React.FC<TicketScreenProps> = ({
   const [selectedTicket, setSelectedTicket] = useState<Ticket | null>(null);
   const [selectedAmount, setSelectedAmount] = useState<number>(0);
   const [customAmount, setCustomAmount] = useState<string>("");
-  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+  const [setUploadedFile] = useState<File | null>(null);
 
   const t = translations[language];
 

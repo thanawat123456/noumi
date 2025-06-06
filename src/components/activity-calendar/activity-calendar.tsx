@@ -31,10 +31,7 @@ export default function ActivityCalendarPanel() {
   const activityName = (query.name as string) || "ทำวัตร";
 
   const specialDays = {
-    6: { text: activityName , bgColor: "#9F95D6" },
-    13: { text: activityName , bgColor: "#9F95D6" },
-    28: { text: "ตักบาตรเทโว" , bgColor: "#9F95D6" },
-    29: { text: "ตักบาตรเทโว" , bgColor: "#9F95D6" },
+    12: { text: activityName, bgColor: "#9F95D6" },
   };
 
   // ฟังก์ชันสำหรับปุ่มย้อนกลับ
@@ -52,6 +49,11 @@ export default function ActivityCalendarPanel() {
       router.push("/login");
     }
   }, [isAuthenticated, isLoading, router]);
+
+  useEffect(() => {
+    dayjs.locale("th");
+    setSelectedDate(dayjs().date(12));
+  }, []);
 
   // const isSpecialDay = (day: Dayjs) => {
   //   const dayOfMonth = day.date();
@@ -78,7 +80,7 @@ export default function ActivityCalendarPanel() {
 
       <div className="bg-white text-white rounded-b-3xl">
         <WhiteHeaderProfile />
-        <div className="bg-[#FF7A05] flex items-center justify-between relative pt-8 pb-20 mt-10 rounded-tl-[50px]">
+        <div className="bg-[#FF7A05] flex items-center justify-between relative pt-8 pb-20 pl-4 mt-10 rounded-tl-[50px]">
           <div className="flex items-center space-x-3">
             <svg
               className="w-6 h-6"
@@ -109,7 +111,7 @@ export default function ActivityCalendarPanel() {
           </div>
 
           <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="th">
-            <div className="flex justify-center w-full px-4">
+            <div className="flex justify-center w-full px-4 z-30">
               <CustomCalendarWrapper>
                 <DateCalendar
                   value={selectedDate}
@@ -137,6 +139,10 @@ export default function ActivityCalendarPanel() {
                       backgroundColor: "#FF5A1F",
                       color: "#fff",
                     },
+                    "& .MuiPickersCalendarHeader-switchViewButton": {
+                      display: "none",
+                      pointerEvents: "none",
+                    },
                     // วันที่ 6 และ 13 - ทำวัตรใหญ่
                     "& .MuiPickersDay-root[aria-label*='6,'], & .MuiPickersDay-root[aria-label*='13,']":
                       {
@@ -149,6 +155,8 @@ export default function ActivityCalendarPanel() {
                         "&.Mui-selected": {
                           backgroundColor: "#9F95D6 !important",
                         },
+                        "& .Mui-MuiSvgIcon-root MuiSvgIcon-fontSizeMedium MuiPickersCalendarHeader-switchViewIcon css-14yom7c-MuiSvgIcon-root-MuiPickersCalendarHeader-switchViewIcon":
+                          {},
                       },
                     // วันที่ 28 และ 29 - ตักบาตรเทโว
                     "& .MuiPickersDay-root[aria-label*='28,'], & .MuiPickersDay-root[aria-label*='29,']":
@@ -163,6 +171,53 @@ export default function ActivityCalendarPanel() {
                           backgroundColor: "#9F95D6 !important",
                         },
                       },
+                    // วันที่ 12 - วันพิเศษ (เพิ่มสัญลักษณ์ดาวและสีทอง)
+                    "& .MuiPickersDay-root[aria-label*='12,']": {
+                      backgroundColor: "#FFD700 !important",
+                      color: "#333 !important",
+                      fontWeight: "bold !important",
+                      position: "relative",
+                      "&:hover": {
+                        backgroundColor: "#FFC000 !important",
+                      },
+                      "&.Mui-selected": {
+                        backgroundColor: "#FFD700 !important",
+                      },
+                      "&::after": {
+                        content: '"⭐"',
+                        position: "absolute",
+                        top: "-2px",
+                        right: "-2px",
+                        fontSize: "12px",
+                        lineHeight: "1",
+                      },
+                      "&::before": {
+                        content: '""',
+                        position: "absolute",
+                        top: "-2px",
+                        left: "-2px",
+                        right: "-2px",
+                        bottom: "-2px",
+                        border: "2px solid #FFD700",
+                        borderRadius: "50%",
+                        animation: "pulse 2s infinite",
+                      },
+                    },
+                    // เพิ่ม keyframes สำหรับ animation
+                    "@keyframes pulse": {
+                      "0%": {
+                        transform: "scale(1)",
+                        opacity: 1,
+                      },
+                      "50%": {
+                        transform: "scale(1.1)",
+                        opacity: 0.7,
+                      },
+                      "100%": {
+                        transform: "scale(1)",
+                        opacity: 1,
+                      },
+                    },
                   }}
                 />
               </CustomCalendarWrapper>
@@ -170,11 +225,11 @@ export default function ActivityCalendarPanel() {
           </LocalizationProvider>
 
           {/* ภาพ temple อยู่ด้านล่าง */}
-          <div className="fixed bottom-10 left-1/2 transform -translate-x-1/2">
+          <div className="w-full fixed bottom-14 left-1/2 transform -translate-x-1/2 opacity-60">
             <img
               src="/temple-cld.png"
               alt="Temple"
-              className="w-100 h-auto"
+              className="w-full h-auto"
               style={{ maxHeight: "200px" }}
             />
           </div>
@@ -182,7 +237,7 @@ export default function ActivityCalendarPanel() {
           {/* แสดงข้อมูลวันที่เลือกเฉพาะเมื่อเป็นวันพิเศษ - ทับภาพ temple */}
           {selectedDate &&
             specialDays[selectedDate.date() as keyof typeof specialDays] && (
-              <div className="fixed bottom-35 left-1/2 transform -translate-x-1/2 px-4 w-full max-w-md z-20 px-15">
+              <div className="fixed bottom-20 left-1/2 transform -translate-x-1/2 w-full max-w-md z-20 px-10">
                 <h3 className="text-lg font-bold text-center text-gray-700 mb-4">
                   วันสำคัญที่เลือก
                 </h3>

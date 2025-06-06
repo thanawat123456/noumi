@@ -75,7 +75,7 @@ export default function CeremonyCalendarPanel() {
 
       <div className="bg-white text-white rounded-b-3xl">
         <WhiteHeaderProfile />
-        <div className="bg-[#FF7A05] flex items-center justify-between relative pt-8 pb-20 mt-10 rounded-tl-[50px]">
+        <div className="bg-[#FF7A05] flex items-center justify-between relative pt-8 pb-20 pl-4 mt-10 rounded-tl-[50px]">
           <div className="flex items-center space-x-3">
             <svg
               className="w-6 h-6"

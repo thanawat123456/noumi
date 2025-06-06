@@ -34,15 +34,15 @@ export default function NummuHome() {
         <div className="w-full max-w-md bg-[#FFDCE6] rounded-3xl overflow-hidden h-full">
           {/* Full orange background with logo and images */}
           <div
-            className="flex flex-col items-center justify-center bg-[#FF7A05] rounded-3xl px-8 pt-12 pb-32 relative"
+            className="flex flex-col items-center justify-center bg-[#FF7A05] rounded-3xl px-8 pt-12 pb-40 relative"
             style={{
               backgroundImage: "url(/images/orange-bg-full.jpg)",
               backgroundSize: "cover",
               backgroundPosition: "center",
-              height: "70%", // ปรับความสูงของส่วนสีส้มให้เหมาะสม
+              height: "75%", // ปรับความสูงของส่วนสีส้มให้เหมาะสม
             }}
           >
-            <div className="w-48 h-52 mb-4 mt-8">
+            <div className="w-48 h-52 mb-4 mt-10">
               <img
                 src="/images/noumi.png"
                 alt="Nummu Logo"
@@ -57,22 +57,29 @@ export default function NummuHome() {
               />
             </div>
 
-            <div className="w-40 h-12">
+            <div className="w-40 h-12 -mb-25 abslute z-20">
               <img
                 src="/images/wat-suthat.svg"
                 className="w-full h-full object-contain"
               />
             </div>
 
+             <div className="w-100 h-full -mb-25 abslute z-10">
+              <img
+                src="/temple-cld.png"
+                className="w-full h-full object-contain opacity-60"
+              />
+            </div>
+
             {/* Pink section with a curved top-left corner */}
             <div
               className="absolute bottom-0 left-0 right-0 h-28 bg-[#FFDCE6]"
-              style={{ borderTopLeftRadius: "60% 100%" }}
+              style={{ borderTopLeftRadius: "80% 100%" }}
             ></div>
           </div>
 
           {/* Buttons */}
-          <div className="relative z-10 flex flex-col space-y-4 mt-6 px-4">
+          <div className="relative z-10 flex flex-col space-y-4 mt-4 px-18">
             <button
               onClick={handleLogin}
               className="w-full py-3 bg-[#FF8CB7] hover:bg-[#FF7A05] transition text-[#FFDCE6] rounded-full z-20"
