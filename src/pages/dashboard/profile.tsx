@@ -422,6 +422,7 @@ export default function Profile() {
   const [luckyNumbers, setLuckyNumbers] = useState<number[]>([]);
   const [luckyColors, setLuckyColors] = useState<string[]>([]);
   const [zodiacSign, setZodiacSign] = useState<string>('');
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [destinations, setDestinations] = useState<any[]>([]);
   const [bgStyles, setBgStyles] = useState({
     gradient: '#f0f0f0',

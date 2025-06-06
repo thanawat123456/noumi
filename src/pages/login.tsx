@@ -212,6 +212,7 @@ export default function Login() {
     try {
       await login(email, password);
       // ลบ router.push('/dashboard') ออก เพราะ useEffect จะทำงานเมื่อ isAuthenticated เปลี่ยน
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       // ใช้ AuthError ที่มี userMessage แทน
       if (err.name === 'AuthError') {
@@ -262,6 +263,7 @@ export default function Login() {
   const handleGoogleLogin = async () => {
     try {
       await loginWithGoogle();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       if (error.name === 'AuthError') {
         showError(

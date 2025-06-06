@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "next dev",
     "build": "NEXT_DISABLE_ESLINT=1 next build",
-    "start": "next start"
+    "start": "next start",
+    "lint": "next lint"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
@@ -20,7 +21,6 @@
     "cookie": "^1.0.2",
     "dayjs": "^1.11.13",
     "dexie": "^4.0.11",
-    "jsqr": "^1.4.0",
     "localforage": "^1.10.0",
     "lucide-react": "^0.511.0",
     "next": "15.3.2",
@@ -34,6 +34,7 @@
     "sqlite3": "^5.1.7"
   },
   "devDependencies": {
+    "@eslint/eslintrc": "^3",
     "@tailwindcss/postcss": "^4.1.6",
     "@types/bcryptjs": "^2.4.6",
     "@types/cookie": "^0.6.0",
@@ -43,6 +44,8 @@
     "@types/react-modal": "^3.16.3",
     "@types/sql.js": "^1.4.9",
     "autoprefixer": "^10.4.21",
+    "eslint": "^9",
+    "eslint-config-next": "15.3.2",
     "postcss": "^8.5.3",
     "tailwindcss": "^4.1.6",
     "typescript": "^5"
