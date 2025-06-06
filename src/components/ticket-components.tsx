@@ -25,6 +25,7 @@ interface TicketHeaderProps {
   userName?: string;
   language: 'th' | 'en';
   avatar?: string | '/images/profile/travel/Profile.jpeg';
+  step: 'list' | 'detail' | 'confirm' | 'qrcode' | 'success';
 }
 
 interface TicketListProps {
@@ -42,6 +43,7 @@ interface TicketDetailProps {
   selectedAmount: number;
   customAmount: string;
   language: 'th' | 'en';
+  onBackClick: () => void;
 }
 
 interface TicketConfirmationProps {
@@ -49,6 +51,7 @@ interface TicketConfirmationProps {
   amount: number;
   onConfirm: () => void;
   language: 'th' | 'en';
+  onBackClick: () => void;
 }
 
 interface TicketQRCodeProps {
@@ -57,6 +60,7 @@ interface TicketQRCodeProps {
   onUpload: (file: File) => void;
   onConfirmPayment: () => void;
   language: 'th' | 'en';
+  onBackClick: () => void;
 }
 
 interface TicketSuccessProps {
@@ -73,31 +77,20 @@ interface TicketScreenProps {
 // Language translations
 const translations = {
   th: {
-    // Header
     greeting: "สวัสดี,ยินดีต้อนรับ",
     search: "ค้นหา...",
     buyTicket: "ซื้อตั๋ว",
     yourTicket: "ตั๋วของคุณ",
-    
-    // Tabs
     thai: "คนไทย",
     tourist: "TOURIST",
-    
-    // Ticket List
     free: "ฟรี",
     baht: "บาท",
     freeDonation: "ฟรี / บริจาค",
-    
-    // Ticket Detail
     freeOrDonation: "ฟรี หรือ บริจาคตามศรัทธา",
     amount: "จำนวนเงิน (บาท)",
     donationLimit: "มูลค่าของเงินบริจาคต้องไม่เกิน 20,000 บาท",
-    
-    // Confirmation
     confirmPurchase: "ยืนยันการซื้อตั๋ว",
     confirm: "ตกลง",
-    
-    // QR Code
     scanQR: "สแกนผ่าน QR",
     bank: "ธนาคารกรุงไทย",
     accountNumber: "เลขบัญชี 123-4-456-8889-87",
@@ -106,36 +99,23 @@ const translations = {
     uploadFile: "อัพโหลดไฟล์",
     changeFile: "เปลี่ยนไฟล์",
     confirmPayment: "ยืนยันการชำระเงิน",
-    
-    // Loading
     loading: "กำลังโหลด..."
   },
   en: {
-    // Header
     greeting: "Hello, Welcome",
     search: "Search...",
     buyTicket: "Buy Ticket",
     yourTicket: "Your Ticket",
-    
-    // Tabs
     thai: "THAI",
     tourist: "TOURIST",
-    
-    // Ticket List
     free: "Free",
     baht: "Baht",
     freeDonation: "Free / Donation",
-    
-    // Ticket Detail
     freeOrDonation: "Free or Donation as you wish",
     amount: "Amount (Baht)",
     donationLimit: "Donation amount must not exceed 20,000 Baht",
-    
-    // Confirmation
     confirmPurchase: "Confirm Ticket Purchase",
     confirm: "Confirm",
-    
-    // QR Code
     scanQR: "Scan QR Code",
     bank: "Krung Thai Bank",
     accountNumber: "Account No. 123-4-456-8889-87",
@@ -144,91 +124,129 @@ const translations = {
     uploadFile: "Upload File",
     changeFile: "Change File",
     confirmPayment: "Confirm Payment",
-    
-    // Loading
     loading: "Loading..."
   }
 };
 
 /**
- * คอมโพเนนต์แสดงส่วนหัวของหน้าซื้อตั๋ว
+ * Header Component
  */
 export const TicketHeader: React.FC<TicketHeaderProps> = ({ 
   onBackClick, 
   title,
   userName = "Praewwy :)",
   language,
-  avatar
+  avatar,
+  step
 }) => {
   const t = translations[language];
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  
+  const getHeaderClass = () => {
+    if (step === 'list' || step === 'success') {
+      return "bg-[#FF7A05] text-white p-4 rounded-br-3xl";
+    } else {
+      return "bg-white text-[#FF7A05] p-4 relative z-10";
+    }
+  };
+
+  const getIconColor = () => {
+    if (step === 'list' || step === 'success') {
+      return "text-[#FF7A05]";
+    } else {
+      return "text-white";
+    }
+  };
+
+  const getButtonBgColor = () => {
+    if (step === 'list' || step === 'success') {
+      return "bg-white";
+    } else {
+      return "bg-[#FF7A05]";
+    }
+  };
+
+  const getTextColor = () => {
+    if (step === 'list' || step === 'success') {
+      return "text-white";
+    } else {
+      return "text-[#FF7A05]";
+    }
+  };
+
   return (
-    <div className="bg-orange-500 text-white p-4 rounded-b-3xl">
-      <div className="flex items-center justify-between mb-2">
+    <div className={getHeaderClass()} style={{ borderBottomRightRadius: '50px' }}>
+      <div className="flex items-center justify-between mb-2 mt-5">
         <div className="flex items-center space-x-3">
           <div className="w-10 h-10 rounded-full overflow-hidden bg-white">
-             <button
-               
-                onClick={() => setIsMenuOpen(true)}
-              >
-           <img
-              src={avatar || '/api/placeholder/40/40'} 
-              alt="Profile"
-              className="w-full h-full object-cover"
-            />
+             <button onClick={() => setIsMenuOpen(true)}>
+               <img
+                  src={avatar || '/api/placeholder/40/40'} 
+                  alt="Profile"
+                  className="w-full h-full object-cover"
+                />
             </button>
           </div>
           <div>
-            <p className="text-white text-sm">{t.greeting}</p>
-            <h3 className="text-white text-xl font-medium">{userName}</h3>
+            <p className={`text-sm ${getTextColor()}`}>{t.greeting}</p>
+            <h3 className={`text-xl font-medium ${getTextColor()}`}>{userName}</h3>
           </div>
         </div>
         <div className="flex space-x-2">
-          <button className="w-8 h-8 rounded-full bg-white flex items-center justify-center">
-            <svg className="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+           <Link
+          href="/notifications">
+          <button className={`w-8 h-8 rounded-full ${getButtonBgColor()} flex items-center justify-center`}>
+            <svg className={`w-5 h-5 ${getIconColor()}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
             </svg>
           </button>
-          <button className="w-8 h-8 rounded-full bg-white flex items-center justify-center">
-            <svg className="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          </Link>
+           <Link
+          href="/favorites">
+          <button className={`w-8 h-8 rounded-full ${getButtonBgColor()} flex items-center justify-center`}>
+            <svg className={`w-5 h-5 ${getIconColor()}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
             </svg>
           </button>
+          </Link>
         </div>
       </div>
       
-      {/* ชื่อหน้า */}
-      <div className="flex items-center justify-center relative mb-2">
-        <button onClick={onBackClick} className="absolute left-4">
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-          </svg>
-        </button>
-        <h2 className="text-2xl font-semibold">{title}</h2>
-      </div>
+      {(step === 'list' || step === 'success') && (
+        <div className="flex items-center justify-center relative mb-2">
+          <button onClick={onBackClick} className="absolute left-4">
+            <svg className={`w-6 h-6 ${getTextColor()}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
+          <h2 className={`text-2xl font-semibold ${getTextColor()}`}>{title}</h2>
+        </div>
+      )}
       
-      {/* ช่องค้นหา */}
-      <div className="relative mt-4">
-        <input 
-          type="text" 
-          placeholder={t.search}
-          className="w-full bg-white rounded-full px-10 py-2 text-gray-700"
-        />
-        <svg className="w-5 h-5 text-gray-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-        </svg>
-      </div>
-      
-    <ProfileSlideMenu
-            isOpen={isMenuOpen}
-            onClose={() => setIsMenuOpen(false)}
+      {/* ช่องค้นหา - แสดงเฉพาะ step list เท่านั้น */}
+      {step === 'list' && (
+        <div className="relative mt-4">
+          <input 
+            type="text" 
+            placeholder={t.search}
+            className="w-full bg-white rounded-full px-10 py-2 text-gray-700"
           />
+          <svg className="w-5 h-5 text-gray-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
         </div>
+      )}
+      
+      <ProfileSlideMenu
+        isOpen={isMenuOpen}
+        onClose={() => setIsMenuOpen(false)}
+      />
+    </div>
   );
 };
 
 /**
- * คอมโพเนนต์แสดงรายการตั๋ว
+ * Ticket List Component
  */
 export const TicketList: React.FC<TicketListProps> = ({ 
   tickets, 
@@ -237,19 +255,14 @@ export const TicketList: React.FC<TicketListProps> = ({
   onTabChange,
   language
 }) => {
-  const scrollContainer = useRef<HTMLDivElement>(null);
   const t = translations[language];
 
-  // กรองตั๋วตาม tab ที่เลือก
   const filteredTickets = tickets.filter(ticket => {
-    if (activeTab === 'all') return true; // คนไทย = แสดงทั้งหมด
-    if (activeTab === 'free') return true; // TOURIST = แสดงทั้งหมดแต่ราคาต่าง
     return true;
   });
 
   return (
     <div className="p-4 pb-20">
-      {/* Tabs */}
       <div className="flex mb-6 justify-center">
         <button
           className={`px-16 py-3 rounded-full text-sm font-medium whitespace-nowrap ${
@@ -273,7 +286,6 @@ export const TicketList: React.FC<TicketListProps> = ({
         </button>
       </div>
       
-      {/* Ticket Cards */}
       <div className="space-y-6">
         {filteredTickets.map(ticket => (
           <div 
@@ -287,12 +299,10 @@ export const TicketList: React.FC<TicketListProps> = ({
                 alt={language === 'th' ? ticket.templeName : ticket.templeNameEn} 
                 className="w-full h-48 object-cover"
               />
-              <div className="absolute top-4 right-4 bg-orange-500 text-white px-4 py-1 rounded-full">
+              <div className="absolute top-4 right-4 bg-[#FF7A05] text-white px-4 py-1 rounded-full">
                 {language === 'en' ? 
-                  // ราคาสำหรับชาวต่างชาติ (fix ราคา)
                   (ticket.id === 1 ? '100 Baht' : '200 Baht')
                   :
-                  // ราคาสำหรับคนไทย
                   (ticket.isFree ? t.free : `${ticket.price} ${t.baht}`)
                 }
               </div>
@@ -306,17 +316,15 @@ export const TicketList: React.FC<TicketListProps> = ({
                   .split('\n').map((line, index) => (
                   <span key={index}>
                     {line.trim()}
-                    {index < (language === 'th' ? ticket.description : ticket.descriptionEn).split('/').length - 1 && <br />}
+                    {index < (language === 'th' ? ticket.description : ticket.descriptionEn).split('\n').length - 1 && <br />}
                   </span>
                 ))}
               </p>
-              <button className="w-full mt-4 bg-white text-orange-500 rounded-full py-2 font-medium">
+              <button className="w-full mt-4 bg-white text-[#FF7A05] rounded-full py-2 font-medium">
                 {language === 'en' ? 
-                  // ราคาสำหรับชาวต่างชาติ (fix ราคา)
-                  (ticket.id === 1 ? '100 Baht' : '200 Baht')
+                  (ticket.id === 1 ? 'BUY TICKETS' : 'BUY TICKETS')
                   :
-                  // ราคาสำหรับคนไทย
-                  (ticket.isFree ? t.freeDonation : `${ticket.price} ${t.baht}`)
+                  "ซื้อตั๋ว"
                 }
               </button>
             </div>
@@ -328,7 +336,7 @@ export const TicketList: React.FC<TicketListProps> = ({
 };
 
 /**
- * คอมโพเนนต์แสดงรายละเอียดตั๋วและให้เลือกราคา
+ * Ticket Detail Component
  */
 export const TicketDetail: React.FC<TicketDetailProps> = ({ 
   ticket, 
@@ -336,36 +344,49 @@ export const TicketDetail: React.FC<TicketDetailProps> = ({
   onCustomAmount,
   selectedAmount,
   customAmount,
-  language
+  language,
+  onBackClick
 }) => {
   const t = translations[language];
   
-  // สำหรับชาวต่างชาติ - ไม่แสดงตัวเลือกราคา แสดงเฉพาะราคาที่ fix
   if (language === 'en') {
     const fixedPrice = ticket.id === 1 ? 100 : 200;
     
     return (
-      <div className="min-h-screen p-4 bg-orange-500 h-full flex flex-col">
-        <h2 className="text-white text-2xl font-semibold mb-6">
-          {ticket.templeNameEn}
-        </h2>
-        
-        {/* แสดงราคาที่ fix สำหรับชาวต่างชาติ */}
-        <div className="bg-orange-300 rounded-3xl p-6 mb-6">
-          <div className="text-center">
-            <h3 className="text-white text-xl font-semibold mb-4">Admission Fee</h3>
-            <div className="flex items-center justify-center">
-              <span className="text-white text-6xl font-bold">{fixedPrice}</span>
-              <span className="text-white text-2xl ml-2">THB</span>
+      <div className="min-h-screen bg-white-100 relative">
+        <div className="bg-[#FF7A05] rounded-tr-3xl p-4 min-h-screen relative z-20">
+          <div className="flex items-center justify-center relative pt-4 pb-6">
+            <button onClick={onBackClick} className="absolute left-0">
+              <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+            <h2 className="text-white text-2xl font-semibold">Buy Ticket</h2>
+          </div>
+          
+          <div className="w-11/12 h-1 bg-white/30 mb-8 mx-auto"></div>  
+          
+          <div className="pt-4">
+            <h2 className="text-white text-2xl font-semibold mb-6">
+              {ticket.templeNameEn}
+            </h2>
+            
+            <div className="bg-orange-300 rounded-3xl p-6 mb-6">
+              <div className="text-center">
+                <h3 className="text-white text-xl font-semibold mb-4">Admission Fee</h3>
+                <div className="flex items-center justify-center">
+                  <span className="text-white text-6xl font-bold">{fixedPrice}</span>
+                  <span className="text-white text-2xl ml-2">THB</span>
+                </div>
+                <p className="text-white text-sm mt-4">Fixed price for international visitors</p>
+              </div>
             </div>
-            <p className="text-white text-sm mt-4">Fixed price for international visitors</p>
           </div>
         </div>
       </div>
     );
   }
 
-  // สำหรับคนไทย - แสดงตัวเลือกราคาแบบเดิม
   const predefinedAmounts = [
     ticket.isFree ? 0 : (ticket.price as number),
     10,
@@ -376,94 +397,59 @@ export const TicketDetail: React.FC<TicketDetailProps> = ({
   ];
 
   return (
-    <div className="min-h-screen p-4 bg-orange-500 h-full flex flex-col">
-      <h2 className="text-white text-2xl font-semibold mb-6">
-        {ticket.templeName}
-      </h2>
-      <p className="text-white mb-2">
-        {ticket.isFree ? t.freeOrDonation : `${ticket.price} ${t.baht}`}
-      </p>
-      
-      {/* ตัวเลือกจำนวนเงิน */}
-      <div className="grid grid-cols-2 gap-4 mb-6">
-        {predefinedAmounts.map((amount, index) => (
-          <button 
-            key={index}
-            className={`py-3 rounded-full ${
-              selectedAmount === amount 
-                ? 'bg-white text-orange-500' 
-                : 'bg-orange-300 text-white'
-            }`}
-            onClick={() => onSelectAmount(amount)}
-          >
-            {amount === 0 ? t.free : `${amount} ${t.baht}`}
+    <div className="min-h-screen bg-white relative">
+<div
+  className="bg-[#FF7A05] rounded-tr-full p-4 min-h-screen relative z-20"
+  style={{ borderTopRightRadius: '70px' }} // เพิ่มค่าส่วนตัวเพื่อโค้งมากขึ้น
+>        <div className="flex items-center justify-center relative pt-4 pb-6">
+          <button onClick={onBackClick} className="absolute left-0">
+            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
           </button>
-        ))}
-      </div>
-      
-      {/* ใส่จำนวนเงินเอง */}
-      <div className="mb-2">
-        <label className="text-white bg-white-300 block mb-2">{t.amount}</label>
-        <input 
-          type="text"
-          value={customAmount}
-          onChange={(e) => {
-            const value = e.target.value.replace(/[^0-9]/g, '');
-            onCustomAmount(parseInt(value) || 0);
-          }}
-          className="w-full p-3 bg-white rounded-full text-right"
-          placeholder="0.00"
-        />
-      </div>
-      <p className="text-white text-sm mb-4">{t.donationLimit}</p>
-    </div>
-  );
-};
-
-/**
- * คอมโพเนนต์ยืนยันการซื้อตั๋ว
- */
-export const TicketConfirmation: React.FC<TicketConfirmationProps> = ({ 
-  ticket, 
-  amount, 
-  onConfirm,
-  language
-}) => {
-  const t = translations[language];
-  
-  return (
-    <div className="min-h-screen bg-orange-500 flex flex-col">
-      {/* พื้นหลังสีส้ม */}
-      <div className="flex-1 p-4 flex flex-col mt-5 justify-top items-top">
-        {/* การ์ดสีชมพู */}
-        <div className="bg-pink-200 rounded-3xl p-8 w-full max-w-md mx-auto shadow-lg">
+          <h2 className="text-white text-2xl font-semibold">ซื้อตั๋ว</h2>
+        </div>
+        
+        <div className="w-11/12 h-1 bg-white/30 mb-8 mx-auto"></div>  
+        
+        <div className="pt-4">
+          <h2 className="text-white text-2xl font-semibold mb-6">
+            {ticket.templeName}
+          </h2>
+          <p className="text-white mb-2">
+            {ticket.isFree ? t.freeOrDonation : `${ticket.price} ${t.baht}`}
+          </p>
           
-          {/* หัวข้อ */}
-          <div className="text-center mb-8">
-            <h2 className="text-orange-500 text-2xl font-bold mb-2">
-              {language === 'th' ? 'ยืนยันการซื้อตั๋ว' : 'Confirm Ticket'}
-            </h2>
-            <p className="text-orange-500 text-lg">
-              {language === 'th' ? 'ใน' : 'in'} {language === 'th' ? ticket.templeName : ticket.templeNameEn}
-            </p>
+          <div className="grid grid-cols-2 gap-4 mb-6">
+            {predefinedAmounts.map((amount, index) => (
+              <button 
+                key={index}
+                className={`py-3 rounded-full ${
+                  selectedAmount === amount 
+                    ? 'bg-white text-[#FF7A05]' 
+                    : 'bg-orange-300 text-white'
+                }`}
+                onClick={() => onSelectAmount(amount)}
+              >
+                {amount === 0 ? t.free : `${amount} ${t.baht}`}
+              </button>
+            ))}
           </div>
           
-          {/* ราคา */}
-          <div className="text-center mb-8">
-            <div className="flex items-center justify-center">
-              <span className="text-orange-500 text-7xl font-bold">{amount}</span>
-              <span className="text-orange-500 text-2xl font-medium ml-2">THB</span>
-            </div>
+          <div className="mb-2">
+            <label className="text-white block mb-2">{t.amount}</label>
+            <input 
+              type="text"
+              value={customAmount}
+              onChange={(e) => {
+                const value = e.target.value.replace(/[^0-9]/g, '');
+                onCustomAmount(parseInt(value) || 0);
+              }}
+              className="w-full p-3 bg-white rounded-full text-right"
+              placeholder="0.00"
+            />
           </div>
-          
-          {/* ปุ่มยืนยัน */}
-          <button 
-            className="w-full bg-white text-orange-500 py-4 rounded-full font-bold text-lg shadow-md hover:shadow-lg transition-shadow"
-            onClick={onConfirm}
-          >
-            {language === 'th' ? 'ยืนยัน' : 'CONFIRM'}
-          </button>
-          
+          <p className="text-white text-sm mb-4">{t.donationLimit}</p>
         </div>
       </div>
     </div>
@@ -471,14 +457,75 @@ export const TicketConfirmation: React.FC<TicketConfirmationProps> = ({
 };
 
 /**
- * คอมโพเนนต์แสดง QR Code สำหรับชำระเงินและอัพโหลดสลิป
+ * Ticket Confirmation Component
+ */
+export const TicketConfirmation: React.FC<TicketConfirmationProps> = ({ 
+  ticket, 
+  amount, 
+  onConfirm,
+  language,
+  onBackClick
+}) => {
+  const t = translations[language];
+  
+  return (
+    <div className="min-h-screen bg-white-100 relative">
+      <div className="bg-[#FF7A05] rounded-tr-3xl min-h-screen relative z-20"
+      style={{ borderTopRightRadius: '70px'}}
+      >
+        <div className="flex items-center justify-center relative pt-4 pb-6 px-4">
+          <button onClick={onBackClick} className="absolute left-4">
+            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
+          <h2 className="text-white text-2xl font-semibold">ซื้อตั๋ว</h2>
+        </div>
+        
+        <div className="w-11/12 h-1 bg-white/30 mb-8 mx-auto"></div>       
+        <div className="pt-8 p-4">
+          <div className="flex flex-col justify-center items-center">
+            <div className="bg-pink-200 rounded-3xl p-8 w-full max-w-md mx-auto shadow-lg">
+              <div className="text-center mb-8">
+                <h2 className="text-[#FF7A05] text-2xl font-bold mb-2">
+                  {language === 'th' ? 'ยืนยันการซื้อตั๋ว' : 'Confirm Ticket'}
+                </h2>
+                <p className="text-[#FF7A05] text-lg">
+                  {language === 'th' ? 'ใน' : 'in'} {language === 'th' ? ticket.templeName : ticket.templeNameEn}
+                </p>
+              </div>
+              
+              <div className="text-center mb-8">
+                <div className="flex items-center justify-center">
+                  <span className="text-[#FF7A05] text-7xl font-bold">{amount}</span>
+                  <span className="text-[#FF7A05] text-2xl font-medium ml-2">THB</span>
+                </div>
+              </div>
+              
+              <button 
+                className="w-full bg-white text-[#FF7A05] py-4 rounded-full font-bold text-lg shadow-md hover:shadow-lg transition-shadow"
+                onClick={onConfirm}
+              >
+                {language === 'th' ? 'ยืนยัน' : 'CONFIRM'}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+/**
+ * Ticket QR Code Component
  */
 export const TicketQRCode: React.FC<TicketQRCodeProps> = ({ 
   ticket, 
   amount, 
   onUpload,
   onConfirmPayment,
-  language
+  language,
+  onBackClick
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -490,7 +537,6 @@ export const TicketQRCode: React.FC<TicketQRCodeProps> = ({
       const file = e.target.files[0];
       setSelectedFile(file);
       
-      // สร้าง URL สำหรับแสดงรูปภาพ
       const fileUrl = URL.createObjectURL(file);
       setPreviewUrl(fileUrl);
       
@@ -498,7 +544,6 @@ export const TicketQRCode: React.FC<TicketQRCodeProps> = ({
     }
   };
 
-  // ล้าง URL เมื่อคอมโพเนนต์ถูกทำลาย
   useEffect(() => {
     return () => {
       if (previewUrl) {
@@ -514,106 +559,143 @@ export const TicketQRCode: React.FC<TicketQRCodeProps> = ({
   };
 
   return (
-    <div className="min-h-screen p-4 bg-orange-500 h-full flex flex-col items-center">
-      <div className="bg-pink-100 rounded-3xl p-6 w-full max-w-md">
-        <h2 className="text-center text-xl font-semibold mb-6 text-orange-500">
-          {t.scanQR}
-        </h2>
+    <div className="min-h-screen bg-white-100 relative">
+      <div className="bg-[#FF7A05] rounded-tr-3xl min-h-screen relative z-20"
+      style={{ borderTopRightRadius: '70px'}}
+      >
+        <div className="flex items-center justify-center relative pt-4 pb-6 px-4">
+          <button onClick={onBackClick} className="absolute left-4">
+            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
+          <h2 className="text-white text-2xl font-semibold">ซื้อตั๋ว</h2>
+        </div>
         
-        {/* QR Code */}
-        <div className="flex justify-center mb-4">
-          <div className="bg-white p-4 rounded-lg">
-            <img 
-              src="/images/ticket/qr2.png" 
-              alt="QR Code for payment" 
-              className="w-40 h-40"
+        <div className="w-11/12 h-1 bg-white/30 mb-8 mx-auto"></div>  
+        
+        <div className="pt-8 p-4 flex flex-col items-center">
+          <div className="bg-pink-100 rounded-3xl p-6 w-full max-w-md">
+            <h2 className="text-center text-xl font-semibold mb-6 text-[#FF7A05]">
+              {t.scanQR}
+            </h2>
+            
+            <div className="flex justify-center mb-4">
+              <div className="bg-white p-4 rounded-lg">
+                <img 
+                  src="/images/ticket/qr2.png" 
+                  alt="QR Code for payment" 
+                  className="w-40 h-40"
+                />
+              </div>
+            </div>
+            
+            <div className="text-center mb-6">
+              <p className="text-medium text-[#FF7A05]">{t.bank}</p>
+              <p className="text-medium text-[#FF7A05]">{t.accountNumber}</p>
+              <p className="text-medium text-[#FF7A05]">
+                {t.accountName} {language === 'th' ? ticket.templeName : ticket.templeNameEn}
+              </p>
+            </div>
+            
+            {previewUrl && (
+              <div className="mb-4">
+                <p className="text-center mb-2 font-medium">{t.uploadedSlip}</p>
+                <div className="flex justify-center">
+                  <img 
+                    src={previewUrl} 
+                    alt="Uploaded slip" 
+                    className="max-w-full max-h-64 rounded-lg border-2 border-white"
+                  />
+                </div>
+              </div>
+            )}
+            
+            <input 
+              type="file" 
+              ref={fileInputRef} 
+              onChange={handleFileChange} 
+              accept="image/*" 
+              className="hidden" 
+            />
+            
+            <button 
+              className="w-full bg-white text-[#FF7A05] py-3 rounded-full font-medium"
+              onClick={handleUploadClick}
+            >
+              {selectedFile ? t.changeFile : t.uploadFile}
+            </button>
+            
+            {selectedFile && (
+              <button 
+                className="w-full bg-green-500 text-white py-3 rounded-full font-medium mt-2"
+                onClick={onConfirmPayment}
+              >
+                {t.confirmPayment}
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+/**
+ * Ticket Success Component
+ */
+/**
+ * Ticket Success Component - Updated with curved background
+ */
+
+
+
+export const TicketSuccess: React.FC<TicketSuccessProps> = ({ ticket, language }) => {
+  // กำหนดสีและรูปภาพตามภาษา
+  const getBackgroundColor = () => {
+    return language === 'th' ? 'bg-[#FFE999]' : 'bg-[#FFDCE6]';
+  };
+
+  const getTicketImage = () => {
+    return language === 'th' ? '/images/ticket/AW.png' : '/images/ticket/AW2.png';
+  };
+
+  return (
+    <div className={`min-h-screen ${getBackgroundColor()} relative`}>
+      {/* White section covering full width and half height with curved bottom-left */}
+      <div 
+        className="bg-white w-full absolute top-0 left-0 right-0 z-10"
+        style={{
+          height: '30.5vh',
+          borderBottomLeftRadius: '13rem'
+        }}
+      ></div>
+      
+      {/* Ticket content */}
+      <div className="relative z-20 pt-16">
+        <div className="flex justify-center px-4">
+          <div className="w-full max-w-md">
+            <img
+              src={getTicketImage()}
+              alt="Ticket"
+              className="w-full object-contain drop-shadow-lg"
             />
           </div>
         </div>
-        
-        <div className="text-center mb-6">
-          <p className="text-medium text-orange-500">{t.bank}</p>
-          <p className="text-medium text-orange-500">{t.accountNumber}</p>
-          <p className="text-medium text-orange-500">
-            {t.accountName} {language === 'th' ? ticket.templeName : ticket.templeNameEn}
-          </p>
-        </div>
-        
-        {/* แสดงรูปภาพที่อัพโหลด */}
-        {previewUrl && (
-          <div className="mb-4">
-            <p className="text-center mb-2 font-medium">{t.uploadedSlip}</p>
-            <div className="flex justify-center">
-              <img 
-                src={previewUrl} 
-                alt="Uploaded slip" 
-                className="max-w-full max-h-64 rounded-lg border-2 border-white"
-              />
-            </div>
-          </div>
-        )}
-        
-        <input 
-          type="file" 
-          ref={fileInputRef} 
-          onChange={handleFileChange} 
-          accept="image/*" 
-          className="hidden" 
-        />
-        
-        <button 
-          className="w-full bg-white text-orange-500 py-3 rounded-full font-medium"
-          onClick={handleUploadClick}
-        >
-          {selectedFile ? t.changeFile : t.uploadFile}
-        </button>
-        
-        {selectedFile && (
-          <button 
-            className="w-full bg-green-500 text-white py-3 rounded-full font-medium mt-2"
-            onClick={onConfirmPayment}
-          >
-            {t.confirmPayment}
-          </button>
-        )}
       </div>
     </div>
   );
-};
+  };
 
-/**
- * คอมโพเนนต์แสดงตั๋วที่ซื้อสำเร็จ
- */
-export const TicketSuccess: React.FC<TicketSuccessProps> = ({ ticket, language }) => {
-  return (
-    <div className="min-h-screen bg-yellow-100 flex flex-col p-4">
-      {/* ส่วนบนสีส้ม */}
-      <div className="bg-orange-500 rounded-3xl p-6 w-full max-w-md">
-        
-        {/* ภาพตั๋วทั้งหมด */}
-        <div className="flex justify-center">
-          <img 
-            src="/images/ticket/AW.png"
-            alt="Ticket" 
-            className="w-full max-w-xs object-contain"
-          />
-        </div>
-      </div>
-    </div>
-  );
-};
 
-/**
- * คอมโพเนนต์หลักสำหรับกระบวนการซื้อตั๋ว
- */
+
+
 export const TicketScreen: React.FC<TicketScreenProps> = ({ 
   userName, 
   initialTab = 'all',
   onBackClick 
 }) => {
   const router = useRouter();
-
-  // 
   const [activeTab, setActiveTab] = useState(initialTab);
   const [language, setLanguage] = useState<'th' | 'en'>('th'); 
   const { user } = useAuth();
@@ -627,9 +709,7 @@ export const TicketScreen: React.FC<TicketScreenProps> = ({
 
   const t = translations[language];
 
-  // ดึงข้อมูลตั๋ว
   useEffect(() => {
-    // จำลองข้อมูล
     const mockTickets: Ticket[] = [
       {
         id: 1,
@@ -639,31 +719,30 @@ export const TicketScreen: React.FC<TicketScreenProps> = ({
         isFree: true,
         image: '/images/ticket/วัดสุทัศน์.jpeg',
         description: 'ฟรี หรือ บริจาคตามศรัทธา',
-        descriptionEn: 'Free or Donation as you wish'
+        descriptionEn: '100 Baht'
       },
       {
         id: 2,
-        templeName: 'พิพิธภัณฑ์วัดสุทัศน์',
-        templeNameEn: 'Wat Suthat Museum',
+        templeName: 'พิพิธภัณฑ์ตำหนักสมเด็จพระสังฆราช',
+        templeNameEn: 'The Patriarch is Palace Museum (Pae), Wat Suthat',
         price: 50,
         isFree: false,
         image: '/images/ticket/พิพิธภัณฑ์ตำหนักสมเด็จพระสังฆราช.jpeg',
         description: 'ค่าธรรมเนียม : คนไทย 50 บาท/ชาวต่างชาติ 200 บาท \n ยกเว้นค่าเข้าชม : นักเรียน-นักศึกษาปริญญาตรี (แสดงบัตร)/ \n ผู้สูงอายุตั้งแต่ 60 ปีขึ้นไป/พระภิกษุสงฆ์-สามเณร/ผู้พิการ',
-        descriptionEn: 'Admission Fee: Thai 50 Baht / Foreigner 200 Baht \n Free Admission: Students (with ID) / \n Senior citizens 60+ / Monks / Disabled persons'
-      },
+        descriptionEn: '200 Baht'
+      }
     ];
     
     setTickets(mockTickets);
     setLoading(false);
   }, []);
 
-  // เมื่อเปลี่ยน tab จะเปลี่ยนภาษาด้วย
   const handleTabChange = (tab: string) => {
     setActiveTab(tab);
     if (tab === 'all') {
-      setLanguage('th'); // คนไทย = ภาษาไทย
+      setLanguage('th');
     } else if (tab === 'free') {
-      setLanguage('en'); // TOURIST = ภาษาอังกฤษ
+      setLanguage('en');
     }
   };
 
@@ -689,12 +768,10 @@ export const TicketScreen: React.FC<TicketScreenProps> = ({
     setSelectedTicket(ticket);
     
     if (language === 'en') {
-      // สำหรับชาวต่างชาติ - fix ราคา ไม่ให้เลือก
-      const foreignerPrice = ticket.id === 1 ? 100 : 200; // วัดสุทัศน์ = 100, พิพิธภัณฑ์ = 200
+      const foreignerPrice = ticket.id === 1 ? 100 : 200;
       setSelectedAmount(foreignerPrice);
       setCustomAmount(foreignerPrice.toString());
     } else {
-      // สำหรับคนไทย - ราคาปกติ
       setSelectedAmount(ticket.isFree ? 0 : ticket.price as number);
       setCustomAmount(ticket.isFree ? '0' : (ticket.price as number).toString());
     }
@@ -722,7 +799,6 @@ export const TicketScreen: React.FC<TicketScreenProps> = ({
 
   const handleFileUpload = (file: File) => {
     setUploadedFile(file);
-    // จำลองการส่งไฟล์ไปยังเซิร์ฟเวอร์และรับ QR Code URL กับ Barcode กลับมา
     if (selectedTicket) {
       const updatedTicket: Ticket = {
         ...selectedTicket,
@@ -734,7 +810,6 @@ export const TicketScreen: React.FC<TicketScreenProps> = ({
   };
 
   const handleConfirmPayment = () => {
-    // ส่งข้อมูลการชำระเงินและไฟล์ไปยังเซิร์ฟเวอร์ (จำลอง)
     setStep('success');
   };
 
@@ -742,8 +817,8 @@ export const TicketScreen: React.FC<TicketScreenProps> = ({
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-orange-500 mx-auto"></div>
-          <p className="mt-4 text-orange-500">{t.loading}</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#FF7A05] mx-auto"></div>
+          <p className="mt-4 text-[#FF7A05]">{t.loading}</p>
         </div>
       </div>
     );
@@ -751,16 +826,15 @@ export const TicketScreen: React.FC<TicketScreenProps> = ({
 
   return (
     <div className="min-h-screen bg-white">
-      {/* ส่วนหัว */}
       <TicketHeader
         onBackClick={handleBackClick}
         title={step === 'success' ? t.yourTicket : t.buyTicket}
         userName={user?.fullName || 'Guest'} 
         language={language}
         avatar={user?.avatar || '/images/profile/travel/Profile.jpeg'} 
+        step={step}
       />
       
-      {/* เนื้อหาตามขั้นตอน */}
       {step === 'list' && (
         <TicketList 
           tickets={tickets}
@@ -780,9 +854,10 @@ export const TicketScreen: React.FC<TicketScreenProps> = ({
             selectedAmount={selectedAmount}
             customAmount={customAmount}
             language={language}
+            onBackClick={handleBackClick}
           />
           
-          <div className="fixed bottom-0 left-0 right-0 p-4 bg-white">
+          <div className="fixed bottom-0 left-0 right-0 p-4 bg-white z-30">
             <button 
               className="w-full bg-pink-400 text-white py-3 rounded-full font-medium"
               onClick={handleConfirm}
@@ -799,6 +874,7 @@ export const TicketScreen: React.FC<TicketScreenProps> = ({
           amount={selectedAmount}
           onConfirm={handleProceedToPayment}
           language={language}
+          onBackClick={handleBackClick}
         />
       )}
       
@@ -809,6 +885,7 @@ export const TicketScreen: React.FC<TicketScreenProps> = ({
           onUpload={handleFileUpload}
           onConfirmPayment={handleConfirmPayment}
           language={language}
+          onBackClick={handleBackClick}
         />
       )}
       
@@ -819,7 +896,6 @@ export const TicketScreen: React.FC<TicketScreenProps> = ({
         />
       )}
       
-      {/* Navbar ด้านล่าง (แสดงเฉพาะหน้าแรก) */}
       {step === 'list' && (
         <BottomNavigation activePage="profile" />
       )}
