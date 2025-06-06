@@ -229,7 +229,7 @@ const InformationPage: React.FC<InformationProps> = ({ type, id }) => {
               location: "วัดสุทัศน์เทพวราราม",
               openHours: "08.00 - 20.00 น.",
               type: "ภาพรวม / ทั่วไป",
-              panorama: "/images/panorama/พระศรีศากยมุนี360.mov",
+              panorama: "https://storage.googleapis.com/noumi-3d-models/พระศรีศากยมุนี360.mov",
               description:
                 "พระพุทธรูปประธานในพระอุโบสถ มีความศักดิ์สิทธิ์ เป็นที่เคารพนับถือของพุทธศาสนิกชนทั่วประเทศ",
               worshipGuide: {
@@ -283,7 +283,7 @@ const InformationPage: React.FC<InformationProps> = ({ type, id }) => {
               location: "วัดสุทัศน์เทพวราราม",
               openHours: "08.00 - 20.00 น.",
               type: "การเรียน / การงาน",
-              panorama: "/images/panorama/พระสุนทรีวาณี360.mov",
+              panorama: "https://storage.googleapis.com/noumi-3d-models/พระสุนทรีวาณี360.mov",
               description:
                 "พระสุนทรีวาณีหรือลอยองค์ องค์นี้ประดิษฐานในพระวิหารหลวงวัดสุทัศน์เทพวราราม โดยพระบาทสมเด็จพระจุลจอมเกล้าเจ้าอยู่หัวโปรดเกล้าฯ ให้เสด็จเป็นประธาน ประกอบพิธีเทกองและพุทธาภิเษก เมื่อวันที่ 7 ตุลาคม พ.ศ.๑๘๙๖ ซึ่งตรงกล่าวเป็นรูปแบบพิเศษครั้งแรก",
               worshipGuide: {
@@ -403,7 +403,7 @@ const InformationPage: React.FC<InformationProps> = ({ type, id }) => {
               location: "วัดสุทัศน์เทพวราราม",
               openHours: "08.00 - 20.00 น.",
               type: "ภาพรวม / ทั่วไป",
-              panorama: "/images/panorama/ลานต้นโพธิ์360.mov",
+              panorama: "https://storage.googleapis.com/noumi-3d-models/ลานต้นโพธิ์360.mov",
               description:
                 "ต้นโพธิ์ศักดิ์สิทธิ์ภายในวัด ที่เชื่อกันว่าเป็นต้นโพธิ์ที่นำมาจากพุทธคยา สถานที่ตรัสรู้ของพระพุทธเจ้า",
               worshipGuide: {
@@ -450,7 +450,7 @@ const InformationPage: React.FC<InformationProps> = ({ type, id }) => {
               location: "วัดสุทัศน์เทพวราราม",
               openHours: "08.00 - 20.00 น.",
               type: "สุขภาพ / โรคภัย",
-              panorama: "/images/panorama/พระพุทธตรีโลกเชษฐ์360.mov",
+              panorama: "https://storage.googleapis.com/noumi-3d-models/พระพุทธตรีโลกเชษฐ์360.mov",
               description:
                 "พระพุทธรูปปางนาคปรก เชื่อกันว่าหากมาขอพรเรื่องสุขภาพจะหายจากโรคภัยไข้เจ็บ",
               worshipGuide: {
@@ -503,7 +503,7 @@ const InformationPage: React.FC<InformationProps> = ({ type, id }) => {
               location: "วัดสุทัศน์เทพวราราม",
               openHours: "08.00 - 20.00 น.",
               type: "ความมงคล / ความสำเร็จ",
-              panorama: "/images/panorama/พระกริ่งใหญ่360.mov",
+              panorama: "https://storage.googleapis.com/noumi-3d-models/พระกริ่งใหญ่360.mov",
               description:
                 "พระพุทธรูปปางลีลาศิลปะสุโขทัย เป็นพระพุทธรูปที่มีความงดงาม แสดงถึงการก้าวเดินอย่างสง่างาม เชื่อกันว่าหากสักการะแล้วจะประสบความสำเร็จในชีวิต",
               worshipGuide: {
@@ -557,7 +557,7 @@ const InformationPage: React.FC<InformationProps> = ({ type, id }) => {
               location: "วัดสุทัศน์เทพวราราม",
               openHours: "08.00 - 20.00 น.",
               type: "ความมงคล / ความสำเร็จ",
-              panorama: "/images/panorama/ท้าวเวสุวรรณ360.mov",
+              panorama: "https://storage.googleapis.com/noumi-3d-models/ท้าวเวสุวรรณ360.mov",
               description:
                 "พระพุทธรูปปางลีลาศิลปะสุโขทัย เป็นพระพุทธรูปที่มีความงดงาม แสดงถึงการก้าวเดินอย่างสง่างาม เชื่อกันว่าหากสักการะแล้วจะประสบความสำเร็จในชีวิต",
               worshipGuide: {
@@ -613,7 +613,7 @@ const InformationPage: React.FC<InformationProps> = ({ type, id }) => {
               openHours: "08.00 - 20.00 น.",
               type: "ความมงคล / ความสำเร็จ",
               panorama:
-                "/images/panorama/หลวงพ่อกลักฝิ่น-พระพุทธเสฏฐมุนี(จำลอง)360.mov",
+                "https://storage.googleapis.com/noumi-3d-models/หลวงพ่อกลักฝิ่น-พระพุทธเสฏฐมุนี(จำลอง)360.mov",
               description:
                 "พระพุทธรูปปางลีลาศิลปะสุโขทัย เป็นพระพุทธรูปที่มีความงดงาม แสดงถึงการก้าวเดินอย่างสง่างาม เชื่อกันว่าหากสักการะแล้วจะประสบความสำเร็จในชีวิต",
               worshipGuide: {
@@ -679,7 +679,7 @@ const InformationPage: React.FC<InformationProps> = ({ type, id }) => {
               openHours: "08.00 - 20.00 น.",
               type: "ความมงคล / ความสำเร็จ",
               panorama:
-                "/images/panorama/พระรูปสมเด็จพระสังฆราช(แพติสสเทโวป.ธ.5)360.mov",
+                "https://storage.googleapis.com/noumi-3d-models/พระรูปสมเด็จพระสังฆราช(แพติสสเทโวป.ธ.5)360.mov",
               description:
                 "พระพุทธรูปปางลีลาศิลปะสุโขทัย เป็นพระพุทธรูปที่มีความงดงาม แสดงถึงการก้าวเดินอย่างสง่างาม เชื่อกันว่าหากสักการะแล้วจะประสบความสำเร็จในชีวิต",
               worshipGuide: {
