@@ -294,7 +294,7 @@ export const BuddhaInformationContainer: React.FC = () => {
   const sections: Section[] = [
     { id: 'overview', title: 'ข้อมูลทั่วไป', bgColor: 'bg-blue-500', textColor: 'text-white' },
     { id: 'worshipSteps', title: 'ลำดับการไหว้', bgColor: 'bg-pink-400', textColor: 'text-white' },
-    { id: 'prayers', title: 'บทสวด', bgColor: 'bg-yellow-400', textColor: 'text-white' },
+    { id: 'prayers', title: 'บทสวด', bgColor: 'bg-[#FFC800]', textColor: 'text-white' },
     { id: 'offerings', title: 'ของไหว้', bgColor: 'bg-orange-400', textColor: 'text-white' },
     { id: 'guidelines', title: 'ข้อห้าม/ข้อแนะนำ', bgColor: 'bg-orange-400', textColor: 'text-white' }
   ];

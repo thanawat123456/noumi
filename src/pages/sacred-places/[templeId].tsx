@@ -114,7 +114,7 @@ export default function TempleBuddhaStatues() {
             name: "พระพุทธตรีโลกเชษฐ์",
             templeId: Number(templeId),
             templeName: "วัดสุทัศน์เทพวราราม",
-            image: "/images/temple-list/พระพุทธตรีโลกเชษฐ์ .jpg",
+            image: "/images/temple-list/พระพุทธตรีโลกเชษฐ์.jpg",
             benefits: ["โชคลาภวาสนา"],
             description: "พระพุทธรูปปางนาคปรก",
             popular: false,

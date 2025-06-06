@@ -56,7 +56,7 @@ export const getAllWishPlaces = (): WishPlace[] => {
     {
       id: 3,
       name: 'พระพุทธตรีโลกเชษฐ์',
-      image: '/images/temple-list/พระพุทธตรีโลกเชษฐ์ .jpg',
+      image: '/images/temple-list/พระพุทธตรีโลกเชษฐ์.jpg',
       temple: 'วัดสุทัศน์เทพวราราม',
       wishType: 'ความรัก<br />คู่ครอง',
       category: 'love',
