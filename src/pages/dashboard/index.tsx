@@ -11,26 +11,6 @@ const images = [
     title: "วัดสุทัศน์เทพวราราม",
     subtitle: "สงกรานต์เยือนสายน้ำพระ",
   },
-  {
-    src: "/images/home/วัดโพธิ์.jpeg",
-    title: "วัดโพธิ์",
-    subtitle: "แหล่งเรียนรู้พระพุทธศาสนา",
-  },
-  {
-    src: "/images/home/วัดมังกร.jpg",
-    title: "วัดมังกร",
-    subtitle: "ขอพรเสริมสิริมงคล",
-  },
-  {
-    src: "/images/home/วัดอรุณ.JPEG",
-    title: "วัดอรุณ",
-    subtitle: "วัดสวยริมเจ้าพระยา",
-  },
-  {
-    src: "/images/home/ศาลเจ้าพ่อเสือ.jpg",
-    title: "ศาลเจ้าพ่อเสือ",
-    subtitle: "ขอพรความมั่งคั่งร่ำรวย",
-  },
 ];
 
 const newsData = [
@@ -80,7 +60,7 @@ export default function Dashboard() {
   const router = useRouter();
   const [newsCategory, setNewsCategory] = useState<string>("ALL");
 
-  const [current, setCurrent] = useState(0);
+  const [current] = useState(0);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   // เช็คการล็อกอิน (ใช้โค้ดเดิมที่คุณมี)
@@ -138,9 +118,9 @@ export default function Dashboard() {
     setNewsCategory(category);
   };
 
-  const goTo = (index: number) => {
-    setCurrent(index);
-  };
+  // const goTo = (index: number) => {
+  //   setCurrent(index);
+  // };
 
   return (
     <>
@@ -156,14 +136,23 @@ export default function Dashboard() {
         {/* ส่วนหัว */}
         <div className="bg-[#FF7A05] text-white p-4 rounded-br-[140px]">
           <HeaderProfile onProfileClick={() => setIsMenuOpen(true)} />
-          <div className="mt-4">
-            <h5 className="text-white">
-              Nummu นำใจ นำพาคุณ
-              <br />
-              ตามหาแหล่งที่พึ่งพาทางจิตใจและเข้าถึง
-              <br />
-              การไหว้พระ ขอพร ที่สะดวก ง่าย ในที่เดียว
-            </h5>
+          <div className="mt-4 flex items-center justify-between flex-wrap gap-4">
+            <div className="text-white max-w-md text-sm">
+              <h5>
+                Nummu นำใจ นำพาคุณ
+                <br />
+                ตามหาแหล่งที่พึ่งพาทางจิตใจและเข้าถึง
+                <br />
+                การไหว้พระ ขอพร ที่สะดวก ง่าย ในที่เดียว
+              </h5>
+            </div>
+            <div className="w-30">
+              <img
+                src="/images/home-car.png"
+                alt="รถนำทาง"
+                className="w-full h-auto object-contain"
+              />
+            </div>
           </div>
 
           {/* Search Bar */}
@@ -501,33 +490,27 @@ export default function Dashboard() {
           <div className="space-y-4">
             <div className="w-full max-w-xl mx-auto">
               {images[current] && (
-                <div className="relative rounded-[30px] overflow-hidden">
-                  <img
-                    src={images[current].src} 
-                    alt={images[current].title}
-                    className="w-full h-60 object-cover"
-                  />
-                  <div className="absolute inset-0 bg-black/20 text-white flex flex-col justify-center px-6">
-                    <h2 className="text-2xl font-bold">
-                      {images[current].title}
-                    </h2>
-                    <p className="text-sm">{images[current].subtitle}</p>
+                <a
+                  href="https://www.facebook.com/WatSuthatBangkok/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block"
+                >
+                  <div className="relative rounded-[30px] overflow-hidden cursor-pointer">
+                    <img
+                      src={images[current].src}
+                      alt={images[current].title}
+                      className="w-full h-60 object-cover"
+                    />
+                    <div className="absolute inset-0 bg-black/20 text-white flex flex-col justify-center px-6">
+                      <h2 className="text-2xl font-bold">
+                        {images[current].title}
+                      </h2>
+                      <p className="text-sm">{images[current].subtitle}</p>
+                    </div>
                   </div>
-                </div>
+                </a>
               )}
-
-              {/* Pagination */}
-              <div className="flex justify-center mt-4 gap-2">
-                {images.map((_, idx) => (
-                  <button
-                    key={idx}
-                    onClick={() => goTo(idx)}
-                    className={`h-3 w-6 rounded-full transition-all duration-300 ${
-                      idx === current ? "bg-pink-400 w-6" : "bg-pink-200 w-3"
-                    }`}
-                  ></button>
-                ))}
-              </div>
             </div>
 
             {/* รวมสถานที่ยอดฮิต */}
@@ -542,38 +525,50 @@ export default function Dashboard() {
                 className="overflow-x-auto cursor-grab scroll-smooth hide-scrollbar"
               >
                 <div className="flex space-x-4 w-max snap-x snap-mandatory">
-                  {newsData.map((item, index) => (
-                    <div
-                      key={index}
-                      className="min-w-[250px] max-w-[280px] flex-shrink-0 snap-start"
-                    >
-                      <div className="bg-white rounded-xl overflow-hidden shadow-md h-70 flex flex-col">
-                        <img
-                          src={item.img}
-                          alt={item.title}
-                          className="w-full h-60 object-cover"
-                        />
-                        <div className="p-4 flex flex-col flex-grow bg-[#FFDCE6]">
-                          <div className="flex justify-between items-center mt-auto">
-                            <h3 className="font-bold text-lg text-orange-500 line-clamp-2">
-                              {item.title}
-                            </h3>
-                            <span className="text-orange-500 text-xs">
-                              {item.desc1}
-                            </span>
-                          </div>
-                          <div className="flex justify-between items-center mt-auto">
-                            <span className="text-orange-500 text-xs">
-                              {item.date}
-                            </span>
-                            <span className="text-orange-500 text-xs">
-                              {item.desc2}
-                            </span>
+                  {newsData.map((item, index) => {
+                    const link =
+                      item.title === "วัดโพธิ์"
+                        ? "https://www.lemon8-app.com/jearakor/7323963209566700033?region=th"
+                        : item.title === "วัดอรุณราชวราราม"
+                        ? "https://www.lemon8-app.com/@dicexpatta/7407345939633029648?region=th"
+                        : "#";
+
+                    return (
+                      <a
+                        key={index}
+                        href={link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="min-w-[250px] max-w-[280px] flex-shrink-0 snap-start"
+                      >
+                        <div className="bg-white rounded-xl overflow-hidden shadow-md h-70 flex flex-col">
+                          <img
+                            src={item.img}
+                            alt={item.title}
+                            className="w-full h-60 object-cover"
+                          />
+                          <div className="p-4 flex flex-col flex-grow bg-[#FFDCE6]">
+                            <div className="flex justify-between items-center mt-auto">
+                              <h3 className="font-bold text-lg text-orange-500 line-clamp-2">
+                                {item.title}
+                              </h3>
+                              <span className="text-orange-500 text-xs">
+                                {item.desc1}
+                              </span>
+                            </div>
+                            <div className="flex justify-between items-center mt-auto">
+                              <span className="text-orange-500 text-xs">
+                                {item.date}
+                              </span>
+                              <span className="text-orange-500 text-xs">
+                                {item.desc2}
+                              </span>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    </div>
-                  ))}
+                      </a>
+                    );
+                  })}
                 </div>
               </div>
             </div>
@@ -590,38 +585,50 @@ export default function Dashboard() {
                 className="overflow-x-auto cursor-grab scroll-smooth hide-scrollbar"
               >
                 <div className="flex space-x-4 w-max snap-x snap-mandatory">
-                  {newsData2.map((item, index) => (
-                    <div
-                      key={index}
-                      className="min-w-[250px] max-w-[280px] flex-shrink-0 snap-start"
-                    >
-                      <div className="bg-white rounded-xl overflow-hidden shadow-md h-70 flex flex-col">
-                        <img
-                          src={item.img}
-                          alt={item.title}
-                          className="w-full h-60 object-cover"
-                        />
-                        <div className="p-4 flex flex-col flex-grow bg-[#FFDCE6]">
-                          <div className="flex justify-between items-center mt-auto">
-                            <h3 className="font-bold text-lg text-orange-500 line-clamp-2">
-                              {item.title}
-                            </h3>
-                            <span className="text-orange-500 text-xs">
-                              {item.desc1}
-                            </span>
-                          </div>
-                          <div className="flex justify-between items-center mt-auto">
-                            <span className="text-orange-500 text-xs">
-                              {item.date}
-                            </span>
-                            <span className="text-orange-500 text-xs">
-                              {item.desc2}
-                            </span>
+                  {newsData2.map((item, index) => {
+                    const link =
+                      item.title === "ศาลเจ้าพ่อเสือ"
+                        ? "https://www.lemon8-app.com/@mugantai/7448460556933317121?region=th"
+                        : item.title === "วัดมังกร"
+                        ? "https://www.lemon8-app.com/@mintnyw/7457489921977106945?region=th"
+                        : "#";
+
+                    return (
+                      <a
+                        key={index}
+                        href={link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="min-w-[250px] max-w-[280px] flex-shrink-0 snap-start"
+                      >
+                        <div className="bg-white rounded-xl overflow-hidden shadow-md h-70 flex flex-col">
+                          <img
+                            src={item.img}
+                            alt={item.title}
+                            className="w-full h-60 object-cover"
+                          />
+                          <div className="p-4 flex flex-col flex-grow bg-[#FFDCE6]">
+                            <div className="flex justify-between items-center mt-auto">
+                              <h3 className="font-bold text-lg text-orange-500 line-clamp-2">
+                                {item.title}
+                              </h3>
+                              <span className="text-orange-500 text-xs">
+                                {item.desc1}
+                              </span>
+                            </div>
+                            <div className="flex justify-between items-center mt-auto">
+                              <span className="text-orange-500 text-xs">
+                                {item.date}
+                              </span>
+                              <span className="text-orange-500 text-xs">
+                                {item.desc2}
+                              </span>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    </div>
-                  ))}
+                      </a>
+                    );
+                  })}
                 </div>
               </div>
             </div>

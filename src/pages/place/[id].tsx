@@ -63,7 +63,7 @@ const placesData: Record<string, {
     subtitle: 'ช่วงเวลา เปิด-ปิด',
     openTime: '06.00 - 20.00 น.',
     description: 'เส้นทางท่องเที่ยวเชิงธรรมะที่จะพาไปเรียนรู้เรื่องราวของกฎแห่งกรรม ผ่านสถานที่สำคัญทางพระพุทธศาสนา และการปฏิบัติธรรม',
-    image: '/images/temple-list/พระพุทธตรีโลกเชษฐ์ .jpg',
+    image: '/images/temple-list/พระพุทธตรีโลกเชษฐ์.jpg',
     videoPath: '/video/ตำนานผีเปรต.mp4'
   }
 };

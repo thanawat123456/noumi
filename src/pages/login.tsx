@@ -212,6 +212,7 @@ export default function Login() {
     try {
       await login(email, password);
       // ลบ router.push('/dashboard') ออก เพราะ useEffect จะทำงานเมื่อ isAuthenticated เปลี่ยน
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       // ใช้ AuthError ที่มี userMessage แทน
       if (err.name === 'AuthError') {
@@ -262,6 +263,7 @@ export default function Login() {
   const handleGoogleLogin = async () => {
     try {
       await loginWithGoogle();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       if (error.name === 'AuthError') {
         showError(
@@ -288,7 +290,8 @@ export default function Login() {
     },
     card: {
       width: '100%',
-      maxWidth: '420px',
+      minHeight: '100vh',
+      maxWidth: '100vh',
       background: '#ffecf1',
       borderRadius: '28px',
       padding: '24px',
@@ -446,7 +449,7 @@ export default function Login() {
           {/* คำทักทาย */}
           <h2 style={styles.greetingTitle}>สวัสดี :)</h2>
           <p style={styles.greetingText}>
-            ยอดนิยม กลุ่มเราขาว "ผู้" เข้าสู่แอปพลิเคชัน
+            ยอดนิยม กลุ่มเราขาว &quot;ผู้&quot; เข้าสู่แอปพลิเคชัน
             ที่จะช่วยให้คุณตามหาแหล่งที่พักทางจิตใจและได้เข้าถึง
             การไหว้พระ ขอพร ที่สะดวกนามมากยิ่งขึ้น
           </p>
@@ -528,7 +531,7 @@ export default function Login() {
           
           {/* ลิงก์สมัครสมาชิก */}
           <div style={styles.signUpText}>
-            Don't have an account? <Link href="/signup" style={styles.signUpLink}>Sign Up</Link>
+            Don&apos;t have an account? <Link href="/signup" style={styles.signUpLink}>Sign Up</Link>
           </div>
         </div>
       </div>

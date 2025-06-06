@@ -278,7 +278,7 @@ export const CeremonyActivityScreen: React.FC<CeremonyActivityScreenProps> = ({
     const selectedItem = items.find(item => item.id === id);
     
     if (type === "ceremony") {
-      router.push(`/ceremony/${id}?name=${encodeURIComponent(selectedItem?.name || '')}`);
+      router.push(`/information/8?type=buddha`);
     } else {
       router.push(`/activity/${id}?name=${encodeURIComponent(selectedItem?.name || '')}`);
     }

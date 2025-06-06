@@ -23,7 +23,6 @@ const PlaceDetailScreen: React.FC<PlaceDetailProps> = ({
   openTime,
   description,
   image,
-  videoPath,
   onBack,
 }) => {
   const { isFavorite, toggleFavorite } = useFavorites();

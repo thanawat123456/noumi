@@ -387,6 +387,7 @@ const getZodiacSign = (birthDate: string | undefined) => {
     if ((month === 12 && day >= 22) || (month === 1 && day <= 19)) return "Capricorn";
     if ((month === 1 && day >= 20) || (month === 2 && day <= 18)) return "Aquarius";
     return "Pisces";
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (error) {
     return "Aries";
   }
@@ -401,6 +402,7 @@ const formatBirthDate = (dateString: string | undefined) => {
     const month = (date.getMonth() + 1).toString().padStart(2, '0');
     const year = date.getFullYear();
     return `${day} ${getMonthName(month)} ${year}`;
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (error) {
     return '';
   }
@@ -420,6 +422,7 @@ export default function Profile() {
   const [luckyNumbers, setLuckyNumbers] = useState<number[]>([]);
   const [luckyColors, setLuckyColors] = useState<string[]>([]);
   const [zodiacSign, setZodiacSign] = useState<string>('');
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [destinations, setDestinations] = useState<any[]>([]);
   const [bgStyles, setBgStyles] = useState({
     gradient: '#f0f0f0',
@@ -500,12 +503,12 @@ export default function Profile() {
                 color: hexToRgba(bgStyles.gradient, 100) 
               }}
             >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
               </svg>
             </button>
           <div 
-            className="font-bold text-xl" 
+            className="font-bold text-xl ml-9" 
             style={{ 
               color: hexToRgba(bgStyles.gradient, 100)
             }}
@@ -675,12 +678,13 @@ export default function Profile() {
               
               {destinations && destinations.length > 0 ? (
                 <div className="space-y-4">
-                  <div className="flex overflow-x-auto space-x-4 pb-4" style={{ scrollSnapType: 'x mandatory' }}>
+                  <div className="flex overflow-x-hidden space-x-4 pb-4" style={{ scrollSnapType: 'x mandatory' }}>
                     {destinations.map((destination: any, index: number) => (
                       <div 
                         key={index} 
                         className="flex-shrink-0 w-80 relative"
                         style={{ scrollSnapAlign: 'start' }}
+                        onClick={() => router.push(`/information/${destination.id}?type=buddha`)}
                       >
                         <img 
                           src={destination.image} 
@@ -694,7 +698,7 @@ export default function Profile() {
                         <div className="p-4">
                           <div className="flex justify-between items-start mb-3">
                             <h4 className="text-lg font-semibold text-white-800">{destination.name}</h4>
-                            <span className="bg-yellow-400 text-white-800 px-3 py-1 rounded-full text-xs font-medium">
+                            <span className="bg-[#40B828] text-white-800 px-3 py-1 rounded-full text-xs font-medium text-center">
                               {destination.category}
                             </span>
                           </div>
@@ -705,7 +709,7 @@ export default function Profile() {
                           <a 
                             target="_blank" 
                             rel="noopener noreferrer"
-                            className=" font-medium"
+                            className="font-medium"
                           >
                             Google Map
                           </a>

@@ -53,7 +53,7 @@ export default function HeaderProfile({ onProfileClick }: HeaderProfileProps) {
         </div>
         <div className="flex space-x-3">
           <Link href="/notifications" passHref>
-            <button className="w-10 h-10 rounded-full bg-white flex items-center justify-center ml-20">
+            <button className="w-10 h-10 rounded-full bg-white flex items-center justify-center ml-15">
               <svg
                 className="w-6 h-6 text-[#FF7A05]"
                 fill="none"

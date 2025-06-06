@@ -21,7 +21,6 @@
     "cookie": "^1.0.2",
     "dayjs": "^1.11.13",
     "dexie": "^4.0.11",
-    "jsqr": "^1.4.0",
     "localforage": "^1.10.0",
     "lucide-react": "^0.511.0",
     "next": "15.3.2",
