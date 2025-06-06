@@ -4,14 +4,180 @@ import Head from 'next/head';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
 
+// Error Modal Component
+interface ErrorModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  title: string;
+  message: string;
+  actionText?: string;
+  actionLink?: string;
+}
+
+const ErrorModal: React.FC<ErrorModalProps> = ({ 
+  isOpen, 
+  onClose, 
+  title, 
+  message, 
+  actionText, 
+  actionLink 
+}) => {
+  if (!isOpen) return null;
+
+  const modalStyles: { [key: string]: CSSProperties } = {
+    overlay: {
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      backgroundColor: 'rgba(0, 0, 0, 0.5)',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      zIndex: 1000,
+      padding: '16px',
+    },
+    modal: {
+      backgroundColor: '#ffecf1',
+      borderRadius: '20px',
+      padding: '32px',
+      maxWidth: '400px',
+      width: '100%',
+      boxShadow: '0 10px 25px rgba(0, 0, 0, 0.2)',
+      animation: 'slideIn 0.3s ease-out',
+      position: 'relative',
+    },
+    closeButton: {
+      position: 'absolute',
+      top: '16px',
+      right: '16px',
+      background: 'none',
+      border: 'none',
+      cursor: 'pointer',
+      color: '#f6802f',
+      fontSize: '24px',
+      fontWeight: 'bold',
+    },
+    icon: {
+      textAlign: 'center',
+      marginBottom: '20px',
+      fontSize: '48px',
+    },
+    title: {
+      fontSize: '24px',
+      fontWeight: 'bold',
+      color: '#f6802f',
+      textAlign: 'center',
+      marginBottom: '16px',
+    },
+    message: {
+      fontSize: '16px',
+      color: '#666',
+      textAlign: 'center',
+      lineHeight: '1.5',
+      marginBottom: '24px',
+    },
+    buttonContainer: {
+      display: 'flex',
+      gap: '12px',
+      justifyContent: 'center',
+    },
+    button: {
+      padding: '12px 24px',
+      borderRadius: '25px',
+      border: 'none',
+      fontSize: '16px',
+      fontWeight: '500',
+      cursor: 'pointer',
+      transition: 'all 0.3s ease',
+    },
+    primaryButton: {
+      backgroundColor: '#FF8CB7',
+      color: 'white',
+    },
+    secondaryButton: {
+      backgroundColor: 'white',
+      color: '#f6802f',
+      border: '2px solid #f6802f',
+    },
+  };
+
+  return (
+    <div style={modalStyles.overlay} onClick={onClose}>
+      <div style={modalStyles.modal} onClick={(e) => e.stopPropagation()}>
+        <button style={modalStyles.closeButton} onClick={onClose}>
+          ×
+        </button>
+        
+        <div style={modalStyles.icon}>
+          ⚠️
+        </div>
+        
+        <h3 style={modalStyles.title}>{title}</h3>
+        <p style={modalStyles.message}>{message}</p>
+        
+        <div style={modalStyles.buttonContainer}>
+          {actionText && actionLink ? (
+            <>
+              <Link href={actionLink}>
+                <button 
+                  style={{...modalStyles.button, ...modalStyles.primaryButton}}
+                  onClick={onClose}
+                >
+                  {actionText}
+                </button>
+              </Link>
+              <button 
+                style={{...modalStyles.button, ...modalStyles.secondaryButton}}
+                onClick={onClose}
+              >
+                ลองใหม่
+              </button>
+            </>
+          ) : (
+            <button 
+              style={{...modalStyles.button, ...modalStyles.primaryButton}}
+              onClick={onClose}
+            >
+              ตกลง
+            </button>
+          )}
+        </div>
+      </div>
+      
+      <style jsx>{`
+        @keyframes slideIn {
+          from {
+            opacity: 0;
+            transform: scale(0.8) translateY(-20px);
+          }
+          to {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+          }
+        }
+      `}</style>
+    </div>
+  );
+};
+
 export default function Login() {
   const router = useRouter();
-  const { login, isAuthenticated, isLoading ,loginWithGoogle} = useAuth();
+  const { login, isAuthenticated, isLoading, loginWithGoogle } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  
+  // Modal states
+  const [showErrorModal, setShowErrorModal] = useState(false);
+  const [errorModalData, setErrorModalData] = useState({
+    title: '',
+    message: '',
+    actionText: '',
+    actionLink: ''
+  });
 
   // ถ้าผู้ใช้ล็อกอินอยู่แล้ว ให้ redirect ไปหน้าหลัก
   useEffect(() => {
@@ -20,30 +186,69 @@ export default function Login() {
     }
   }, [isAuthenticated, isLoading, router]);
 
+  const showError = (title: string, message: string, actionText?: string, actionLink?: string) => {
+    setErrorModalData({
+      title,
+      message,
+      actionText: actionText || '',
+      actionLink: actionLink || ''
+    });
+    setShowErrorModal(true);
+  };
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     
     if (!email || !password) {
-      setError('กรุณากรอกอีเมลและรหัสผ่าน');
+      showError(
+        'ข้อมูลไม่ครบถ้วน',
+        'กรุณากรอกอีเมลและรหัสผ่านให้ครบถ้วน'
+      );
       return;
     }
     
     setIsSubmitting(true);
-    setError('');
     
     try {
-      console.log("Attempting login with:", { email });
       await login(email, password);
       // ลบ router.push('/dashboard') ออก เพราะ useEffect จะทำงานเมื่อ isAuthenticated เปลี่ยน
     } catch (err: any) {
-      console.error("Login error details:", err);
-      // จัดการกับข้อผิดพลาด
-      if (err.response?.data?.error) {
-        setError(err.response.data.error);
-      } else if (err.message) {
-        setError(err.message);
+      // ใช้ AuthError ที่มี userMessage แทน
+      if (err.name === 'AuthError') {
+        if (err.statusCode === 401 || err.statusCode === 404) {
+          showError(
+            'ไม่พบข้อมูลผู้ใช้',
+            'ดูเหมือนว่าคุณยังไม่ได้สมัครสมาชิกหรืออีเมล/รหัสผ่านไม่ถูกต้อง กรุณาสมัครสมาชิกก่อนเข้าใช้งาน',
+            'สมัครสมาชิก',
+            '/signup'
+          );
+        } else if (err.statusCode === 400) {
+          showError(
+            'ข้อมูลไม่ถูกต้อง',
+            err.userMessage || 'กรุณาตรวจสอบรูปแบบอีเมลและรหัสผ่านของคุณ'
+          );
+        } else if (err.statusCode >= 500) {
+          showError(
+            'เซิร์ฟเวอร์ขัดข้อง',
+            err.userMessage || 'ระบบมีปัญหาชั่วคราว กรุณาลองใหม่อีกครั้งในภายหลัง'
+          );
+        } else if (err.statusCode === 0) {
+          showError(
+            'ปัญหาการเชื่อมต่อ',
+            err.userMessage || 'ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้'
+          );
+        } else {
+          showError(
+            'เข้าสู่ระบบไม่สำเร็จ',
+            err.userMessage || 'เกิดข้อผิดพลาดในการเข้าสู่ระบบ'
+          );
+        }
       } else {
-        setError('อีเมลหรือรหัสผ่านไม่ถูกต้อง');
+        // Fallback สำหรับ error ที่ไม่ใช่ AuthError
+        showError(
+          'เข้าสู่ระบบไม่สำเร็จ',
+          'เกิดข้อผิดพลาดที่ไม่คาดคิด กรุณาลองใหม่อีกครั้ง'
+        );
       }
     } finally {
       setIsSubmitting(false);
@@ -57,8 +262,18 @@ export default function Login() {
   const handleGoogleLogin = async () => {
     try {
       await loginWithGoogle();
-    } catch (error) {
-      console.error('Google login error:', error);
+    } catch (error: any) {
+      if (error.name === 'AuthError') {
+        showError(
+          'Google Login ไม่สำเร็จ',
+          error.userMessage || 'เกิดข้อผิดพลาดในการเข้าสู่ระบบด้วย Google กรุณาลองใหม่อีกครั้ง'
+        );
+      } else {
+        showError(
+          'Google Login ไม่สำเร็จ',
+          'เกิดข้อผิดพลาดในการเข้าสู่ระบบด้วย Google กรุณาลองใหม่อีกครั้ง'
+        );
+      }
     }
   };
 
@@ -97,19 +312,19 @@ export default function Login() {
     title: {
       fontSize: '32px',
       fontWeight: 'bold',
-      color: '#f6802f', // สีส้ม
+      color: '#f6802f',
       textAlign: 'center',
       marginBottom: '32px',
     },
     greetingTitle: {
       fontSize: '26px',
       fontWeight: 'bold',
-      color: '#f6802f', // สีส้ม
+      color: '#f6802f',
       marginBottom: '8px',
     },
     greetingText: {
       fontSize: '14px',
-      color: '#f6802f', // สีส้ม
+      color: '#f6802f',
       marginBottom: '24px',
       lineHeight: '1.4',
     },
@@ -120,7 +335,7 @@ export default function Login() {
       display: 'block',
       fontSize: '16px',
       fontWeight: '500',
-      color: '#f6802f', // สีส้ม
+      color: '#f6802f',
       marginBottom: '8px',
     },
     inputContainer: {
@@ -144,13 +359,13 @@ export default function Login() {
       background: 'none',
       border: 'none',
       cursor: 'pointer',
-      color: '#f6802f', // สีส้ม
+      color: '#f6802f',
     },
     forgotPassword: {
       display: 'block',
       textAlign: 'right',
       fontSize: '14px',
-      color: '#FF8CB7', // สีส้ม
+      color: '#FF8CB7',
       marginTop: '8px',
       textDecoration: 'none',
     },
@@ -158,7 +373,7 @@ export default function Login() {
       width: '100%',
       padding: '14px',
       borderRadius: '9999px',
-      backgroundColor: '#FF8CB7', // สีชมพูเข้ม
+      backgroundColor: '#FF8CB7',
       color: '#FFDCE6',
       border: 'none',
       fontSize: '18px',
@@ -166,6 +381,7 @@ export default function Login() {
       cursor: 'pointer',
       marginTop: '24px',
       marginBottom: '16px',
+      opacity: isSubmitting ? 0.7 : 1,
     },
     orSignUpWith: {
       textAlign: 'center',
@@ -192,29 +408,21 @@ export default function Login() {
       cursor: 'pointer',
     },
     socialIcon: {
-      color: '#f6802f', // สีส้ม
+      color: '#f6802f',
       fontSize: '24px',
       fontWeight: 'bold',
     },
     signUpText: {
       textAlign: 'center',
       fontSize: '14px',
-      color: '#ee5f9b', // สีชมพูเข้ม
+      color: '#ee5f9b',
       marginTop: '16px',
     },
     signUpLink: {
-      color: '#ee5f9b', // สีชมพูเข้ม
+      color: '#ee5f9b',
       fontWeight: '500',
       textDecoration: 'none',
     },
-    errorContainer: {
-      backgroundColor: '#fee2e2',
-      borderColor: '#f87171',
-      color: '#b91c1c',
-      padding: '12px',
-      borderRadius: '8px',
-      marginBottom: '16px',
-    }
   };
 
   return (
@@ -243,13 +451,6 @@ export default function Login() {
             ที่จะช่วยให้คุณตามหาแหล่งที่พักทางจิตใจและได้เข้าถึง
             การไหว้พระ ขอพร ที่สะดวกนามมากยิ่งขึ้น
           </p>
-          
-          {/* แสดงข้อผิดพลาด (ถ้ามี) */}
-          {error && (
-            <div style={styles.errorContainer}>
-              {error}
-            </div>
-          )}
           
           <form onSubmit={handleSubmit}>
             {/* อีเมลหรือเบอร์โทร */}
@@ -332,6 +533,16 @@ export default function Login() {
           </div>
         </div>
       </div>
+
+      {/* Error Modal */}
+      <ErrorModal
+        isOpen={showErrorModal}
+        onClose={() => setShowErrorModal(false)}
+        title={errorModalData.title}
+        message={errorModalData.message}
+        actionText={errorModalData.actionText}
+        actionLink={errorModalData.actionLink}
+      />
     </>
   );
 }

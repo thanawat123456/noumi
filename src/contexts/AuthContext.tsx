@@ -46,6 +46,19 @@ interface UserSignupData {
   avatar?: string | null; 
 }
 
+// Custom error class สำหรับจัดการ error ที่เป็นมิตรกับผู้ใช้
+class AuthError extends Error {
+  public statusCode: number;
+  public userMessage: string;
+
+  constructor(message: string, statusCode: number = 500, userMessage?: string) {
+    super(message);
+    this.name = 'AuthError';
+    this.statusCode = statusCode;
+    this.userMessage = userMessage || message;
+  }
+}
+
 const AuthContext = createContext<AuthContextType>({
   user: null,
   isAuthenticated: false,
@@ -131,6 +144,77 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     init();
   }, [session, status]);
 
+  // ฟังก์ชันสำหรับแปลง error ให้เป็นมิตรกับผู้ใช้
+  const handleApiError = (error: any): AuthError => {
+    // ป้องกันไม่ให้ error ขึ้นใน console
+    console.warn('Authentication attempt failed (this is normal)');
+    
+    if (error.response) {
+      const status = error.response.status;
+      const errorMessage = error.response.data?.error || error.response.data?.message || 'Unknown error';
+      
+      switch (status) {
+        case 400:
+          return new AuthError(
+            'Bad Request', 
+            400, 
+            'ข้อมูลที่ส่งมาไม่ถูกต้อง กรุณาตรวจสอบรูปแบบอีเมลและรหัสผ่าน'
+          );
+        case 401:
+          return new AuthError(
+            'Unauthorized', 
+            401, 
+            'ไม่พบข้อมูลผู้ใช้หรือรหัสผ่านไม่ถูกต้อง'
+          );
+        case 403:
+          return new AuthError(
+            'Forbidden', 
+            403, 
+            'ไม่มีสิทธิ์เข้าถึง'
+          );
+        case 404:
+          return new AuthError(
+            'Not Found', 
+            404, 
+            'ไม่พบข้อมูลผู้ใช้ในระบบ'
+          );
+        case 429:
+          return new AuthError(
+            'Too Many Requests', 
+            429, 
+            'คุณได้ลองเข้าสู่ระบบหลายครั้งเกินไป กรุณารอสักครู่แล้วลองใหม่'
+          );
+        case 500:
+        case 502:
+        case 503:
+        case 504:
+          return new AuthError(
+            'Server Error', 
+            status, 
+            'เซิร์ฟเวอร์มีปัญหาชั่วคราว กรุณาลองใหม่อีกครั้งในภายหลัง'
+          );
+        default:
+          return new AuthError(
+            errorMessage, 
+            status, 
+            'เกิดข้อผิดพลาดในการเข้าสู่ระบบ'
+          );
+      }
+    } else if (error.request) {
+      return new AuthError(
+        'Network Error', 
+        0, 
+        'ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้ กรุณาตรวจสอบการเชื่อมต่ออินเทอร์เน็ต'
+      );
+    } else {
+      return new AuthError(
+        error.message || 'Unknown Error', 
+        0, 
+        'เกิดข้อผิดพลาดที่ไม่คาดคิด'
+      );
+    }
+  };
+
   // ล็อกอินด้วย email/password
   const login = async (email: string, password: string) => {
     try {
@@ -147,35 +231,41 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return;
       }
       
-      // ถ้าไม่สำเร็จ จึงลอง NextAuth
-      const result = await signIn('credentials', {
-        email,
-        password,
-        redirect: false
-      });
-      
-      // ตรวจสอบผลลัพธ์จาก NextAuth
-      if (result?.ok) {
-        // NextAuth สำเร็จ - ควรเรียก API เพื่อรับข้อมูลผู้ใช้เพิ่มเติม
+      throw new AuthError('Login failed', 401, 'การเข้าสู่ระบบไม่สำเร็จ');
+    } catch (error: any) {
+      // จัดการ error ด้วย axios แล้วลอง NextAuth
+      if (error.response?.status === 401 || error.response?.status === 404) {
         try {
-          const userResponse = await axios.get('/api/auth/session-user');
-          if (userResponse.data.success && userResponse.data.user) {
-            setUser(userResponse.data.user);
-            localStorage.setItem('user', JSON.stringify(userResponse.data.user));
-            setIsAuthenticated(true);
-            return;
+          const result = await signIn('credentials', {
+            email,
+            password,
+            redirect: false
+          });
+          
+          // ตรวจสอบผลลัพธ์จาก NextAuth
+          if (result?.ok) {
+            // NextAuth สำเร็จ - ควรเรียก API เพื่อรับข้อมูลผู้ใช้เพิ่มเติม
+            try {
+              const userResponse = await axios.get('/api/auth/session-user');
+              if (userResponse.data.success && userResponse.data.user) {
+                setUser(userResponse.data.user);
+                localStorage.setItem('user', JSON.stringify(userResponse.data.user));
+                setIsAuthenticated(true);
+                return;
+              }
+            } catch (userError) {
+              console.warn('Error fetching user data after NextAuth login');
+            }
+          } else if (result?.error) {
+            throw new AuthError(result.error, 401, 'การเข้าสู่ระบบไม่สำเร็จ');
           }
-        } catch (userError) {
-          console.error('Error fetching user data after NextAuth login:', userError);
+        } catch (nextAuthError) {
+          // ถ้า NextAuth ก็ไม่ได้ ให้ throw original error
         }
-      } else if (result?.error) {
-        throw new Error(result.error);
       }
       
-      throw new Error('Login failed');
-    } catch (error) {
-      console.error('Login error:', error);
-      throw error;
+      // แปลง error ให้เป็นมิตรกับผู้ใช้
+      throw handleApiError(error);
     }
   };
   
@@ -184,8 +274,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       await signIn('google', { callbackUrl: '/dashboard' });
     } catch (error) {
-      console.error('Google login error:', error);
-      throw error;
+      console.warn('Google login attempt failed');
+      throw new AuthError(
+        'Google Login Failed', 
+        500, 
+        'เกิดข้อผิดพลาดในการเข้าสู่ระบบด้วย Google กรุณาลองใหม่อีกครั้ง'
+      );
     }
   };
 
@@ -199,17 +293,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return;
       }
       
-      throw new Error(response.data.error || 'Signup failed');
+      throw new AuthError(
+        response.data.error || 'Signup failed', 
+        400, 
+        'การสมัครสมาชิกไม่สำเร็จ กรุณาลองใหม่อีกครั้ง'
+      );
     } catch (error) {
-      console.error('Signup error:', error);
-      throw error;
+      throw handleApiError(error);
     }
   };
 
   const setPassword = async (password: string) => {
     try {
       if (!tempUserData) {
-        throw new Error('No temporary user data found');
+        throw new AuthError(
+          'No temporary user data found', 
+          400, 
+          'ไม่พบข้อมูลชั่วคราว กรุณาเริ่มกระบวนการสมัครใหม่'
+        );
       }
       
       console.log("Sending data to API:", {
@@ -233,10 +334,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return;
       }
       
-      throw new Error(response.data.error || 'Failed to set password');
+      throw new AuthError(
+        response.data.error || 'Failed to set password', 
+        400, 
+        'การตั้งรหัสผ่านไม่สำเร็จ'
+      );
     } catch (error) {
-      console.error('Set password error:', error);
-      throw error;
+      throw handleApiError(error);
     }
   };
 

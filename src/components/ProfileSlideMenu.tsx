@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, User, Heart, Bell, Settings, LogOut } from 'lucide-react';
+import { X, User, Heart, Bell, Settings, LogOut, Shield } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/router';
 
@@ -8,10 +8,23 @@ interface ProfileSlideMenuProps {
   onClose: () => void;
 }
 
+// กำหนด admin emails
+const ADMIN_EMAILS = [
+  'admin@example.com',
+  'admin@gmail.com',
+  'thanawat@example.com', 
+];
+
 const ProfileSlideMenu: React.FC<ProfileSlideMenuProps> = ({ isOpen, onClose }) => {
   const { user, logout } = useAuth();
   const router = useRouter();
   const [isAnimating, setIsAnimating] = useState(false);
+
+  // เช็คว่าเป็น admin หรือไม่
+  const isAdmin = user?.email && (
+    ADMIN_EMAILS.includes(user.email) || 
+    user.email.includes('admin')
+  );
 
   useEffect(() => {
     if (isOpen) {
@@ -37,7 +50,7 @@ const ProfileSlideMenu: React.FC<ProfileSlideMenuProps> = ({ isOpen, onClose }) 
   };
 
   const menuItems = [
-    { icon: User, label: 'ตัวฉัน', path: '/admin/dashboard' },
+    { icon: User, label: 'ตัวฉัน', path: '/dashboard' },
     { icon: Heart, label: 'สถานที่โปรด', path: '/favorites' },
     { icon: Bell, label: 'การแจ้งเตือน', path: '/notifications' },
     { icon: Settings, label: 'การตั้งค่า', path: '/settings' },
@@ -73,7 +86,7 @@ const ProfileSlideMenu: React.FC<ProfileSlideMenuProps> = ({ isOpen, onClose }) 
         <div className="pt-16 px-6 pb-8">
           <div className="flex items-center space-x-4">
             <img
-              src={user?.avatar || "/images/default-avatar.png"}
+              src={user?.avatar || "/images/profile/travel/Profile.jpeg"}
               alt="Profile"
               className="w-20 h-20 rounded-full border-4 border-white object-cover"
             />
@@ -107,6 +120,19 @@ const ProfileSlideMenu: React.FC<ProfileSlideMenuProps> = ({ isOpen, onClose }) 
                   </li>
                 );
               })}
+              
+              {/* Admin Menu - แสดงเฉพาะ admin */}
+              {isAdmin && (
+                <li>
+                  <a
+                    href="/admin/dashboard"
+                    className="flex items-center space-x-4 p-3 hover:bg-orange-50 rounded-lg transition-colors group"
+                  >
+                    <Shield className="text-[#FF7A05] group-hover:scale-110 transition-transform" size={24} />
+                    <span className="text-[#FF7A05] font-medium text-lg">ผู้ดูแลระบบ</span>
+                  </a>
+                </li>
+              )}
             </ul>
           </nav>
 
@@ -126,6 +152,5 @@ const ProfileSlideMenu: React.FC<ProfileSlideMenuProps> = ({ isOpen, onClose }) 
     </>
   );
 };
-
 
 export default ProfileSlideMenu;

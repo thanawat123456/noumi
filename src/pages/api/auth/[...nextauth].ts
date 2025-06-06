@@ -37,18 +37,26 @@ export default NextAuth({
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" }
       },
-      async authorize(credentials) {
+      async authorize(credentials, req) {
         if (!credentials?.email || !credentials?.password) {
           return null;
         }
         
         try {
+          // Initialize database
+          await dbService.init();
+          
           const user = await dbService.getUserByEmailAndPassword(
             credentials.email,
             credentials.password
           );
           
           if (user) {
+            // บันทึกการ login สำหรับ credentials provider
+            // ใช้ undefined สำหรับ IP และ user-agent เนื่องจากไม่สามารถเข้าถึงได้ใน NextAuth
+            await dbService.recordLogin(user.id!);
+            console.log(`Login recorded for user ${user.email} (credentials)`);
+            
             return {
               id: user.id?.toString() || '',
               email: user.email,
@@ -64,6 +72,7 @@ export default NextAuth({
       }
     })
   ],
+  
   cookies: {
     sessionToken: {
       name: `next-auth.session-token`,
@@ -95,9 +104,12 @@ export default NextAuth({
   
   callbacks: {
     async signIn({ user, account, profile }) {
-      // ถ้าเป็นการล็อกอินด้วย Google
-      if (account?.provider === 'google' && profile?.email) {
-        try {
+      try {
+        // Initialize database
+        await dbService.init();
+        
+        // ถ้าเป็นการล็อกอินด้วย Google
+        if (account?.provider === 'google' && profile?.email) {
           // ตรวจสอบว่ามีผู้ใช้นี้ในฐานข้อมูลหรือยัง
           let dbUser = await dbService.getUserByEmail(profile.email);
           
@@ -114,20 +126,24 @@ export default NextAuth({
             dbUser = await dbService.getUserById(userId);
           }
           
-          // อัปเดตข้อมูลใน user object (สำหรับใช้ใน session)
+          // บันทึกการ login สำหรับ Google provider
           if (dbUser && dbUser.id) {
+            await dbService.recordLogin(dbUser.id);
+            console.log(`Login recorded for user ${dbUser.email} (Google)`);
+            
+            // อัปเดตข้อมูลใน user object (สำหรับใช้ใน session)
             user.id = dbUser.id.toString();
             user.name = dbUser.full_name || profile.name || '';
             user.email = dbUser.email;
             user.image = dbUser.avatar || profile.image || null;
           }
-        } catch (error) {
-          console.error('Google sign-in error:', error);
-          return false;
         }
+        
+        return true;
+      } catch (error) {
+        console.error('Sign-in error:', error);
+        return false;
       }
-      
-      return true;
     },
     
     async session({ session, token }) {
