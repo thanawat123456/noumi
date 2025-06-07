@@ -832,7 +832,7 @@ export const TicketScreen: React.FC<TicketScreenProps> = ({
   const [selectedTicket, setSelectedTicket] = useState<Ticket | null>(null);
   const [selectedAmount, setSelectedAmount] = useState<number>(0);
   const [customAmount, setCustomAmount] = useState<string>("");
-  const [setUploadedFile] = useState<File | null>(null);
+  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
 
   const t = translations[language];
 
