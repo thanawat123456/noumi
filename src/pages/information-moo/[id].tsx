@@ -349,7 +349,7 @@ export default function BuddhaStatueInfo() {
         templeName: "วัดสุทัศน์เทพวราราม",
         image: "/images/temple-list/พระศรีศากยมุนี.jpeg",
         glbModel:
-          "https://storage.googleapis.com/noumi-3d-models/พระกริ่งใหญ่.glb", // ใช้ไฟล์ที่มี
+          "https://storage.googleapis.com/noumi-3d-models/พระพุทธศรีศากยมุนี.glb", // ใช้ไฟล์ที่มี
         benefits: ["ภาพรวมทั่วไป"],
         description: "พระพุทธรูปประธานในพระอุโบสถ",
         category: "พระสุขกรวัตตี์",
