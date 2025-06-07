@@ -24,6 +24,8 @@ export default function NummuHome() {
         setCloudMargin("-mb-63");
       } else if (width === 350 && height === 667) {
         setCloudMargin("-mb-63");
+      } else if (width === 300 && height === 667) {
+        setCloudMargin("-mb-53");
       } else if (width === 430 && height === 932) {
         setCloudMargin("-mb-110");
       } else if (width === 414 && height === 896) {
