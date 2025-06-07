@@ -19,24 +19,26 @@ export default function NummuHome() {
     const handleResize = () => {
       const width = window.innerWidth;
       const height = window.innerHeight;
-      
+
       if (width === 375 && height === 667) {
-        setCloudMargin("-mb-72");
+        setCloudMargin("-mb-63");
+      } else if (width === 350 && height === 667) {
+        setCloudMargin("-mb-63");
       } else if (width === 430 && height === 932) {
-        setCloudMargin("-mb-115");
-      } else if (width === 414 && height === 896) {
         setCloudMargin("-mb-110");
+      } else if (width === 414 && height === 896) {
+        setCloudMargin("-mb-105");
       } else if (width === 390 && height === 844) {
-        setCloudMargin("-mb-100");
+        setCloudMargin("-mb-95");
       } else {
         setCloudMargin("-mb-100"); // default
       }
     };
 
     handleResize(); // Check on mount
-    window.addEventListener('resize', handleResize);
-    
-    return () => window.removeEventListener('resize', handleResize);
+    window.addEventListener("resize", handleResize);
+
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   const handleLogin = () => {
@@ -75,7 +77,7 @@ export default function NummuHome() {
             }}
           >
             {/* Nummu logo */}
-            <div className="w-48 h-52 mb-4 mt-10">
+            <div className="w-45 h-50 mb-4 mt-4 z-20">
               <img
                 src="/images/noumi.png"
                 alt="Nummu Logo"
@@ -84,7 +86,7 @@ export default function NummuHome() {
             </div>
 
             {/* Guide image */}
-            <div className="w-25 h-12 mb-15">
+            <div className="w-25 h-12 mb-12 z-20">
               <img
                 src="/images/nummu-guides.png"
                 className="w-full h-full object-contain"
@@ -92,7 +94,7 @@ export default function NummuHome() {
             </div>
 
             {/* Wat Suthat image */}
-            <div className="w-40 h-12 -mb-75 absolute z-20">
+            <div className="w-40 h-12 -mb-63 absolute z-20">
               <img
                 src="/images/wat-suthat.svg"
                 className="w-full h-full object-contain"
@@ -100,7 +102,7 @@ export default function NummuHome() {
             </div>
 
             {/* Cloud image with responsive positioning */}
-            <div className={`w-full h-full ${cloudMargin} absolute z-10`}>
+            <div className={`w-125 h-full ${cloudMargin} absolute z-10`}>
               <img
                 src="/temple-cld.png"
                 className="w-full h-full object-contain opacity-60"
@@ -109,13 +111,13 @@ export default function NummuHome() {
 
             {/* Pink bottom curve */}
             <div
-              className="absolute bottom-0 left-0 right-0 h-20 bg-[#FFDCE6]"
+              className="absolute bottom-0 left-0 right-0 h-18 bg-[#FFDCE6]"
               style={{ borderTopLeftRadius: "200px" }}
             ></div>
           </div>
 
           {/* Buttons */}
-          <div className="absolute bottom-20 left-0 right-0 px-8 flex flex-col space-y-4 z-30">
+          <div className="absolute bottom-18 left-0 right-0 px-8 flex flex-col space-y-4 z-30">
             <button
               onClick={handleLogin}
               className="w-full py-3 bg-[#FF8CB7] hover:bg-[#FF7A05] transition text-[#FFDCE6] rounded-full"
