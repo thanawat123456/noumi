@@ -50,7 +50,7 @@ export default function NummuHome() {
             }}
           >
             {/* Nummu logo */}
-            <div className="w-45 h-50 mb-4 mt-4 z-20">
+            <div className="w-45 h-48 mb-4 mt-4 z-20">
               <img
                 src="/images/noumi.png"
                 alt="Nummu Logo"
