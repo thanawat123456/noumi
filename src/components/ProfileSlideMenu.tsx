@@ -50,7 +50,7 @@ const ProfileSlideMenu: React.FC<ProfileSlideMenuProps> = ({ isOpen, onClose }) 
   };
 
   const menuItems = [
-    { icon: User, label: 'ตัวฉัน', path: '/dashboard' },
+    { icon: User, label: 'ตัวฉัน', path: '/dashboard/profile' },
     { icon: Heart, label: 'สถานที่โปรด', path: '/favorites' },
     { icon: Bell, label: 'การแจ้งเตือน', path: '/notifications' },
     { icon: Settings, label: 'การตั้งค่า', path: '/settings' },
