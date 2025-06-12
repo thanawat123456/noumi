@@ -46,7 +46,7 @@ export default function HeaderProfile({ onProfileClick }: HeaderProfileProps) {
           </button>
           <div>
             <p className="text-white text-sm">สวัสดี,ยินดีต้อนรับ</p>
-            <h3 className="text-white text-xl font-medium">
+            <h3 className="text-white text-md font-medium">
               {user?.fullName || "Praewwy :)"}
             </h3>
           </div>

@@ -151,7 +151,7 @@ export const WishPlacesHeader: React.FC<WishPlacesHeaderProps> = ({
         }}
       >
         <div
-          className="flex gap-3 min-w-max"
+          className="flex gap-3 min-w-max p-6"
           style={{
             overflow: "hidden",
           }}

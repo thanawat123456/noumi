@@ -429,7 +429,7 @@ export const WishPlacesHeader: React.FC<WishPlacesHeaderProps> = ({
 
       {/* Categories */}
       <div
-        className="mt-8 grid grid-cols-6 gap-21 pb-4 overflow-x-auto scrollbar-hide"
+        className="mt-8 grid grid-cols-6 gap-21 pb-4 overflow-x-auto scrollbar-hide p-2 -mr-2 -ml-2"
         style={{
           WebkitOverflowScrolling: "touch",
           scrollbarWidth: "none",

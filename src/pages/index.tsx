@@ -2,7 +2,7 @@ import React from "react";
 import { useRouter } from "next/router";
 import Head from "next/head";
 import { useAuth } from "@/contexts/AuthContext";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 export default function NummuHome() {
   const router = useRouter();
@@ -39,7 +39,6 @@ export default function NummuHome() {
 
       <div className="fixed inset-0 flex items-center justify-center bg-[#FF7A05]">
         <div className="w-full max-w-md h-screen overflow-hidden relative pb-20">
-          {/* Orange top section */}
           <div
             className="flex flex-col items-center justify-center bg-[#FF7A05] px-8 pt-12 pb-40 relative"
             style={{
@@ -49,7 +48,6 @@ export default function NummuHome() {
               height: "75%",
             }}
           >
-            {/* Nummu logo */}
             <div className="w-45 h-48 mb-4 mt-4 z-20">
               <img
                 src="/images/noumi.png"
@@ -57,16 +55,12 @@ export default function NummuHome() {
                 className="w-full h-full object-contain"
               />
             </div>
-
-            {/* Guide image */}
             <div className="w-25 h-12 mb-12 z-20">
               <img
                 src="/images/nummu-guides.png"
                 className="w-full h-full object-contain"
               />
             </div>
-
-            {/* Wat Suthat image */}
             <div className="w-40 h-12 -mb-63 absolute z-20">
               <img
                 src="/images/wat-suthat.svg"
@@ -74,7 +68,6 @@ export default function NummuHome() {
               />
             </div>
 
-            {/* Cloud image with responsive positioning */}
             <div className="absolute bottom-18 left-1/2 transform -translate-x-1/2 z-10 w-[500px]">
               <img
                 src="/temple-cld.png"

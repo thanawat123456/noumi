@@ -193,7 +193,7 @@ export const TicketHeader: React.FC<TicketHeaderProps> = ({
           </div>
           <div>
             <p className={`text-sm ${getTextColor()}`}>{t.greeting}</p>
-            <h3 className={`text-xl font-medium ${getTextColor()}`}>
+            <h3 className={`text-md font-medium ${getTextColor()}`}>
               {userName}
             </h3>
           </div>

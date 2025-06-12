@@ -64,13 +64,13 @@ export default function WhiteHeaderProfile({ onProfileClick }: HeaderProfileProp
           </button>
           <div>
             <p className="text-[#FF7A05] text-sm">สวัสดี,ยินดีต้อนรับ</p>
-            <h3 className="text-[#FF7A05] text-xl font-medium">
+            <h3 className="text-[#FF7A05] text-md font-medium">
               {user?.fullName || "Praewwy :)"}
             </h3>
           </div>
         </div>
         <div className="flex space-x-3">
-          <button className="w-10 h-10 rounded-full bg-[#FF7A05] flex items-center justify-center ml-25">
+          <button className="w-10 h-10 rounded-full bg-[#FF7A05] flex items-center justify-center ml-20">
             <svg
               className="w-6 h-6 text-white"
               fill="none"

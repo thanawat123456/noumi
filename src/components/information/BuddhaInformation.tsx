@@ -258,7 +258,7 @@ const BuddhaInformation = () => {
           {/* Buddha Info Card */}
           <div className="bg-white p-4 border-b border-gray-200">
             <div className="mb-2">
-              <h1 className="text-xl font-medium text-gray-800">{buddhaInfo.name}</h1>
+              <h1 className="text-md font-medium text-gray-800">{buddhaInfo.name}</h1>
               <p className="text-gray-500 text-sm">{buddhaInfo.temple}</p>
             </div>
             

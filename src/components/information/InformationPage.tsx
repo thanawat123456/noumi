@@ -23,7 +23,6 @@ interface SectionConfig {
   zIndex: number;
 }
 
-
 const InformationPage: React.FC<InformationProps> = ({ type, id }) => {
   const router = useRouter();
   const { isAuthenticated, isLoading } = useAuth();
@@ -33,8 +32,6 @@ const InformationPage: React.FC<InformationProps> = ({ type, id }) => {
   >(null);
   const [loading, setLoading] = useState(true);
   const sectionRef = useRef<HTMLDivElement>(null);
-
-  
 
   const [information, setInformation] = useState({
     id: 1,
@@ -113,7 +110,9 @@ const InformationPage: React.FC<InformationProps> = ({ type, id }) => {
               location: "วัดสุทัศน์เทพวราราม",
               openHours: "08.00 - 20.00 น.",
               type: "ภาพรวม / ทั่วไป",
-              panorama: "https://storage.googleapis.com/noumi-3d-models/พระศรีศากยมุนี360.mov",
+              map: "/images/map/Map01พระพุทธศรีศากยมุนี.png",
+              panorama:
+                "https://storage.googleapis.com/noumi-3d-models/พระศรีศากยมุนี360.mov",
               description:
                 "พระพุทธรูปประธานในพระอุโบสถ มีความศักดิ์สิทธิ์ เป็นที่เคารพนับถือของพุทธศาสนิกชนทั่วประเทศ",
               worshipGuide: {
@@ -167,7 +166,9 @@ const InformationPage: React.FC<InformationProps> = ({ type, id }) => {
               location: "วัดสุทัศน์เทพวราราม",
               openHours: "08.00 - 20.00 น.",
               type: "การเรียน / การงาน",
-              panorama: "https://storage.googleapis.com/noumi-3d-models/พระสุนทรีวาณี360.mov",
+              map: "/images/map/Map03พระสุนทรีวาณี.png",
+              panorama:
+                "https://storage.googleapis.com/noumi-3d-models/พระสุนทรีวาณี360.mov",
               description:
                 "พระสุนทรีวาณีหรือลอยองค์ องค์นี้ประดิษฐานในพระวิหารหลวงวัดสุทัศน์เทพวราราม โดยพระบาทสมเด็จพระจุลจอมเกล้าเจ้าอยู่หัวโปรดเกล้าฯ ให้เสด็จเป็นประธาน ประกอบพิธีเทกองและพุทธาภิเษก เมื่อวันที่ 7 ตุลาคม พ.ศ.๑๘๙๖ ซึ่งตรงกล่าวเป็นรูปแบบพิเศษครั้งแรก",
               worshipGuide: {
@@ -225,11 +226,12 @@ const InformationPage: React.FC<InformationProps> = ({ type, id }) => {
             },
             3: {
               id: 3,
-              name: "พระพุทธรังสีมุทราภัย (หลวงพ่อเหลือ)",
+              name: "พระพุทธรังสีมุทราภัย\n(หลวงพ่อเหลือ)",
               image: "/images/temple-list/พระพุทธรังสีมุทราภัย.jpeg",
               location: "วัดสุทัศน์เทพวราราม",
               openHours: "08.00 - 20.00 น.",
               type: "โชคลาภ / วาสนา",
+              map: "/images/map/Map06พระพุทธรังสีมุทราภัย.png",
               panorama: "",
               description:
                 "พระพุทธรูปประจำวิหารด้านทิศใต้ เชื่อกันว่าหากมาขอพรด้านโชคลาภจะมีความสำเร็จ มีความศักดิ์สิทธิ์ เป็นที่เคารพนับถือของพุทธศาสนิกชน",
@@ -287,7 +289,9 @@ const InformationPage: React.FC<InformationProps> = ({ type, id }) => {
               location: "วัดสุทัศน์เทพวราราม",
               openHours: "08.00 - 20.00 น.",
               type: "ภาพรวม / ทั่วไป",
-              panorama: "https://storage.googleapis.com/noumi-3d-models/ลานต้นโพธิ์360.mov",
+              map: "/images/map/Map05ต้นพระศรีมหาโพธิ์.png",
+              panorama:
+                "https://storage.googleapis.com/noumi-3d-models/ลานต้นโพธิ์360.mov",
               description:
                 "ต้นโพธิ์ศักดิ์สิทธิ์ภายในวัด ที่เชื่อกันว่าเป็นต้นโพธิ์ที่นำมาจากพุทธคยา สถานที่ตรัสรู้ของพระพุทธเจ้า",
               worshipGuide: {
@@ -334,7 +338,9 @@ const InformationPage: React.FC<InformationProps> = ({ type, id }) => {
               location: "วัดสุทัศน์เทพวราราม",
               openHours: "08.00 - 20.00 น.",
               type: "สุขภาพ / โรคภัย",
-              panorama: "https://storage.googleapis.com/noumi-3d-models/พระพุทธตรีโลกเชษฐ์360.mov",
+              map: "/images/map/Map07พระพุทธตรีโลกเชษฐ์.png",
+              panorama:
+                "https://storage.googleapis.com/noumi-3d-models/พระพุทธตรีโลกเชษฐ์360.mov",
               description:
                 "พระพุทธรูปปางนาคปรก เชื่อกันว่าหากมาขอพรเรื่องสุขภาพจะหายจากโรคภัยไข้เจ็บ",
               worshipGuide: {
@@ -387,7 +393,9 @@ const InformationPage: React.FC<InformationProps> = ({ type, id }) => {
               location: "วัดสุทัศน์เทพวราราม",
               openHours: "08.00 - 20.00 น.",
               type: "ความมงคล / ความสำเร็จ",
-              panorama: "https://storage.googleapis.com/noumi-3d-models/พระกริ่งใหญ่360.mov",
+              map: "/images/map/Map04พระกริ่งใหญ่.png",
+              panorama:
+                "https://storage.googleapis.com/noumi-3d-models/พระกริ่งใหญ่360.mov",
               description:
                 "พระพุทธรูปปางลีลาศิลปะสุโขทัย เป็นพระพุทธรูปที่มีความงดงาม แสดงถึงการก้าวเดินอย่างสง่างาม เชื่อกันว่าหากสักการะแล้วจะประสบความสำเร็จในชีวิต",
               worshipGuide: {
@@ -441,7 +449,9 @@ const InformationPage: React.FC<InformationProps> = ({ type, id }) => {
               location: "วัดสุทัศน์เทพวราราม",
               openHours: "08.00 - 20.00 น.",
               type: "ความมงคล / ความสำเร็จ",
-              panorama: "https://storage.googleapis.com/noumi-3d-models/ท้าวเวสุวรรณ360.mov",
+              map: "/images/map/Map02ท้าวเวสสุวรรณ.png",
+              panorama:
+                "https://storage.googleapis.com/noumi-3d-models/ท้าวเวสุวรรณ360.mov",
               description:
                 "พระพุทธรูปปางลีลาศิลปะสุโขทัย เป็นพระพุทธรูปที่มีความงดงาม แสดงถึงการก้าวเดินอย่างสง่างาม เชื่อกันว่าหากสักการะแล้วจะประสบความสำเร็จในชีวิต",
               worshipGuide: {
@@ -496,6 +506,7 @@ const InformationPage: React.FC<InformationProps> = ({ type, id }) => {
               location: "วัดสุทัศน์เทพวราราม",
               openHours: "08.00 - 20.00 น.",
               type: "ความมงคล / ความสำเร็จ",
+              map: "/images/map/Map08หลวงพ่อกลักฝิ่น.png",
               panorama:
                 "https://storage.googleapis.com/noumi-3d-models/หลวงพ่อกลักฝิ่น-พระพุทธเสฏฐมุนี(จำลอง)360.mov",
               description:
@@ -562,6 +573,7 @@ const InformationPage: React.FC<InformationProps> = ({ type, id }) => {
               location: "วัดสุทัศน์เทพวราราม",
               openHours: "08.00 - 20.00 น.",
               type: "ความมงคล / ความสำเร็จ",
+              map: "/images/map/Map09พระรูปสมเด็จพระสังฆราช.png",
               panorama:
                 "https://storage.googleapis.com/noumi-3d-models/พระรูปสมเด็จพระสังฆราช(แพติสสเทโวป.ธ.5)360.mov",
               description:
@@ -613,8 +625,7 @@ const InformationPage: React.FC<InformationProps> = ({ type, id }) => {
 
           if ((buddhaData as any)[Number(id)]) {
             setInformation((buddhaData as any)[Number(id)]);
-          } 
-
+          }
         } else if (type === "temple") {
           // ข้อมูลจำลองสำหรับวัด
           const templeData = {
@@ -687,11 +698,9 @@ const InformationPage: React.FC<InformationProps> = ({ type, id }) => {
             },
           };
 
-
           if ((templeData as any)[Number(id)]) {
             setInformation((templeData as any)[Number(id)]);
-          } 
-
+          }
         }
 
         setLoading(false);
@@ -705,14 +714,15 @@ const InformationPage: React.FC<InformationProps> = ({ type, id }) => {
   }, [id, isAuthenticated, type]);
 
   const { toggleFavorite, isFavorite } = useFavorites([
-    { id: information.id, isFavorite: false }
+    { id: information.id, isFavorite: false },
   ]);
 
   const [showPanorama, setShowPanorama] = useState(false);
+  const [showMapPopup, setShowMapPopup] = useState(false);
 
   const handleFavoriteClick = () => {
-  toggleFavorite(information.id);
-};
+    toggleFavorite(information.id);
+  };
 
   // Handle section animations with cleanup
   useEffect(() => {
@@ -1099,21 +1109,21 @@ const InformationPage: React.FC<InformationProps> = ({ type, id }) => {
           </div>
 
           {/* Heart Button */}
-         <div className="absolute bottom-4 right-4 z-10">
-            <button 
+          <div className="absolute bottom-4 right-4 z-10">
+            <button
               onClick={handleFavoriteClick}
               className={`w-10 h-10 rounded-full flex items-center justify-center shadow-md transition-all duration-200 ${
-                isFavorite(information.id) 
-                  ? 'bg-red-500' 
-                  : 'bg-white bg-opacity-70'
+                isFavorite(information.id)
+                  ? "bg-red-500"
+                  : "bg-white bg-opacity-70"
               }`}
             >
-              <Heart 
+              <Heart
                 className={`w-6 h-6 transition-colors duration-200 ${
-                  isFavorite(information.id) 
-                    ? 'text-white fill-white' 
-                    : 'text-orange-500'
-                }`} 
+                  isFavorite(information.id)
+                    ? "text-white fill-white"
+                    : "text-orange-500"
+                }`}
               />
             </button>
           </div>
@@ -1126,21 +1136,41 @@ const InformationPage: React.FC<InformationProps> = ({ type, id }) => {
         <div className="bg-white p-4">
           {/* Title and Schedule */}
           <div className="border-b border-orange-300 pb-3 mb-3">
-            {information.id !== 3 && (
+            {information.id && (
               <div className="text-end bottom-4 right-0 z-10">
+                {information.id !== 3 && (
+                  <button
+                    className="bg-none py-1 pb-8 rounded-full font-semibold text-[12px] text-[#aba6a6] hover:text-orange-600 transition mr-2"
+                    onClick={() => setShowPanorama(true)}
+                  >
+                    View 360°
+                  </button>
+                )}
+                {information.id !== 3 && (
+                  <span className="text-[#aba6a6]">|</span>
+                )}
                 <button
-                  className="bg-none py-1 pb-8 rounded-full font-bold text-md text-[#aba6a6] hover:text-orange-600 transition"
-                  onClick={() => setShowPanorama(true)}
+                  className="bg-none py-1 pb-8 rounded-full font-semibold text-[12px] text-[#aba6a6] hover:text-orange-600 transition ml-2 mr-2"
+                  onClick={() => setShowMapPopup(true)}
                 >
-                  View 360°
+                  View Map
+                </button>
+                <span className="text-[#aba6a6]">|</span>
+                <button className="bg-none py-1 pb-8 rounded-full font-semibold text-[12px] text-[#aba6a6] hover:text-orange-600 transition ml-2">
+                  Google Map
                 </button>
               </div>
             )}
             <div className="flex justify-between items-center mb-2">
-              <h2 className="text-xl font-bold text-gray-900">
-                {information.name}
+              <h2 className="text-md font-bold text-gray-900">
+                {information.name.split("\n").map((line, idx) => (
+                  <React.Fragment key={idx}>
+                    {line}
+                    <br />
+                  </React.Fragment>
+                ))}
               </h2>
-              <div className="text-xl font-bold text-gray-900">
+              <div className="text-md font-bold text-gray-900">
                 {information.type}
               </div>
             </div>
@@ -1168,10 +1198,30 @@ const InformationPage: React.FC<InformationProps> = ({ type, id }) => {
             </div>
           )}
 
+          {showMapPopup && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30 backdrop-blur-sm">
+              <div className="bg-white p-4 rounded-lg max-w-[90%] max-h-[90%] relative shadow-xl">
+                <button
+                  onClick={() => setShowMapPopup(false)}
+                  className="absolute top-1 right-2 text-gray-500 hover:text-red-500 text-lg"
+                >
+                  ✕
+                </button>
+                <img
+                  src={information.map}
+                  alt="Map"
+                  className="max-w-full max-h-[80vh] rounded pt-4"
+                />
+              </div>
+            </div>
+          )}
+
           <div className="border-b border-orange-300 pb-3 mb-4">
             <div className="flex justify-between items-center">
-              <div className="text-gray-700 font-medium">ช่วงเวลา เปิด-ปิด</div>
-              <div className="text-gray-700 font-medium">
+              <div className="text-gray-700 font-medium text-md">
+                ช่วงเวลา เปิด-ปิด
+              </div>
+              <div className="text-gray-700 font-medium text-md">
                 {information.openHours}
               </div>
             </div>
