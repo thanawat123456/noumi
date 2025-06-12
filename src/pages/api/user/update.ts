@@ -9,8 +9,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   try {
-    
     const {
+      userId, // เพิ่มการรับ userId
       email,
       password,
       phone,
@@ -23,11 +23,20 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       avatar
     } = req.body;
 
-    if (!email) {
-      return res.status(400).json({ error: 'Email is required' });
+    // ตรวจสอบว่ามี userId หรือ email
+    if (!userId && !email) {
+      return res.status(400).json({ error: 'User ID or Email is required' });
     }
 
-    const currentUser = await dbService.getUserByEmail(email);
+    let currentUser;
+
+    // ลองหา user จาก userId ก่อน ถ้าไม่มีให้ใช้ email
+    if (userId) {
+      currentUser = await dbService.getUserById(userId);
+    } else if (email) {
+      currentUser = await dbService.getUserByEmail(email);
+    }
+
     if (!currentUser) {
       return res.status(404).json({ error: 'User not found' });
     }
@@ -39,7 +48,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (email && email !== currentUser.email) {
       // Check if new email already exists
       const existingUser = await dbService.getUserByEmail(email);
-      if (existingUser) {
+      if (existingUser && existingUser.id !== currentUser.id) {
         return res.status(400).json({ error: 'Email already exists' });
       }
       updates.push('email = ?');
@@ -108,6 +117,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(500).json({ error: 'Failed to get updated user data' });
     }
 
+    // ส่งข้อมูลกลับในรูปแบบที่ frontend ต้องการ
     const userResponse = {
       id: updatedUser.id,
       email: updatedUser.email,
@@ -135,4 +145,3 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     });
   }
 }
-

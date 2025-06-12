@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
-import { ArrowLeft, Camera, Save, Calendar, Phone, Mail, User, Droplet, Star } from 'lucide-react';
+import { ArrowLeft, Camera, Save, Calendar, Phone, Mail, User, Droplet, Star, Info } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import axios from 'axios';
+import { calculateAstrologyData, getAllZodiacSigns, getAllElements, getAllDaysOfWeek } from '@/utils/astrology';
 
 export default function Settings() {
   const router = useRouter();
-  const { user, isAuthenticated, isLoading } = useAuth();
+  const { user, isAuthenticated, isLoading, updateUser } = useAuth();
   
   // Form state
   const [formData, setFormData] = useState({
@@ -27,12 +28,17 @@ export default function Settings() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({ type: '', text: '' });
   const [avatarPreview, setAvatarPreview] = useState('');
+  const [calculatedData, setCalculatedData] = useState({
+    zodiacSign: '',
+    elementType: '',
+    dayOfBirth: ''
+  });
 
-  // Element types and zodiac signs options
-  const elementTypes = ['ไม้', 'ไฟ', 'ดิน', 'โลหะ', 'น้ำ'];
-  const zodiacSigns = ['ชวด', 'ฉลู', 'ขาล', 'เถาะ', 'มะโรง', 'มะเส็ง', 'มะเมีย', 'มะแม', 'วอก', 'ระกา', 'จอ', 'กุน'];
+  // Options from utility functions
+  const zodiacSigns = getAllZodiacSigns();
+  const elementTypes = getAllElements();
+  const daysOfWeek = getAllDaysOfWeek();
   const bloodGroups = ['A', 'B', 'AB', 'O'];
-  const daysOfWeek = ['อาทิตย์', 'จันทร์', 'อังคาร', 'พุธ', 'พฤหัสบดี', 'ศุกร์', 'เสาร์'];
 
   // Load user data
   useEffect(() => {
@@ -41,9 +47,9 @@ export default function Settings() {
     }
     
     if (user) {
-      setFormData({
+      const userData = {
         email: user.email || '',
-        password: '', // Don't pre-fill password
+        password: '',
         confirmPassword: '',
         phone: user.phone || '',
         fullName: user.fullName || '',
@@ -53,8 +59,16 @@ export default function Settings() {
         zodiacSign: user.zodiacSign || '',
         bloodGroup: user.bloodGroup || '',
         avatar: user.avatar || ''
-      });
+      };
+      
+      setFormData(userData);
       setAvatarPreview(user.avatar || '');
+      
+      // คำนวณข้อมูลโหราศาสตร์ถ้ามีวันเกิด
+      if (user.birthDate) {
+        const astrology = calculateAstrologyData(user.birthDate);
+        setCalculatedData(astrology);
+      }
     }
   }, [user, isAuthenticated, isLoading, router]);
 
@@ -65,12 +79,32 @@ export default function Settings() {
       ...prev,
       [name]: value
     }));
+
+    // ถ้าเป็นการเปลี่ยนวันเกิด ให้คำนวณข้อมูลโหราศาสตร์ใหม่
+    if (name === 'birthDate' && value) {
+      const astrology = calculateAstrologyData(value);
+      setCalculatedData(astrology);
+      
+      // อัพเดทข้อมูลในฟอร์มด้วย (แต่ยังไม่บันทึกลงฐานข้อมูล)
+      setFormData(prev => ({
+        ...prev,
+        zodiacSign: astrology.zodiacSign,
+        elementType: astrology.elementType,
+        dayOfBirth: astrology.dayOfBirth
+      }));
+    }
   };
 
   // Handle avatar upload
   const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+
+    // Check file size (5MB limit)
+    if (file.size > 5 * 1024 * 1024) {
+      setMessage({ type: 'error', text: 'ไฟล์รูปภาพต้องมีขนาดไม่เกิน 5MB' });
+      return;
+    }
 
     // Preview
     const reader = new FileReader();
@@ -79,8 +113,7 @@ export default function Settings() {
     };
     reader.readAsDataURL(file);
 
-    // Here you would typically upload to a server
-    // For now, we'll store as base64
+    // Convert to base64
     const base64 = await convertToBase64(file);
     setFormData(prev => ({
       ...prev,
@@ -101,6 +134,11 @@ export default function Settings() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    if (!user || !user.id) {
+      setMessage({ type: 'error', text: 'ไม่พบข้อมูลผู้ใช้' });
+      return;
+    }
+    
     // Validate passwords if changing
     if (formData.password && formData.password !== formData.confirmPassword) {
       setMessage({ type: 'error', text: 'รหัสผ่านไม่ตรงกัน' });
@@ -112,6 +150,7 @@ export default function Settings() {
 
     try {
       const updateData: any = {
+        userId: user.id,
         email: formData.email,
         phone: formData.phone,
         fullName: formData.fullName,
@@ -128,13 +167,15 @@ export default function Settings() {
         updateData.password = formData.password;
       }
 
+      console.log('Sending update data:', updateData);
+
       const response = await axios.put('/api/user/update', updateData);
 
       if (response.data.success) {
         setMessage({ type: 'success', text: 'บันทึกข้อมูลสำเร็จ' });
         
-        // Update local storage and context
-        localStorage.setItem('user', JSON.stringify(response.data.user));
+        // อัพเดทข้อมูลใน context และ localStorage
+        updateUser(response.data.user);
         
         // Clear password fields
         setFormData(prev => ({
@@ -142,6 +183,26 @@ export default function Settings() {
           password: '',
           confirmPassword: ''
         }));
+
+        // อัพเดท form data ด้วยข้อมูลใหม่
+        const updatedUser = response.data.user;
+        setFormData(prev => ({
+          ...prev,
+          email: updatedUser.email || '',
+          phone: updatedUser.phone || '',
+          fullName: updatedUser.fullName || '',
+          birthDate: updatedUser.birthDate || '',
+          dayOfBirth: updatedUser.dayOfBirth || '',
+          elementType: updatedUser.elementType || '',
+          zodiacSign: updatedUser.zodiacSign || '',
+          bloodGroup: updatedUser.bloodGroup || '',
+          avatar: updatedUser.avatar || '',
+          password: '',
+          confirmPassword: ''
+        }));
+
+        setAvatarPreview(updatedUser.avatar || '');
+        
       } else {
         throw new Error(response.data.error || 'Failed to update');
       }
@@ -290,12 +351,29 @@ export default function Settings() {
                   onChange={handleChange}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF7A05]"
                 />
+                {formData.birthDate && (
+                  <div className="mt-2 p-3 bg-blue-50 rounded-lg">
+                    <div className="flex items-center mb-2">
+                      <Info size={16} className="mr-2 text-blue-500" />
+                      <span className="text-sm font-medium text-blue-700">ข้อมูลที่คำนวณได้จากวันเกิด:</span>
+                    </div>
+                    <div className="text-sm text-blue-600 space-y-1">
+                      <p>• วันเกิด: <span className="font-medium">{calculatedData.dayOfBirth}</span></p>
+                      <p>• ราศี: <span className="font-medium">{calculatedData.zodiacSign}</span></p>
+                      <p>• ธาตุ: <span className="font-medium">{calculatedData.elementType}</span></p>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
 
             {/* Birth and Zodiac Information */}
             <div className="bg-white rounded-xl p-6 shadow-sm space-y-4">
               <h2 className="text-lg font-semibold text-[#FF7A05] mb-4">ข้อมูลดวงชะตา</h2>
+              <p className="text-sm text-gray-600 mb-4">
+                <Info size={14} className="inline mr-1" />
+                ข้อมูลเหล่านี้จะถูกคำนวณอัตโนมัติจากวันเกิดที่คุณกรอก
+              </p>
               
               <div>
                 <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
@@ -306,11 +384,28 @@ export default function Settings() {
                   name="dayOfBirth"
                   value={formData.dayOfBirth}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF7A05]"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF7A05] bg-gray-50"
+                  disabled
                 >
-                  <option value="">เลือกวันเกิด</option>
+                  <option value="">คำนวณจากวันเกิด</option>
                   {daysOfWeek.map(day => (
                     <option key={day} value={day}>{day}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="text-sm font-medium text-gray-700 mb-2 block">ราศี</label>
+                <select
+                  name="zodiacSign"
+                  value={formData.zodiacSign}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF7A05] bg-gray-50"
+                  disabled
+                >
+                  <option value="">คำนวณจากวันเกิด</option>
+                  {zodiacSigns.map(zodiac => (
+                    <option key={zodiac} value={zodiac}>{zodiac}</option>
                   ))}
                 </select>
               </div>
@@ -321,26 +416,12 @@ export default function Settings() {
                   name="elementType"
                   value={formData.elementType}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF7A05]"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF7A05] bg-gray-50"
+                  disabled
                 >
-                  <option value="">เลือกธาตุ</option>
+                  <option value="">คำนวณจากราศี</option>
                   {elementTypes.map(element => (
                     <option key={element} value={element}>{element}</option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label className="text-sm font-medium text-gray-700 mb-2 block">ปีนักษัตร</label>
-                <select
-                  name="zodiacSign"
-                  value={formData.zodiacSign}
-                  onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF7A05]"
-                >
-                  <option value="">เลือกปีนักษัตร</option>
-                  {zodiacSigns.map(zodiac => (
-                    <option key={zodiac} value={zodiac}>{zodiac}</option>
                   ))}
                 </select>
               </div>

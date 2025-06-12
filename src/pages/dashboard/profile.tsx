@@ -5,6 +5,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import Link from "next/link";
 import BottomNavigation from "@/components/BottomNavigation";
 import ProfileSlideMenu from "@/components/ProfileSlideMenu";
+import { calculateAstrologyData, getZodiacEnglishName } from "@/utils/astrology";
 
 // ข้อมูลธาตุประจำราศี (12 ราศี) - ข้อมูลสมบูรณ์
 const zodiacElementsData = {
@@ -35,7 +36,6 @@ const zodiacElementsData = {
     name: "ราศีเมถุน",
     element: "ธาตุลม",
     image: "/images/profile/element/มิถุ.png",
-
     color: "#f1c40f",
     bgColor: "#FA7A3E",
     personality:
@@ -48,7 +48,6 @@ const zodiacElementsData = {
     name: "ราศีกรกฎ",
     element: "ธาตุน้ำ",
     image: "/images/profile/element/กรก.png",
-
     color: "#3498db",
     bgColor: "#7CB2DF",
     personality:
@@ -61,7 +60,6 @@ const zodiacElementsData = {
     name: "ราศีสิงห์",
     element: "ธาตุไฟ",
     image: "/images/profile/element/สิง.png",
-
     color: "#f39c12",
     bgColor: "#E8C238",
     personality: "คนที่มีพลังงานมาก กระตือรือร้น มีเสน่ห์ และมักมีความเข้มงวด",
@@ -73,7 +71,6 @@ const zodiacElementsData = {
     name: "ราศีกันย์",
     element: "ธาตุุดิน",
     image: "/images/profile/element/กันยา.png",
-
     color: "#8e44ad",
     bgColor: "#82503A",
     personality:
@@ -86,7 +83,6 @@ const zodiacElementsData = {
     name: "ราศีตุลย์",
     element: "ธาตุลม",
     image: "/images/profile/element/ตุลา.png",
-
     color: "#1abc9c",
     bgColor: "#F5B7CE",
     personality:
@@ -99,7 +95,6 @@ const zodiacElementsData = {
     name: "ราศีพิจิก",
     element: "ธาตุน้ำ",
     image: "/images/profile/element/พฤศ.png",
-
     color: "#c0392b",
     bgColor: "#774A8F",
     personality:
@@ -112,7 +107,6 @@ const zodiacElementsData = {
     name: "ราศีธนู",
     element: "ธาตุไฟ",
     image: "/images/profile/element/ธันวา.png",
-
     color: "#2980b9",
     bgColor: "#3D7953",
     personality: "คนที่มีพลังงานมาก กระตือรือร้น มีเสน่ห์ และมักมีความเข้มงวด",
@@ -124,7 +118,6 @@ const zodiacElementsData = {
     name: "ราศีมังกร",
     element: "ธาตุดิน",
     image: "/images/profile/element/มกรา.png",
-
     color: "#7f8c8d",
     bgColor: "#998D75",
     personality:
@@ -137,7 +130,6 @@ const zodiacElementsData = {
     name: "ราศีกุมภ์",
     element: "ธาตุลม",
     image: "/images/profile/element/กุมภา.png",
-
     color: "#9b59b6",
     bgColor: "#517DEE",
     personality:
@@ -150,7 +142,6 @@ const zodiacElementsData = {
     name: "ราศีมีน",
     element: "ธาตุน้ำ",
     image: "/images/profile/element/มีนา.png",
-
     color: "#16a085",
     bgColor: "#1ABAC5",
     personality:
@@ -165,7 +156,7 @@ const zodiacElementsData = {
 const zodiacTravelDestinationsData = {
   Aries: [
     {
-      name: "เทวสถานสำหรับพระนคร ท้าวเวสสุวรรณ ",
+      name: "เทวสถานสำหรับพระนคร ท้าวเวสสุวรรณ ",
       image: "/images/profile/travel/ท้าวเวสุวรรณ.jpeg",
       mapLink: "/information/7?type=buddha",
       description:
@@ -238,7 +229,7 @@ const zodiacTravelDestinationsData = {
   Leo: [
     {
       name: "ศาลเจ้าพ่อเสือ เจ้าพ่อเสือ",
-      image: "/images/profile/travel/ศาสเจ้าพ่อเสือ.jpeg",
+      image: "/images/profile/travel/ศาสเจ้าพ่อเสือ.jpg",
       mapLink: "",
       description:
         "เป็นเทพเจ้าสายจีน จะช่วยเสริมดวงเรื่องความเมตตา การงานและการสนับสนุนให้พบกับความเจริญรุ่งเรืองในชีวิต",
@@ -321,7 +312,7 @@ const zodiacTravelDestinationsData = {
   Aquarius: [
     {
       name: "ศาลเจ้าพ่อเสือ เจ้าพ่อเสือ",
-      image: "/images/profile/travel/ศาสเจ้าพ่อเสือ.jpeg",
+      image: "/images/profile/travel/ศาสเจ้าพ่อเสือ.jpg",
       mapLink: "",
       description:
         "เป็นเทพเจ้าสายจีน จะช่วยเสริมดวงเรื่องความเมตตา การงานและการสนับสนุนให้พบกับความเจริญรุ่งเรืองในชีวิต",
@@ -347,7 +338,7 @@ const zodiacTravelDestinationsData = {
     },
     {
       name: "ศาลเจ้าพ่อเสือ เจ้าพ่อเสือ",
-      image: "/images/profile/travel/ศาสเจ้าพ่อเสือ.jpeg",
+      image: "/images/profile/travel/ศาสเจ้าพ่อเสือ.jpg",
       mapLink: "",
       description:
         "เป็นเทพเจ้าสายจีน จะช่วยเสริมดวงเรื่องความเมตตา การงานและการสนับสนุนให้พบกับความเจริญรุ่งเรืองในชีวิต",
@@ -408,8 +399,8 @@ const getLuckyColorsByZodiac = (zodiacSign: string) => {
   return colorMap[zodiacSign as keyof typeof colorMap] || defaultColors;
 };
 
-// ฟังก์ชันแปลงวันเกิดเป็นราศี
-const getZodiacSign = (birthDate: string | undefined) => {
+
+const getZodiacSignFallback = (birthDate: string | undefined) => {
   if (!birthDate) return "Aries";
   try {
     const date = new Date(birthDate);
@@ -438,7 +429,6 @@ const getZodiacSign = (birthDate: string | undefined) => {
     if ((month === 1 && day >= 20) || (month === 2 && day <= 18))
       return "Aquarius";
     return "Pisces";
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (error) {
     return "Aries";
   }
@@ -453,7 +443,6 @@ const formatBirthDate = (dateString: string | undefined) => {
     const month = (date.getMonth() + 1).toString().padStart(2, "0");
     const year = date.getFullYear();
     return `${day} ${getMonthName(month)} ${year}`;
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (error) {
     return "";
   }
@@ -484,7 +473,6 @@ export default function Profile() {
   const [luckyNumbers, setLuckyNumbers] = useState<number[]>([]);
   const [luckyColors, setLuckyColors] = useState<string[]>([]);
   const [zodiacSign, setZodiacSign] = useState<string>("");
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [destinations, setDestinations] = useState<any[]>([]);
   const [bgStyles, setBgStyles] = useState({
     gradient: "#f0f0f0",
@@ -499,32 +487,54 @@ export default function Profile() {
     }
 
     if (user) {
-      const userZodiac =
-        user.zodiacSign ||
-        (user.birthDate ? getZodiacSign(user.birthDate) : "Aries");
-      setZodiacSign(userZodiac);
+      let userZodiacEnglish = "";
+      
+      // ถ้ามีวันเกิด ให้คำนวณข้อมูลใหม่จาก astrology utils
+      if (user.birthDate) {
+        console.log("Calculating astrology data from birthDate:", user.birthDate);
+        const astrologyData = calculateAstrologyData(user.birthDate);
+        console.log("Calculated astrology data:", astrologyData);
+        
+        // แปลงราศีไทยเป็นอังกฤษ
+        userZodiacEnglish = getZodiacEnglishName(astrologyData.zodiacSign);
+        console.log("English zodiac name:", userZodiacEnglish);
+      } else {
+        // fallback ใช้ข้อมูลเดิม
+        userZodiacEnglish = user.zodiacSign ? 
+          getZodiacEnglishName(user.zodiacSign) : 
+          getZodiacSignFallback(user.birthDate);
+      }
+
+      // ถ้าไม่พบราศีภาษาอังกฤษ ให้ใช้ fallback
+      if (!userZodiacEnglish) {
+        userZodiacEnglish = getZodiacSignFallback(user.birthDate);
+      }
+
+      console.log("Final zodiac sign (English):", userZodiacEnglish);
+      setZodiacSign(userZodiacEnglish);
 
       const zodiacInfo =
-        zodiacElementsData[userZodiac as keyof typeof zodiacElementsData] ||
+        zodiacElementsData[userZodiacEnglish as keyof typeof zodiacElementsData] ||
         zodiacElementsData["Aries"];
+      
       setBgStyles({
         gradient: zodiacInfo.bgColor,
         textColor: zodiacInfo.color,
-        opacity: 60, // 60% สำหรับพื้นหลังหลัก
+        opacity: 60,
       });
 
       const destinationData =
         zodiacTravelDestinationsData[
-          userZodiac as keyof typeof zodiacTravelDestinationsData
+          userZodiacEnglish as keyof typeof zodiacTravelDestinationsData
         ] || zodiacTravelDestinationsData["Aries"];
       setDestinations(destinationData);
 
       const numbers =
-        luckyNumbersByZodiac[userZodiac as keyof typeof luckyNumbersByZodiac] ||
+        luckyNumbersByZodiac[userZodiacEnglish as keyof typeof luckyNumbersByZodiac] ||
         luckyNumbersByZodiac["Aries"];
       setLuckyNumbers(numbers);
 
-      const colors = getLuckyColorsByZodiac(userZodiac);
+      const colors = getLuckyColorsByZodiac(userZodiacEnglish);
       setLuckyColors(colors);
     }
   }, [user, isAuthenticated, isLoading, router]);
@@ -557,6 +567,7 @@ export default function Profile() {
     brown: { bg: "#A0522D", text: "น้ำตาล" },
     purple: { bg: "#DDA0DD", text: "ม่วง" },
     black: { bg: "#696969", text: "ดำ" },
+    gray: { bg: "#808080", text: "เทา" },
     "light blue": { bg: "#ADD8E6", text: "ฟ้าอ่อน" },
     "dark blue": { bg: "#00008B", text: "น้ำเงินเข้ม" },
   };
@@ -682,7 +693,7 @@ export default function Profile() {
         <div
           className="flex-1 relative pb-20 pt-15 "
           style={{
-            backgroundColor: hexToRgba(bgStyles.gradient, bgStyles.opacity), // 60%
+            backgroundColor: hexToRgba(bgStyles.gradient, bgStyles.opacity),
             borderTopRightRadius: "180px",
           }}
         >
@@ -707,7 +718,7 @@ export default function Profile() {
             <div
               className="mb-6 bg-opacity-95 backdrop-blur-sm rounded-3xl p-6 shadow-lg"
               style={{
-                backgroundColor: hexToRgba(bgStyles.gradient, 80), // 80%
+                backgroundColor: hexToRgba(bgStyles.gradient, 80),
                 backdropFilter: "blur(10px)",
               }}
             >
@@ -780,7 +791,7 @@ export default function Profile() {
             <div
               className="mb-6 rounded-3xl p-6 shadow-lg"
               style={{
-                backgroundColor: hexToRgba(bgStyles.gradient, 80), // 80%
+                backgroundColor: hexToRgba(bgStyles.gradient, 80),
                 backdropFilter: "blur(10px)",
               }}
             >
@@ -801,7 +812,7 @@ export default function Profile() {
                 <h3 className="text-white text-lg font-semibold mb-4">
                   {zodiacElementsData[
                     zodiacSign as keyof typeof zodiacElementsData
-                  ]?.element || "ราศีไฟ"}
+                  ]?.element || "ธาตุไฟ"}
                 </h3>
                 <p className="text-base">
                   <span className="font-medium">บุคลิก :</span>{" "}
@@ -821,11 +832,10 @@ export default function Profile() {
             </div>
 
             {/* Travel Destinations Section */}
-            {/* Travel Destinations Section */}
             <div
               className="mb-8 rounded-3xl p-6 shadow-lg"
               style={{
-                backgroundColor: hexToRgba(bgStyles.gradient, 55), // 55%
+                backgroundColor: hexToRgba(bgStyles.gradient, 55),
                 backdropFilter: "blur(10px)",
               }}
             >
@@ -837,16 +847,14 @@ export default function Profile() {
 
               {destinations && destinations.length > 0 ? (
                 <div className="space-y-4">
-                  {/* แก้ไข: เปลี่ยนจาก overflow-x-hidden เป็น overflow-x-auto และเพิ่ม flex-nowrap */}
                   <div
                     className="flex overflow-x-auto space-x-4 pb-4 flex-nowrap"
                     style={{
                       scrollSnapType: "x mandatory",
-                      scrollbarWidth: "none", // Firefox
-                      msOverflowStyle: "none", // IE/Edge
+                      scrollbarWidth: "none",
+                      msOverflowStyle: "none",
                     }}
                   >
-                    {/* เพิ่ม CSS เพื่อซ่อน scrollbar ใน WebKit browsers */}
                     <style jsx>{`
                       .flex::-webkit-scrollbar {
                         display: none;
@@ -868,7 +876,6 @@ export default function Profile() {
                               "/images/profile/travel/default.jpg";
                           }}
                         />
-                        {/* Content below image instead of overlay */}
                         <div className="p-4">
                           <div className="flex justify-between items-start mb-3">
                             <Link href={destination.mapLink}>
@@ -888,7 +895,6 @@ export default function Profile() {
                     ))}
                   </div>
 
-                  {/* Dots indicator - แก้ไขให้แสดงจุดตามจำนวนสถานที่จริง */}
                   <div className="flex justify-center space-x-2 mt-4">
                     {destinations.map((_, index) => (
                       <div

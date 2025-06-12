@@ -6,6 +6,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import BottomNavigation from "@/components/BottomNavigation";
 import { ArrowLeft, Heart } from "lucide-react";
 import Image from "next/image";
+import { useFavorites } from "@/hooks/useFavorites";
 
 // Types
 interface InformationProps {
@@ -22,6 +23,7 @@ interface SectionConfig {
   zIndex: number;
 }
 
+
 const InformationPage: React.FC<InformationProps> = ({ type, id }) => {
   const router = useRouter();
   const { isAuthenticated, isLoading } = useAuth();
@@ -31,6 +33,8 @@ const InformationPage: React.FC<InformationProps> = ({ type, id }) => {
   >(null);
   const [loading, setLoading] = useState(true);
   const sectionRef = useRef<HTMLDivElement>(null);
+
+  
 
   const [information, setInformation] = useState({
     id: 1,
@@ -90,126 +94,6 @@ const InformationPage: React.FC<InformationProps> = ({ type, id }) => {
     },
   });
 
-  // interface ChantItem {
-  //   title: string;
-  //   text: string;
-  //   transliteration: string; // Make it optional with the ? symbol
-  // }
-
-  // 2. Define proper interfaces for your Buddha and Temple information
-  // interface BuddhInfo {
-  //   id: number;
-  //   name: string;
-  //   image: string;
-  //   location: string;
-  //   openHours: string;
-  //   type: string;
-  //   description: string;
-  //   worshipGuide: {
-  //     title: string;
-  //     steps: string[];
-  //   };
-  //   chants: {
-  //     title: string;
-  //     items: {
-  //       title: string;
-  //       text: string;
-  //       transliteration?: string;
-  //     }[];
-  //   };
-  //   offerings: {
-  //     title: string;
-  //     items: {
-  //       name: string;
-  //       description: string;
-  //       description2: string;
-  //       image: string;
-  //     }[];
-  //   };
-  //   guidelines: {
-  //     title: string;
-  //     dress: {
-  //       title: string;
-  //       description: string;
-  //       image: string;
-  //     };
-  //     behavior: {
-  //       title: string;
-  //       description: string;
-  //       image: string;
-  //     };
-  //     photography: {
-  //       title: string;
-  //       description: string;
-  //       image: string;
-  //     };
-  //   };
-  // }
-
-  // interface TempleInfo {
-  //   id: number;
-  //   name: string;
-  //   image: string;
-  //   location: string;
-  //   openHours: string;
-  //   type: string;
-  //   description: string;
-  //   worshipGuide: {
-  //     title: string;
-  //     steps: string[];
-  //   };
-  //   chants: {
-  //     title: string;
-  //     items: ChantItem[];
-  //   };
-  //   offerings: {
-  //     title: string;
-  //     items: {
-  //       name: string;
-  //       description: string;
-  //       description2: string;
-  //       image: string;
-  //     }[];
-  //   };
-  //   guidelines: {
-  //     title: string;
-  //     dress: {
-  //       title: string;
-  //       description: string;
-  //       image: string;
-  //     };
-  //     behavior: {
-  //       title: string;
-  //       description: string;
-  //       image: string;
-  //     };
-  //     photography: {
-  //       title: string;
-  //       description: string;
-  //       image: string;
-  //     };
-  //   };
-  // }
-
-  // แก้ไขส่วน useEffect สำหรับการโหลดข้อมูล
-  // useEffect(() => {
-  //   if (!id || !isAuthenticated) return;
-
-  //   const fetchInformation = async () => {
-  //     try {
-
-  //       setLoading(false);
-  //     } catch (error) {
-  //       console.error(`Failed to fetch ${type} info:`, error);
-  //       setLoading(false);
-  //     }
-  //   };
-
-  //   fetchInformation();
-  // }, [id, isAuthenticated, type]);
-
-  // Fetch information data
-  
   useEffect(() => {
     if (!id || !isAuthenticated) return;
 
@@ -730,90 +614,7 @@ const InformationPage: React.FC<InformationProps> = ({ type, id }) => {
           if ((buddhaData as any)[Number(id)]) {
             setInformation((buddhaData as any)[Number(id)]);
           } 
-          // else {
-          //   setInformation({
-          //     id: Number(id),
-          //     name: `พระพุทธรูปสำคัญ #${id}`,
-          //     image: "/api/placeholder/400/500",
-          //     location: "วัดสุทัศน์เทพวราราม",
-          //     openHours: "08.00 - 20.00 น.",
-          //     type: "ภาพรวม / ทั่วไป",
-          //     description:
-          //       "พระพุทธรูปสำคัญประจำวัด ที่มีความเก่าแก่และศักดิ์สิทธิ์",
-          //     worshipGuide: {
-          //       title: "ลำดับการไหว้",
-          //       steps: [
-          //         // "จุดธูปเทียน 3 ดอก เทียน 2 เล่ม",
-          //         // "ตั้งจิตอธิษฐาน กล่าวคำบูชา",
-          //         // "กราบ 3 ครั้ง",
-          //         // "ปักธูปเทียนในที่ที่จัดไว้",
-          //         "นั่งสมาธิสักครู่ก่อนลุกออกไป",
-          //       ],
-          //     },
-          //     chants: {
-          //       title: "บทสวด",
-          //       items: [
-          //         {
-          //           title: "คำบูชาพระพุทธรูป",
-          //           text: "นะโม ตัสสะ ภะคะวะโต อะระหะโต สัมมาสัมพุทธัสสะ (3 จบ)",
-          //           text2: "",
-          //           transliteration:
-          //             "Namo tassa bhagavato arahato sammāsambuddhassa (3 times)",
-          //         },
-          //         {
-          //           title: "คำขอพรเฉพาะ",
-          //           text: "ข้าพเจ้าขอน้อมบูชาพระพุทธรูปศักดิ์สิทธิ์องค์นี้ ด้วยเครื่องสักการะทั้งหลายเหล่านี้ ขอให้ข้าพเจ้าและครอบครัว จงประสบแต่ความสุข ความเจริญ",
-          //           text2: "",
-          //           transliteration: "",
-          //         },
-          //       ],
-          //     },
-          //     offerings: {
-          //       title: "ของไหว้",
-          //       items: [
-          //         {
-          //           name: "ดอกไม้",
-          //           description: "ดอกบัว หรือดอกไม้สีขาว",
-          //           description2: "",
-          //           image: "/api/placeholder/100/100",
-          //         },
-          //         {
-          //           name: "ธูปเทียน",
-          //           description: "ธูป 3 ดอก เทียน 2 เล่ม",
-          //           description2: "",
-          //           image: "/api/placeholder/100/100",
-          //         },
-          //         {
-          //           name: "ผลไม้",
-          //           description: "ผลไม้ตามความเหมาะสม",
-          //           description2: "",
-          //           image: "/api/placeholder/100/100",
-          //         },
-          //       ],
-          //     },
-          //     guidelines: {
-          //       title: "ข้อห้าม / ข้อแนะนำ",
-          //       dress: {
-          //         title: "การแต่งกาย",
-          //         description:
-          //           "แต่งกายสุภาพ ไม่ควรนุ่งสั้น และไม่ควรสวมเสื้อผ้าบางเปิดเผยร่างกาย ไม่สมควรใส่กางเกงขาสั้น",
-          //         image: "/api/placeholder/300/200",
-          //       },
-          //       behavior: {
-          //         title: "การวางตัว",
-          //         description:
-          //           "สำรวมกาย วาจา ใจ ไม่ส่งเสียงดัง ไม่พูดคุยเสียงดัง ไม่ส่งเสียงรบกวนผู้อื่น",
-          //         image: "/api/placeholder/300/200",
-          //       },
-          //       photography: {
-          //         title: "การถ่ายรูป",
-          //         description:
-          //           "ไม่ควรถ่ายภาพในบริเวณที่มีป้ายห้ามหรือในพื้นที่ศักดิ์สิทธิ์โดยไม่ได้รับอนุญาต",
-          //         image: "/api/placeholder/300/200",
-          //       },
-          //     },
-          //   });
-          // }
+
         } else if (type === "temple") {
           // ข้อมูลจำลองสำหรับวัด
           const templeData = {
@@ -886,83 +687,11 @@ const InformationPage: React.FC<InformationProps> = ({ type, id }) => {
             },
           };
 
-          // ตรวจสอบว่ามีข้อมูลวัดที่ ID นี้หรือไม่
 
           if ((templeData as any)[Number(id)]) {
             setInformation((templeData as any)[Number(id)]);
           } 
-          // else {
-          //   // กรณีไม่พบข้อมูล ใช้ข้อมูลเริ่มต้น
-          //   setInformation({
-          //     id: Number(id),
-          //     name: `วัด #${id}`,
-          //     image: "/api/placeholder/400/500",
-          //     location: "กรุงเทพมหานคร",
-          //     openHours: "08.00 - 20.00 น.",
-          //     type: "ภาพรวม / ทั่วไป",
-          //     description: "วัดที่มีความสำคัญทางประวัติศาสตร์และศิลปวัฒนธรรม",
-          //     worshipGuide: {
-          //       title: "ลำดับการไหว้",
-          //       steps: [
-          //         // "แต่งกายสุภาพเรียบร้อย",
-          //         // "เดินเข้าทางประตูวัดอย่างสงบสำรวม",
-          //         // "กราบพระประธานในพระอุโบสถ",
-          //         // "เวียนประทักษิณรอบพระอุโบสถ 3 รอบ",
-          //         "สักการะพระพุทธรูปสำคัญในวัด",
-          //       ],
-          //     },
-          //     chants: {
-          //       title: "บทสวด",
-          //       items: [
-          //         {
-          //           title: "คำบูชาพระรัตนตรัย",
-          //           text: "อิมินา สักกาเรนะ, พุทธัง ปูเชมิ ฯ\nอิมินา สักกาเรนะ, ธัมมัง ปูเชมิ ฯ\nอิมินา สักกาเรนะ, สังฆัง ปูเชมิ ฯ",
-          //           text2: "",
-          //           transliteration:
-          //             "Iminā sakkārena, buddhaṃ pūjemi ฯ\nIminā sakkārena, dhammaṃ pūjemi ฯ\nIminā sakkārena, saṅghaṃ pūjemi ฯ",
-          //         },
-          //       ],
-          //     },
-          //     offerings: {
-          //       title: "ของไหว้",
-          //       items: [
-          //         {
-          //           name: "ดอกไม้",
-          //           description: "ดอกบัว ดอกกุหลาบ ดอกดาวเรือง",
-          //           description2: "",
-          //           image: "/api/placeholder/100/100",
-          //         },
-          //         {
-          //           name: "ธูปเทียน",
-          //           description: "ธูป 3 ดอก เทียน 2 เล่ม",
-          //           description2: "",
-          //           image: "/api/placeholder/100/100",
-          //         },
-          //       ],
-          //     },
-          //     guidelines: {
-          //       title: "ข้อห้าม / ข้อแนะนำ",
-          //       dress: {
-          //         title: "การแต่งกาย",
-          //         description:
-          //           "แต่งกายสุภาพ ไม่ควรนุ่งสั้น และไม่ควรสวมเสื้อผ้าบางเปิดเผยร่างกาย ไม่สมควรใส่กางเกงขาสั้น",
-          //         image: "/api/placeholder/300/200",
-          //       },
-          //       behavior: {
-          //         title: "การวางตัว",
-          //         description:
-          //           "สำรวมกาย วาจา ใจ ไม่ส่งเสียงดัง ไม่พูดคุยเสียงดัง ไม่ส่งเสียงรบกวนผู้อื่น",
-          //         image: "/api/placeholder/300/200",
-          //       },
-          //       photography: {
-          //         title: "การถ่ายรูป",
-          //         description:
-          //           "ไม่ควรถ่ายภาพในบริเวณที่มีป้ายห้ามหรือในพื้นที่ศักดิ์สิทธิ์โดยไม่ได้รับอนุญาต",
-          //         image: "/api/placeholder/300/200",
-          //       },
-          //     },
-          //   });
-          // }
+
         }
 
         setLoading(false);
@@ -975,7 +704,15 @@ const InformationPage: React.FC<InformationProps> = ({ type, id }) => {
     fetchInformation();
   }, [id, isAuthenticated, type]);
 
+  const { toggleFavorite, isFavorite } = useFavorites([
+    { id: information.id, isFavorite: false }
+  ]);
+
   const [showPanorama, setShowPanorama] = useState(false);
+
+  const handleFavoriteClick = () => {
+  toggleFavorite(information.id);
+};
 
   // Handle section animations with cleanup
   useEffect(() => {
@@ -1362,9 +1099,22 @@ const InformationPage: React.FC<InformationProps> = ({ type, id }) => {
           </div>
 
           {/* Heart Button */}
-          <div className="absolute bottom-4 right-4 z-10">
-            <button className="w-10 h-10 rounded-full bg-white bg-opacity-70 flex items-center justify-center shadow-md">
-              <Heart className="w-6 h-6 text-orange-500" />
+         <div className="absolute bottom-4 right-4 z-10">
+            <button 
+              onClick={handleFavoriteClick}
+              className={`w-10 h-10 rounded-full flex items-center justify-center shadow-md transition-all duration-200 ${
+                isFavorite(information.id) 
+                  ? 'bg-red-500' 
+                  : 'bg-white bg-opacity-70'
+              }`}
+            >
+              <Heart 
+                className={`w-6 h-6 transition-colors duration-200 ${
+                  isFavorite(information.id) 
+                    ? 'text-white fill-white' 
+                    : 'text-orange-500'
+                }`} 
+              />
             </button>
           </div>
 

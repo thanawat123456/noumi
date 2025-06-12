@@ -18,6 +18,7 @@ interface AuthContextType {
   loginWithGoogle: () => Promise<void>;
   signup: (userData: UserSignupData) => Promise<void>;
   setPassword: (password: string) => Promise<void>;
+  updateUser: (userData: User) => void; // เพิ่มบรรทัดนี้
   logout: () => Promise<void>;
 }
 
@@ -67,6 +68,7 @@ const AuthContext = createContext<AuthContextType>({
   loginWithGoogle: async () => {},
   signup: async () => {},
   setPassword: async () => {},
+  updateUser: () => {}, // เพิ่มบรรทัดนี้
   logout: async () => {},
 });
 
@@ -272,7 +274,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // ล็อกอินด้วย Google
   const loginWithGoogle = async () => {
     try {
-      await signIn('google', { callbackUrl: '/dashboard' });
+      await signIn('google', { callbackUrl: '/settings' });
     } catch (error) {
       console.warn('Google login attempt failed');
       throw new AuthError(
@@ -344,6 +346,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  // เพิ่ม updateUser method
+  const updateUser = (userData: User) => {
+    setUser(userData);
+    localStorage.setItem('user', JSON.stringify(userData));
+  };
+
   const logout = async () => {
     try {
       // ล็อกเอาท์จาก NextAuth
@@ -368,6 +376,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         loginWithGoogle,
         signup,
         setPassword,
+        updateUser, // เพิ่มบรรทัดนี้
         logout
       }}
     >
