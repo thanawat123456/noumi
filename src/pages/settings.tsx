@@ -239,7 +239,7 @@ export default function Settings() {
         <div className="bg-[#FF7A05] text-white p-4">
           <div className="flex items-center justify-between">
             <button
-              onClick={() => router.back()}
+              onClick={() => router.push("/dashboard")}
               className="p-2 hover:bg-white/20 rounded-full transition-colors"
             >
               <ArrowLeft size={24} />

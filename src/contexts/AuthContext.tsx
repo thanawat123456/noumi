@@ -18,7 +18,8 @@ interface AuthContextType {
   loginWithGoogle: () => Promise<void>;
   signup: (userData: UserSignupData) => Promise<void>;
   setPassword: (password: string) => Promise<void>;
-  updateUser: (userData: User) => void; // เพิ่มบรรทัดนี้
+  updateUser: (userData: User) => Promise<void>; // *** เปลี่ยนเป็น async function ***
+  refreshUserData: () => Promise<void>; // *** เพิ่มฟังก์ชันรีเฟรชข้อมูล ***
   logout: () => Promise<void>;
 }
 
@@ -68,7 +69,8 @@ const AuthContext = createContext<AuthContextType>({
   loginWithGoogle: async () => {},
   signup: async () => {},
   setPassword: async () => {},
-  updateUser: () => {}, // เพิ่มบรรทัดนี้
+  updateUser: async () => {}, // *** เปลี่ยนเป็น async ***
+  refreshUserData: async () => {}, // *** เพิ่มฟังก์ชันใหม่ ***
   logout: async () => {},
 });
 
@@ -82,7 +84,33 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isLoading, setIsLoading] = useState<boolean>(true);
   
   // ใช้ session จาก NextAuth
-  const { data: session, status } = useSession();
+  const { data: session, status, update: updateSession } = useSession();
+
+  // *** เพิ่มฟังก์ชันสำหรับรีเฟรชข้อมูลผู้ใช้จาก database ***
+  const refreshUserData = async (): Promise<void> => {
+    try {
+      if (session?.user?.id) {
+        const response = await axios.get(`/api/users/${session.user.id}`);
+        if (response.data.success && response.data.user) {
+          const freshUser = response.data.user;
+          setUser(freshUser);
+          localStorage.setItem('user', JSON.stringify(freshUser));
+          
+          // *** อัปเดต session ด้วยข้อมูลใหม่ ***
+          await updateSession({
+            ...session,
+            user: {
+              ...session.user,
+              name: freshUser.fullName,
+              image: freshUser.avatar
+            }
+          });
+        }
+      }
+    } catch (error) {
+      console.error('Failed to refresh user data:', error);
+    }
+  };
 
   useEffect(() => {
     const init = async () => {
@@ -96,19 +124,39 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           
           // ถ้ามี id ใน sessionUser
           if (sessionUser.id) {
-            const userFromSession: User = {
-              id: typeof sessionUser.id === 'string' ? parseInt(sessionUser.id) : sessionUser.id as number,
-              email: sessionUser.email || '',
-              fullName: sessionUser.name || '',
-              avatar: sessionUser.image || null,
-              // ข้อมูลอื่นๆ จะถูกเติมจาก API หรือจัดการในฝั่ง server
-            };
-            
-            setUser(userFromSession);
-            setIsAuthenticated(true);
-            
-            // ยังคงเก็บใน localStorage สำหรับความเข้ากันได้กับระบบเดิม
-            localStorage.setItem('user', JSON.stringify(userFromSession));
+            // *** โหลดข้อมูลล่าสุดจาก database เสมอ ***
+            try {
+              const response = await axios.get(`/api/users/${sessionUser.id}`);
+              if (response.data.success && response.data.user) {
+                const freshUser = response.data.user;
+                setUser(freshUser);
+                localStorage.setItem('user', JSON.stringify(freshUser));
+                setIsAuthenticated(true);
+              } else {
+                // fallback ใช้ข้อมูลจาก session
+                const userFromSession: User = {
+                  id: typeof sessionUser.id === 'string' ? parseInt(sessionUser.id) : sessionUser.id as number,
+                  email: sessionUser.email || '',
+                  fullName: sessionUser.name || '',
+                  avatar: sessionUser.image || null,
+                };
+                setUser(userFromSession);
+                localStorage.setItem('user', JSON.stringify(userFromSession));
+                setIsAuthenticated(true);
+              }
+            } catch (apiError) {
+              console.warn('Failed to fetch fresh user data, using session data:', apiError);
+              // fallback ใช้ข้อมูลจาก session
+              const userFromSession: User = {
+                id: typeof sessionUser.id === 'string' ? parseInt(sessionUser.id) : sessionUser.id as number,
+                email: sessionUser.email || '',
+                fullName: sessionUser.name || '',
+                avatar: sessionUser.image || null,
+              };
+              setUser(userFromSession);
+              localStorage.setItem('user', JSON.stringify(userFromSession));
+              setIsAuthenticated(true);
+            }
           } else {
             // กรณีไม่มี id ใน session.user เราต้องขอข้อมูลเพิ่มเติมจาก API
             try {
@@ -285,7 +333,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  // ฟังก์ชันอื่นๆ คงเดิม...
   const signup = async (userData: UserSignupData) => {
     try {
       const response = await axios.post('/api/auth/signup', userData);
@@ -346,10 +393,83 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  // เพิ่ม updateUser method
-  const updateUser = (userData: User) => {
-    setUser(userData);
-    localStorage.setItem('user', JSON.stringify(userData));
+  // *** ปรับปรุง updateUser method ให้มี fallback และ error handling ที่ดีกว่า ***
+  const updateUser = async (userData: User): Promise<void> => {
+    try {
+      // อัปเดตใน local state และ localStorage ก่อน (เพื่อ UX ที่ดี)
+      setUser(userData);
+      localStorage.setItem('user', JSON.stringify(userData));
+      
+      // พยายามอัปเดตข้อมูลในฐานข้อมูลผ่าน API
+      if (userData.id) {
+        try {
+          const response = await axios.put(`/api/users/${userData.id}`, userData);
+          if (response.data.success && response.data.user) {
+            const updatedUser = response.data.user;
+            
+            // อัปเดตด้วยข้อมูลจาก API response (อาจจะมีการแปลงหรือปรับปรุงจาก server)
+            setUser(updatedUser);
+            localStorage.setItem('user', JSON.stringify(updatedUser));
+            
+            // อัปเดต NextAuth session
+            if (session?.user) {
+              await updateSession({
+                ...session,
+                user: {
+                  ...session.user,
+                  name: updatedUser.fullName,
+                  image: updatedUser.avatar
+                }
+              });
+            }
+            return;
+          }
+        } catch (apiError: any) {
+          console.warn('Failed to update user via API, using local update only:', apiError.message);
+          
+          // ถ้า API ล้มเหลว แต่ยังมี session ให้ลองอัปเดต session
+          if (session?.user) {
+            try {
+              await updateSession({
+                ...session,
+                user: {
+                  ...session.user,
+                  name: userData.fullName,
+                  image: userData.avatar
+                }
+              });
+            } catch (sessionError) {
+              console.warn('Failed to update session after API failure:', sessionError);
+            }
+          }
+          
+          // ถ้า API endpoint ยังไม่พร้อม ให้ใช้ local state ไปก่อน
+          // (ในอนาคตเมื่อ API พร้อมแล้ว ข้อมูลจะถูก sync)
+          return;
+        }
+      }
+      
+      // fallback: อัปเดต NextAuth session ถ้าไม่มี user.id หรือ API ไม่พร้อม
+      if (session?.user) {
+        try {
+          await updateSession({
+            ...session,
+            user: {
+              ...session.user,
+              name: userData.fullName,
+              image: userData.avatar
+            }
+          });
+        } catch (sessionError) {
+          console.warn('Failed to update session:', sessionError);
+        }
+      }
+      
+    } catch (error) {
+      console.error('Failed to update user:', error);
+      // แม้ว่าจะเกิด error ก็ยังคงข้อมูลใน local state
+      // เพื่อให้ user เห็นการเปลี่ยนแปลงใน UI
+    }
   };
 
   const logout = async () => {
@@ -376,7 +496,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         loginWithGoogle,
         signup,
         setPassword,
-        updateUser, // เพิ่มบรรทัดนี้
+        updateUser, // *** ตอนนี้เป็น async function แล้ว ***
+        refreshUserData, // *** เพิ่มฟังก์ชันใหม่ ***
         logout
       }}
     >

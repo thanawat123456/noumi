@@ -2,6 +2,7 @@ import NextAuth, { Session, User } from 'next-auth';
 import GoogleProvider from 'next-auth/providers/google';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import dbService from '@/lib/db';
+import { updateUserData } from '@/lib/userUpdateHelper';
 
 // ขยาย type สำหรับ session
 declare module "next-auth" {
@@ -53,7 +54,6 @@ export default NextAuth({
           
           if (user) {
             // บันทึกการ login สำหรับ credentials provider
-            // ใช้ undefined สำหรับ IP และ user-agent เนื่องจากไม่สามารถเข้าถึงได้ใน NextAuth
             await dbService.recordLogin(user.id!);
             console.log(`Login recorded for user ${user.email} (credentials)`);
             
@@ -124,6 +124,22 @@ export default NextAuth({
             
             const userId = await dbService.addUser(newUser);
             dbUser = await dbService.getUserById(userId);
+          } else {
+            // *** แก้ไขส่วนนี้ - อัปเดตเฉพาะข้อมูลที่จำเป็นเท่านั้น ***
+            // อัปเดตเฉพาะ avatar ถ้าไม่มี หรือถ้า Google มีข้อมูลใหม่
+            const shouldUpdateAvatar = !dbUser.avatar && profile.image;
+            
+            if (shouldUpdateAvatar) {
+              // ใช้ helper function สำหรับอัปเดตข้อมูล
+              await updateUserData(dbUser.id!, {
+                avatar: profile.image
+              });
+              // รีเฟรชข้อมูล user หลังจากอัปเดต
+              dbUser = await dbService.getUserById(dbUser.id!);
+            }
+            
+            // *** ไม่อัปเดต full_name เพราะ user อาจจะแก้ไขแล้ว ***
+            // *** ใช้ข้อมูลจาก database แทนข้อมูลจาก Google profile ***
           }
           
           // บันทึกการ login สำหรับ Google provider
@@ -131,11 +147,11 @@ export default NextAuth({
             await dbService.recordLogin(dbUser.id);
             console.log(`Login recorded for user ${dbUser.email} (Google)`);
             
-            // อัปเดตข้อมูลใน user object (สำหรับใช้ใน session)
+            // *** ใช้ข้อมูลจาก database เป็นหลัก แทนการใช้ข้อมูลจาก Google profile ***
             user.id = dbUser.id.toString();
-            user.name = dbUser.full_name || profile.name || '';
+            user.name = dbUser.full_name || profile.name || '';  // ใช้ข้อมูลจาก database ก่อน
             user.email = dbUser.email;
-            user.image = dbUser.avatar || profile.image || null;
+            user.image = dbUser.avatar || profile.image || null;  // ใช้ avatar จาก database ก่อน
           }
         }
         
@@ -147,8 +163,27 @@ export default NextAuth({
     },
     
     async session({ session, token }) {
-      if (token && session.user) {
-        session.user.id = token.sub || '';
+      // *** เพิ่มการโหลดข้อมูลล่าสุดจาก database ทุกครั้งที่สร้าง session ***
+      if (token?.sub && session.user) {
+        try {
+          await dbService.init();
+          const dbUser = await dbService.getUserById(parseInt(token.sub));
+          
+          if (dbUser) {
+            // ใช้ข้อมูลล่าสุดจาก database
+            session.user.id = dbUser.id?.toString() || token.sub;
+            session.user.name = dbUser.full_name || session.user.name;
+            session.user.email = dbUser.email || session.user.email;
+            session.user.image = dbUser.avatar || session.user.image;
+          } else {
+            // fallback ถ้าไม่เจอใน database
+            session.user.id = token.sub;
+          }
+        } catch (error) {
+          console.error('Error loading user data in session:', error);
+          // fallback to token data
+          session.user.id = token.sub || '';
+        }
       }
       return session;
     },
