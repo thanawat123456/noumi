@@ -166,7 +166,7 @@ const InformationPage: React.FC<InformationProps> = ({ type, id }) => {
               image: "/images/temple-list/พระสุนทรีวาณี.jpeg",
               location: "วัดสุทัศน์เทพวราราม",
               openHours: "08.00 - 20.00 น.",
-              type: "การเรียน / การงาน",
+              type: "การงาน / การเรียน",
               map: "/images/map/Map03พระสุนทรีวาณี.png",
               panorama:
                 "https://storage.googleapis.com/noumi-3d-models/พระสุนทรีวาณี360.mov",
@@ -338,7 +338,7 @@ const InformationPage: React.FC<InformationProps> = ({ type, id }) => {
               image: "/images/temple-list/พระพุทธตรีโลกเชษฐ์.jpg",
               location: "วัดสุทัศน์เทพวราราม",
               openHours: "08.00 - 20.00 น.",
-              type: "สุขภาพ / โรคภัย",
+              type: "โชคลาภ / วาสนา",
               map: "/images/map/Map07พระพุทธตรีโลกเชษฐ์.png",
               panorama:
                 "https://storage.googleapis.com/noumi-3d-models/พระพุทธตรีโลกเชษฐ์360.mov",
@@ -393,7 +393,7 @@ const InformationPage: React.FC<InformationProps> = ({ type, id }) => {
               image: "/images/temple-list/พระกริ่งใหญ่.jpeg",
               location: "วัดสุทัศน์เทพวราราม",
               openHours: "08.00 - 20.00 น.",
-              type: "ความมงคล / ความสำเร็จ",
+              type: "สุขภาพ / โรคภัย",
               map: "/images/map/Map04พระกริ่งใหญ่.png",
               panorama:
                 "https://storage.googleapis.com/noumi-3d-models/พระกริ่งใหญ่360.mov",
@@ -449,7 +449,7 @@ const InformationPage: React.FC<InformationProps> = ({ type, id }) => {
               image: "/images/temple-list/ท้าวเวสุวรรณ.jpg",
               location: "วัดสุทัศน์เทพวราราม",
               openHours: "08.00 - 20.00 น.",
-              type: "ความมงคล / ความสำเร็จ",
+              type: "การเงิน / ธุรกิจ",
               map: "/images/map/Map02ท้าวเวสสุวรรณ.png",
               panorama:
                 "https://storage.googleapis.com/noumi-3d-models/ท้าวเวสุวรรณ360.mov",
@@ -502,11 +502,11 @@ const InformationPage: React.FC<InformationProps> = ({ type, id }) => {
             },
             8: {
               id: 8,
-              name: "หลวงพ่อกลักฝิ่น พระพุทธเสฏฐมุนี (จำลอง)",
+              name: "หลวงพ่อกลักฝิ่น\nพระพุทธเสฏฐมุนี (จำลอง)",
               image: "/images/temple-list/พระพุทธเสฏฐมุนี.jpeg",
               location: "วัดสุทัศน์เทพวราราม",
               openHours: "08.00 - 20.00 น.",
-              type: "ความมงคล / ความสำเร็จ",
+              type: "ความรัก / คู่ครอง",
               map: "/images/map/Map08หลวงพ่อกลักฝิ่น.png",
               panorama:
                 "https://storage.googleapis.com/noumi-3d-models/หลวงพ่อกลักฝิ่น-พระพุทธเสฏฐมุนี(จำลอง)360.mov",
@@ -573,7 +573,7 @@ const InformationPage: React.FC<InformationProps> = ({ type, id }) => {
               image: "/images/temple-list/พระรูปสมเด็จพระสังฆราช.jpeg",
               location: "วัดสุทัศน์เทพวราราม",
               openHours: "08.00 - 20.00 น.",
-              type: "ความมงคล /\n ความสำเร็จ",
+              type: "การเรียน / การงาน",
               map: "/images/map/Map09พระรูปสมเด็จพระสังฆราช.png",
               panorama:
                 "https://storage.googleapis.com/noumi-3d-models/พระรูปสมเด็จพระสังฆราช(แพติสสเทโวป.ธ.5)360.mov",
