@@ -406,7 +406,7 @@ export default function BuddhaStatueInfo() {
         templeName: "วัดสุทัศน์เทพวราราม",
         image: "/images/temple-list/พระพุทธเสฏฐมุนี.jpeg",
         glbModel:
-          "https://storage.googleapis.com/noumi-3d-models/พระพุทธเสฏฐมุนี.glb",
+          "https://storage.googleapis.com/noumi-3d-models/พระพุทธเสฏฐมุนี2.glb",
         benefits: ["คู่รักคู่ครอง"],
         description: "พระพุทธรูปประจำวิหารด้านทิศใต้",
         category: "พระพุทธรังสีมุทราภัย",
@@ -480,7 +480,7 @@ export default function BuddhaStatueInfo() {
         name: "พระรูปสมเด็จพระสังฆราช",
         templeId: 1,
         templeName: "วัดสุทัศน์เทพวราราม",
-        image: "/images/temple-list/ท้าวเวสุวรรณ.jpg",
+        image: "/images/temple-list/พระรูปสมเด็จพระสังฆราช.jpeg",
         glbModel:
           "https://storage.googleapis.com/noumi-3d-models/พระรูปสมเด็จพระสังฆราช.glb",
         benefits: ["การเรียนการงาน"],
