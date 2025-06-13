@@ -368,7 +368,7 @@ export default function BuddhaStatueInfo() {
         templeName: "วัดสุทัศน์เทพวราราม",
         image: "/images/temple-list/พระสุนทรีวาณี.jpeg",
         glbModel:
-          "https://storage.googleapis.com/noumi-3d-models/พระสุนทรีวารี.glb", // ใช้ไฟล์ที่มี
+          "https://storage.googleapis.com/noumi-3d-models/พระสุนทรีวาณี.glb", // ใช้ไฟล์ที่มี
         benefits: ["การงานการเรียน"],
         description: "พระพุทธรูปประจำวิหารด้านทิศตะวันออก",
         category: "พระพุทธรักษาวนมี",
