@@ -45,6 +45,7 @@ const InformationPage: React.FC<InformationProps> = ({ type, id }) => {
     type: type === "temple" ? "ภาพรวม / ทั่วไป" : "ภาพรวม / ทั่วไป",
     description: "ข้อมูลกำลังโหลด...",
     panorama: "/api/placeholder/100/100",
+    map: "/api/placeholder/100/100",
     worshipGuide: {
       title: "ลำดับการไหว้",
       steps: ["กำลังโหลดข้อมูล..."],
