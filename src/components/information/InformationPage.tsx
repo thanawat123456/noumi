@@ -569,11 +569,11 @@ const InformationPage: React.FC<InformationProps> = ({ type, id }) => {
             },
             9: {
               id: 9,
-              name: "พระรูปสมเด็จพระสังฆราช (แพ ติสสเทโว ป.ธ.5)",
+              name: "พระรูปสมเด็จพระสังฆราช\n(แพ ติสสเทโว ป.ธ.5)",
               image: "/images/temple-list/พระรูปสมเด็จพระสังฆราช.jpeg",
               location: "วัดสุทัศน์เทพวราราม",
               openHours: "08.00 - 20.00 น.",
-              type: "ความมงคล / ความสำเร็จ",
+              type: "ความมงคล /\n ความสำเร็จ",
               map: "/images/map/Map09พระรูปสมเด็จพระสังฆราช.png",
               panorama:
                 "https://storage.googleapis.com/noumi-3d-models/พระรูปสมเด็จพระสังฆราช(แพติสสเทโวป.ธ.5)360.mov",
@@ -1172,7 +1172,12 @@ const InformationPage: React.FC<InformationProps> = ({ type, id }) => {
                 ))}
               </h2>
               <div className="text-md font-bold text-gray-900">
-                {information.type}
+                {information.type.split("\n").map((line, idx) => (
+                  <React.Fragment key={idx}>
+                    {line}
+                    <br />
+                  </React.Fragment>
+                ))}
               </div>
             </div>
           </div>
