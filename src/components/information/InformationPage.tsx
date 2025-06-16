@@ -46,6 +46,7 @@ const InformationPage: React.FC<InformationProps> = ({ type, id }) => {
     description: "ข้อมูลกำลังโหลด...",
     panorama: "/api/placeholder/100/100",
     map: "/api/placeholder/100/100",
+    ggMap: "/api/placeholder/100/100",
     worshipGuide: {
       title: "ลำดับการไหว้",
       steps: ["กำลังโหลดข้อมูล..."],
@@ -55,6 +56,8 @@ const InformationPage: React.FC<InformationProps> = ({ type, id }) => {
       items: [
         {
           title: "กำลังโหลด...",
+          title2: "กำลังโหลด...",
+          title3: "กำลังโหลด...",
           text: "กำลังโหลดข้อมูล...",
           text2: "กำลังโหลดข้อมูล...",
           transliteration: "กำลังโหลด...",
@@ -112,6 +115,7 @@ const InformationPage: React.FC<InformationProps> = ({ type, id }) => {
               openHours: "08.00 - 20.00 น.",
               type: "ภาพรวม / ทั่วไป",
               map: "/images/map/Map01พระพุทธศรีศากยมุนี.png",
+              ggMap: "https://maps.app.goo.gl/wPT84Kox4udg12Wq7",
               panorama:
                 "https://storage.googleapis.com/noumi-3d-models/พระศรีศากยมุนี360.mov",
               description:
@@ -168,6 +172,7 @@ const InformationPage: React.FC<InformationProps> = ({ type, id }) => {
               openHours: "08.00 - 20.00 น.",
               type: "การงาน / การเรียน",
               map: "/images/map/Map03พระสุนทรีวาณี.png",
+              ggMap: "https://maps.app.goo.gl/VK7x9QbLLuhjpDz99",
               panorama:
                 "https://storage.googleapis.com/noumi-3d-models/พระสุนทรีวาณี360.mov",
               description:
@@ -190,9 +195,12 @@ const InformationPage: React.FC<InformationProps> = ({ type, id }) => {
                   },
                   {
                     title:
-                      "นะโม ตัสสะ ภะคะวะโต อะระหะโต สัมมา สัมพุทธัสสะ( 3 จบ ) มุนินทะ วะทะนัมพุชะ คัพภะสัมภะวะ สุนทะรี ปาณีนัง สะระณัง วาณี มัยหัง ปิณะยะตัง",
-                    text: "ข้าพเจ้าขอน้อมบูชาพระบรมศาสดาสัมมาสัมพุทธเจ้า ด้วยเครื่องสักการะทั้งหลายเหล่านี้ ขอให้ข้าพเจ้าและครอบครัว จงประสบแต่ความสุข ความเจริญ ปราศจากโรคภัยไข้เจ็บทั้งปวง ขอให้มีสติปัญญาเฉียบแหลม และประสบความสำเร็จในการศึกษาและหน้าที่การงาน",
+                      "นะโม ตัสสะ ภะคะวะโต อะระหะโต สัมมา สัมพุทธัสสะ( 3 จบ )",
+                    title2: ".     .     .     .     .     .     .",
+                    title3:
+                      "มุนินทะ วะทะนัมพุชะ\nคัพภะสัมภะวะ สุนทะรี\nปาณีนัง สะระณัง วาณี\nมัยหัง ปิณะยะตัง",
                   },
+
                   {
                     text: "“คาถาพระสุนทรีวาณี” หากบริกรรมสม่ำเสมอจะเกิดปัญญา พระเถระผู้ใหญ่มักแนะนำให้นวกภิกษุผู้เริ่มศึกษาพระธรรม บริกรรมคาถานี้เป็นนิตย์ ก่อให้เกิดสมาธิจิตตั้งมั่น",
                   },
@@ -233,6 +241,7 @@ const InformationPage: React.FC<InformationProps> = ({ type, id }) => {
               openHours: "08.00 - 20.00 น.",
               type: "โชคลาภ / วาสนา",
               map: "/images/map/Map06พระพุทธรังสีมุทราภัย.png",
+              ggMap: "https://maps.app.goo.gl/ceekFFCgfYn2UpG66",
               panorama: "",
               description:
                 "พระพุทธรูปประจำวิหารด้านทิศใต้ เชื่อกันว่าหากมาขอพรด้านโชคลาภจะมีความสำเร็จ มีความศักดิ์สิทธิ์ เป็นที่เคารพนับถือของพุทธศาสนิกชน",
@@ -291,6 +300,7 @@ const InformationPage: React.FC<InformationProps> = ({ type, id }) => {
               openHours: "08.00 - 20.00 น.",
               type: "ภาพรวม / ทั่วไป",
               map: "/images/map/Map05ต้นพระศรีมหาโพธิ์.png",
+              ggMap: "https://maps.app.goo.gl/xX6XSJRAyoYPAw7o9",
               panorama:
                 "https://storage.googleapis.com/noumi-3d-models/ลานต้นโพธิ์360.mov",
               description:
@@ -340,6 +350,7 @@ const InformationPage: React.FC<InformationProps> = ({ type, id }) => {
               openHours: "08.00 - 20.00 น.",
               type: "โชคลาภ / วาสนา",
               map: "/images/map/Map07พระพุทธตรีโลกเชษฐ์.png",
+              ggMap: "https://maps.app.goo.gl/dWCFeZCDbreKfPci9",
               panorama:
                 "https://storage.googleapis.com/noumi-3d-models/พระพุทธตรีโลกเชษฐ์360.mov",
               description:
@@ -362,7 +373,10 @@ const InformationPage: React.FC<InformationProps> = ({ type, id }) => {
                   },
                   {
                     title:
-                      "นะโม ตัสสะ ภะคะวะโต อะระหะโต สัมมา สัมพุทธัสสะ( 3 จบ )",
+                      "นะโม ตัสสะ ภะคะวะโต อะระหะโต สัมมา สัมพุทธัสสะ ( 3 จบ )",
+                  },
+                  {
+                    text: "ติโลกะเชฎฐะพุทโธโย สัพพะโลเก อะนุตตะโร\nมะโหโปสะถะมัชณัฏโฐ สาธูนัง ปุญญะมากะโร\nตังปูชะนานุภาเวนะ มะหาโภคะมะหัทธะโน\nธีโร โหมิ มะหาปุญโญ โหตุ เม ชะยะมังคะลังฯ",
                   },
                 ],
               },
@@ -395,6 +409,7 @@ const InformationPage: React.FC<InformationProps> = ({ type, id }) => {
               openHours: "08.00 - 20.00 น.",
               type: "สุขภาพ / โรคภัย",
               map: "/images/map/Map04พระกริ่งใหญ่.png",
+              ggMap: "https://maps.app.goo.gl/PyEundg627tKzHry9",
               panorama:
                 "https://storage.googleapis.com/noumi-3d-models/พระกริ่งใหญ่360.mov",
               description:
@@ -417,8 +432,8 @@ const InformationPage: React.FC<InformationProps> = ({ type, id }) => {
                   },
                   {
                     title:
-                      "นะโม ตัสสะ ภะคะวะโต อะระหะโต สัมมา สัมพุทธัสสะ( 3 จบ )",
-                    text: "กิง กัมมัง กุสะลัง ยันตัง สัมพุทธะปฏิมยิทัง ปูชะนัง มะมะ อัชเชวัง กุสะลัง เอวะ สาธุกํ พุทโธ โย สัพพะปาณีนัง สะระณัง เขมะมุตตะมังติโลกะนาถะสัมพุทธัง วันทามิ ตัง สิเรนะหัง นัตถิ เม สะระณัง อัญญัง พุทโธ เม สะระณัง วะรัง อิมินา ปูชะเนเนวัง โหตุ เม ชะยะมังคะลัง ฯ",
+                      "นะโม ตัสสะ ภะคะวะโต อะระหะโต สัมมา สัมพุทธัสสะ ( 3 จบ )",
+                    text: "เภสัชชะคะรุกัจเฉรัง ยัง  กิงกิณิกะนามะกัง\nติสสะเทวะกะตัง จิตตัง  มะหานุภาวะฐานิยัง\nตังปูชะนานุภาเวนะ ยะใส วะโส สุกิตติ เม\nสิทธิ์ ลาโภ ชะโย นิจจัง  สัพพะโสตถี จะ สัพพะทา",
                   },
                 ],
               },
@@ -451,6 +466,7 @@ const InformationPage: React.FC<InformationProps> = ({ type, id }) => {
               openHours: "08.00 - 20.00 น.",
               type: "การเงิน / ธุรกิจ",
               map: "/images/map/Map02ท้าวเวสสุวรรณ.png",
+              ggMap: "https://maps.app.goo.gl/PyEundg627tKzHry9",
               panorama:
                 "https://storage.googleapis.com/noumi-3d-models/ท้าวเวสุวรรณ360.mov",
               description:
@@ -473,7 +489,10 @@ const InformationPage: React.FC<InformationProps> = ({ type, id }) => {
                   },
                   {
                     title: "ตั้งคาถาบูชาท้าวเวสสุวรรณ",
-                    text: "อิติปิโส ภะคะวา ยะมะราชาโน ท้าวเวสสุวรรณโณ มะระณัง สุขัง อะหัง สุคะโต นะโมพุทธายะ ท้าวเวสสุวรรณโณ จาตุมะหาราชิกา ยักขะพันตา ภัทภูริโต เวสสะ พุสะ พุทธัง อะระหัง พุทโธ ท้าวเวสสุวรรณโณ นะโม พุทธายะ (9 จบ) นะโม ตัสสะ ภะคะวะโต อะระหะโต สัมมา สัมพุทธัสสะ( 3 จบ )",
+                    text: "นะโม ตัสสะ ภะคะวะโต อะระหะโต สัมมา สัมพุทธัสสะ( 3 จบ )",
+                  },
+                  {
+                    text: "เวสสะวัณโณ มะเหสักโข ยักขะราชา มะหิทธิโก\nตั้งปูชะนาวะเสเนวะ โส มัง รักขะตุ สัพพะทา\nอันตะราโย จะ นัสสันตุ ปาปิคคะโห จุปัททะโว\nวัฑฒะตัง โข มะมัง ลาโก สะทา โสตถี ภะวันตุ เมฯ",
                   },
                 ],
               },
@@ -508,6 +527,7 @@ const InformationPage: React.FC<InformationProps> = ({ type, id }) => {
               openHours: "08.00 - 20.00 น.",
               type: "ความรัก / คู่ครอง",
               map: "/images/map/Map08หลวงพ่อกลักฝิ่น.png",
+              ggMap: "https://maps.app.goo.gl/SctV7JmUuCDtRuhy8",
               panorama:
                 "https://storage.googleapis.com/noumi-3d-models/หลวงพ่อกลักฝิ่น-พระพุทธเสฏฐมุนี(จำลอง)360.mov",
               description:
@@ -530,11 +550,14 @@ const InformationPage: React.FC<InformationProps> = ({ type, id }) => {
                   },
                   {
                     title: "คาถาบูชาพระพุทธเสรฏฐมุนี (หลวงพ่อกลักฝิ่น)",
-                    text: "อิมินา สักกาเรนะ พระพุทธเสรฏฐมุนี ปูเชมิ ทุติยัมปี อิมินา สักกาเรนะ พระพุทธเสรฏฐมุนี (หลวงพ่อกลักฝิ่น) ปูเชมิ ตติยัมปี อิมินา สักกาเรนะ พระพุทธเสรฏฐมุนี ปูเชมิ นะโมพุทธายะ ตะโม โชติปรายะโน ชะโย นิจจัง (ภาวนาเถิดกลับร้ายกลายเป็นดี ทุกประการแลฯ ) พุทธัง อาราธะนัง กะโรมิ ธัมมัง อาราธะนัง กะโรมิ สังฆัง อาราธะนัง กะโรมิ",
+                    text: "อิมินา สักกาเรนะ พุทธะเสฏฐะมุนิง อะภิปูชะยามิ\nทุติยัมปิ อิมินา สักกาเรนะ พุทธะเสฏฐะมุนิง อะภิปูชะยามิ\nตะติยัมปี อิมินา สักกาเรนะ พุทธะเสฏฐะมุนิง อะภิปูชะยามิ",
                   },
                   {
                     title: "บทสวดขอขมากรรม หลวงพ่อกลักฝิ่น",
-                    text: "“นะโม ตัสสะ ภะคะวะโต อะระหะโต สัมมาสัมพุทธัสสะ” (3 จบ) “อิมัง มิฉา อธิฐานัง ปันจะทะธาราปิ ทุติยัมปิ อิมัง มิฉา อธิฐานัง ปันจะทะธาราปิ ตะติยัมปิ อิมัง มิฉา อธิฐานัง ปันจะทะธาราปิ”",
+                    text: "“นะโม ตัสสะ ภะคะวะโต อะระหะโต สัมมาสัมพุทธัสสะ” (3 จบ)",
+                  },
+                  {
+                    text: "พุทธัง สะระณัง คัจฉามิ, ธัมมัง สะระณัง คัจฉามิ, สังฆัง สะระณัง คัจฉามิ\nทุติยัมปิ พุทธัง สะระณัง คัจฉามิ, ทุติยัมปิ ธัมมัง สะระณัง คัจฉามิ, ทุติยัมปิ สังฆัง สะระณัง คัจฉามิ\nตะติยัมปิ พุทธัง สะระณัง คัจฉามิ, ตะติยัมปิ ธัมมัง สะระณัง คัจฉามิ, ตะติยัมปิ สังฆัง สะระณัง คัจฉามิ\nโย โทโส โมหะจิตเตนะ พุทธัสมิง ปาปะกะโต มะยา ขะมะละ เม กะตัง โทสัง สัพพะปาปัง วินัสสะตุ\nโย โทโส โมหะจิตเตนะ ธัมมัสมิง ปาปะกะโต มะยา ขะมะถะ เม กะตัง โทสัง สัพพะปาปัง วินัสสะตุ\nโย โทโส โมทะจิตเตนะ สังฆัสมิง ปาปะกะโต มะยา ขะมะถา เม กะตัง โทสัง สัพพะปาปัง วินัสสะตุ",
                   },
                   {
                     text: "หลังกล่าวจบ ให้ตั้งจิตให้สงบแน่วแน่ และกล่าวคาถาบูชาต่อ “นะถอน โมถอน พุทถอน ธาถอน ยะถอน นะคลอน โมคลอน พุทคลอน ธาคลอน ยะคลอน ถอนด้วย นะโมพุทธายะ นะมามิยัง”",
@@ -575,6 +598,7 @@ const InformationPage: React.FC<InformationProps> = ({ type, id }) => {
               openHours: "08.00 - 20.00 น.",
               type: "การเรียน / การงาน",
               map: "/images/map/Map09พระรูปสมเด็จพระสังฆราช.png",
+              ggMap: "https://maps.app.goo.gl/h8Va3U4nKdC1g2H47",
               panorama:
                 "https://storage.googleapis.com/noumi-3d-models/พระรูปสมเด็จพระสังฆราช(แพติสสเทโวป.ธ.5)360.mov",
               description:
@@ -720,6 +744,7 @@ const InformationPage: React.FC<InformationProps> = ({ type, id }) => {
 
   const [showPanorama, setShowPanorama] = useState(false);
   const [showMapPopup, setShowMapPopup] = useState(false);
+  const [showGGMap, setshowGGMap] = useState(false);
 
   const handleFavoriteClick = () => {
     toggleFavorite(information.id);
@@ -905,12 +930,23 @@ const InformationPage: React.FC<InformationProps> = ({ type, id }) => {
                     <h4 className="text-lg font-bold mb-2 leading-tight">
                       {chant.title}
                     </h4>
+                    <h4 className="text-lg font-bold mb-2 leading-tight">
+                      {chant.title2}
+                    </h4>
+                    <h4 className="text-lg font-bold mb-2 leading-tight">
+                      {chant.title3}
+                    </h4>
 
                     {/* Main chant text */}
                     {chant.text && (
                       <div className="mb-4">
                         <p className="text-sm leading-relaxed whitespace-pre-line font-medium">
-                          {chant.text}
+                          {chant.text.split("\n").map((line, idx) => (
+                            <React.Fragment key={idx}>
+                              {line}
+                              <br />
+                            </React.Fragment>
+                          ))}
                         </p>
                         <p className="text-sm leading-relaxed whitespace-pre-line font-medium pt-4">
                           {chant.text2}
@@ -1157,9 +1193,14 @@ const InformationPage: React.FC<InformationProps> = ({ type, id }) => {
                   View Map
                 </button>
                 <span className="text-[#aba6a6]">|</span>
-                <button className="bg-none py-1 pb-8 rounded-full font-semibold text-[12px] text-[#aba6a6] hover:text-orange-600 transition ml-2">
+                <a
+                  className="bg-none py-1 pb-8 rounded-full font-semibold text-[12px] text-[#aba6a6] hover:text-orange-600 transition ml-2"
+                  href={information.ggMap}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
                   Google Map
-                </button>
+                </a>
               </div>
             )}
             <div className="flex justify-between items-center mb-2">
@@ -1218,6 +1259,19 @@ const InformationPage: React.FC<InformationProps> = ({ type, id }) => {
                   alt="Map"
                   className="max-w-full max-h-[80vh] rounded pt-4"
                 />
+              </div>
+            </div>
+          )}
+
+          {showGGMap && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30 backdrop-blur-sm">
+              <div className="bg-white p-4 rounded-lg max-w-[90%] max-h-[90%] relative shadow-xl">
+                <a
+                  href={information.ggMap}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
+                ></a>
               </div>
             </div>
           )}
