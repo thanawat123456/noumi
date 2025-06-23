@@ -1,9 +1,9 @@
-// pages/admin/dashboard.tsx
+// pages/admin/dashboard.tsx - Updated to show login count statistics
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { useAuth } from '@/contexts/AuthContext';
 import Head from 'next/head';
-import { Users, Eye, Calendar, LogOut, Search, Filter, RefreshCw } from 'lucide-react';
+import { Users, Eye, Calendar, LogOut, Search, Filter, RefreshCw, LogIn } from 'lucide-react';
 import axios from 'axios';
 
 interface UserData {
@@ -20,9 +20,10 @@ interface UserData {
 
 interface DashboardStats {
   totalUsers: number;
-  todayVisits: number;
-  weeklyVisits: number;
-  monthlyVisits: number;
+  totalLogins: number;        // *** เปลี่ยนจากการเข้าชม เป็นจำนวน login ทั้งหมด ***
+  todayLogins: number;        // *** จำนวน login วันนี้ ***
+  weeklyLogins: number;       // *** จำนวน login สัปดาห์นี้ ***
+  monthlyLogins: number;      // *** จำนวน login เดือนนี้ ***
 }
 
 export default function AdminDashboard() {
@@ -32,9 +33,10 @@ export default function AdminDashboard() {
   const [users, setUsers] = useState<UserData[]>([]);
   const [stats, setStats] = useState<DashboardStats>({
     totalUsers: 0,
-    todayVisits: 0,
-    weeklyVisits: 0,
-    monthlyVisits: 0,
+    totalLogins: 0,
+    todayLogins: 0,
+    weeklyLogins: 0,
+    monthlyLogins: 0,
   });
   const [searchTerm, setSearchTerm] = useState('');
   const [filterBy, setFilterBy] = useState<'all' | 'today' | 'week' | 'month'>('all');
@@ -87,51 +89,68 @@ export default function AdminDashboard() {
         return;
       }
       
-      // Fetch all users - ส่ง user email ไปด้วยเพื่อตรวจสอบสิทธิ์
-      const usersResponse = await axios.get('/api/admin/users', {  // เปลี่ยนเป็น users-simple
-        headers: {
-          'user-email': user.email
-        }
-      });
+      // *** เรียก API สถิติการ login ***
+      const [usersResponse, loginStatsResponse] = await Promise.all([
+        // ดึงข้อมูลผู้ใช้
+        axios.get('/api/admin/users', {
+          headers: {
+            'user-email': user.email
+          }
+        }),
+        // ดึงสถิติการ login
+        axios.get('/api/admin/login-stats', {
+          headers: {
+            'user-email': user.email
+          }
+        })
+      ]);
+
       if (usersResponse.data.success) {
         setUsers(usersResponse.data.users);
-        
-        // ใช้สถิติจาก API ถ้ามี
-        if (usersResponse.data.stats) {
+
+        // *** ใช้สถิติการ login จาก API ***
+        if (loginStatsResponse.data.success) {
           setStats({
             totalUsers: usersResponse.data.users.length,
-            todayVisits: usersResponse.data.stats.todayVisits,
-            weeklyVisits: usersResponse.data.stats.weeklyVisits,
-            monthlyVisits: usersResponse.data.stats.monthlyVisits
+            totalLogins: loginStatsResponse.data.stats.totalLogins || 0,
+            todayLogins: loginStatsResponse.data.stats.todayLogins || 0,
+            weeklyLogins: loginStatsResponse.data.stats.weeklyLogins || 0,
+            monthlyLogins: loginStatsResponse.data.stats.monthlyLogins || 0,
           });
         } else {
-          // คำนวณสถิติแบบเดิมถ้าไม่มี stats จาก API
+          // *** Fallback: คำนวณจาก login_count ของ users ***
           const totalUsers = usersResponse.data.users.length;
+          const totalLogins = usersResponse.data.users.reduce((sum: number, user: UserData) => 
+            sum + (user.login_count || 0), 0
+          );
           
-          // คำนวณสถิติต่างๆ
+          // คำนวณการ login ในช่วงเวลาต่างๆ (ใช้ last_login เป็นตัวประมาณ)
           const now = new Date();
-          const todayStart = new Date(now.setHours(0, 0, 0, 0));
-          const weekStart = new Date(now.setDate(now.getDate() - 7));
-          const monthStart = new Date(now.setMonth(now.getMonth() - 1));
+          const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+          const weekStart = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+          const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
           
-          // นับการเข้าใช้งาน
-          const todayVisits = usersResponse.data.users.filter((user: UserData) => 
+          // ประมาณการ login (ใช้ users ที่ login ในช่วงเวลานั้นคูณด้วย login_count เฉลี่ย)
+          const avgLoginCount = totalLogins / (totalUsers || 1);
+          
+          const todayLoginUsers = usersResponse.data.users.filter((user: UserData) => 
             user.last_login && new Date(user.last_login) >= todayStart
           ).length;
           
-          const weeklyVisits = usersResponse.data.users.filter((user: UserData) => 
+          const weeklyLoginUsers = usersResponse.data.users.filter((user: UserData) => 
             user.last_login && new Date(user.last_login) >= weekStart
           ).length;
           
-          const monthlyVisits = usersResponse.data.users.filter((user: UserData) => 
+          const monthlyLoginUsers = usersResponse.data.users.filter((user: UserData) => 
             user.last_login && new Date(user.last_login) >= monthStart
           ).length;
           
           setStats({
             totalUsers,
-            todayVisits,
-            weeklyVisits,
-            monthlyVisits
+            totalLogins,
+            todayLogins: Math.round(todayLoginUsers * avgLoginCount),
+            weeklyLogins: Math.round(weeklyLoginUsers * avgLoginCount),
+            monthlyLogins: Math.round(monthlyLoginUsers * avgLoginCount),
           });
         }
       }
@@ -144,7 +163,6 @@ export default function AdminDashboard() {
   };
 
   const handleLogout = async () => {
-
     router.push('/dashboard');
   };
 
@@ -249,7 +267,7 @@ export default function AdminDashboard() {
           </div>
         </header>
 
-        {/* Stats Cards */}
+        {/* Stats Cards - Updated to show login statistics */}
         <div className="px-4 py-6">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
             <div className="bg-white p-6 rounded-xl shadow-sm">
@@ -263,11 +281,11 @@ export default function AdminDashboard() {
 
             <div className="bg-white p-6 rounded-xl shadow-sm">
               <div className="flex items-center justify-between mb-2">
-                <Eye className="w-8 h-8 text-green-500" />
+                <LogIn className="w-8 h-8 text-green-500" />
                 <span className="text-sm text-gray-500">วันนี้</span>
               </div>
-              <p className="text-2xl font-bold text-gray-800">{stats.todayVisits}</p>
-              <p className="text-sm text-gray-600">การเข้าชม</p>
+              <p className="text-2xl font-bold text-gray-800">{stats.todayLogins}</p>
+              <p className="text-sm text-gray-600">เข้าชม</p>
             </div>
 
             <div className="bg-white p-6 rounded-xl shadow-sm">
@@ -275,17 +293,17 @@ export default function AdminDashboard() {
                 <Calendar className="w-8 h-8 text-purple-500" />
                 <span className="text-sm text-gray-500">สัปดาห์นี้</span>
               </div>
-              <p className="text-2xl font-bold text-gray-800">{stats.weeklyVisits}</p>
-              <p className="text-sm text-gray-600">การเข้าชม</p>
+              <p className="text-2xl font-bold text-gray-800">{stats.weeklyLogins}</p>
+              <p className="text-sm text-gray-600">เข้าชม</p>
             </div>
 
             <div className="bg-white p-6 rounded-xl shadow-sm">
               <div className="flex items-center justify-between mb-2">
-                <Calendar className="w-8 h-8 text-orange-500" />
-                <span className="text-sm text-gray-500">เดือนนี้</span>
+                <Eye className="w-8 h-8 text-orange-500" />
+                <span className="text-sm text-gray-500">รวมทั้งหมด</span>
               </div>
-              <p className="text-2xl font-bold text-gray-800">{stats.monthlyVisits}</p>
-              <p className="text-sm text-gray-600">การเข้าชม</p>
+              <p className="text-2xl font-bold text-gray-800">{stats.totalLogins}</p>
+              <p className="text-sm text-gray-600">เข้าชม</p>
             </div>
           </div>
 
@@ -305,7 +323,6 @@ export default function AdminDashboard() {
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="w-full pl-10 pr-4 py-2 border border-gray-400 text-gray-500 placeholder-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-600"
                     />
-
                 </div>
                 <div className="flex items-center space-x-2">
                   <Filter className="w-5 h-5 text-gray-600" />
@@ -323,7 +340,7 @@ export default function AdminDashboard() {
               </div>
             </div>
 
-            {/* User Table */}
+            {/* User Table - Added Login Count Column */}
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead className="bg-gray-50">
@@ -338,10 +355,10 @@ export default function AdminDashboard() {
                       อีเมล
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      เบอร์โทร
+                      จำนวนเข้าชม
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      วันเกิด
+                      เข้าสู่ระบบล่าสุด
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       วันที่สมัคร
@@ -376,10 +393,15 @@ export default function AdminDashboard() {
                           {user.email}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                          {user.phone || '-'}
+                          <div className="flex items-center">
+                            <LogIn className="w-4 h-4 text-green-500 mr-2" />
+                            <span className="font-semibold text-green-600">
+                              {user.login_count || 0} ครั้ง
+                            </span>
+                          </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                          {formatDate(user.birth_date)}
+                          {formatDate(user.last_login)}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
                           {formatDate(user.created_at)}
@@ -400,7 +422,8 @@ export default function AdminDashboard() {
             {/* Pagination */}
             <div className="px-6 py-4 border-t flex justify-between items-center">
               <p className="text-sm text-gray-600">
-                แสดง {indexOfFirstUser + 1} - {Math.min(indexOfLastUser, filteredUsers.length)} 
+                {indexOfFirstUser + 1} - {Math.min(indexOfLastUser, filteredUsers.length )}  
+                  จาก {filteredUsers.length} ผู้ใช้งาน
               </p>
               <div className="flex space-x-2">
                 <button 

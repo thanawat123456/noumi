@@ -1,28 +1,6 @@
-// pages/api/users/[id].ts - แก้ไขการตรวจสอบ session
-
 import { NextApiRequest, NextApiResponse } from 'next';
-import { getServerSession } from 'next-auth';
+import { getSession } from 'next-auth/react';
 import dbService from '@/lib/db';
-
-// *** สร้าง NextAuth config object แยก ***
-const authOptions = {
-  session: { strategy: 'jwt' as const },
-  secret: process.env.NEXTAUTH_SECRET,
-  callbacks: {
-    async jwt({ token, user }: { token: any, user?: any }) {
-      if (user) {
-        token.id = user.id;
-      }
-      return token;
-    },
-    async session({ session, token }: { session: any, token: any }) {
-      if (token?.id) {
-        session.user.id = token.id;
-      }
-      return session;
-    }
-  }
-};
 
 /**
  * แปลง camelCase เป็น snake_case สำหรับฐานข้อมูล
@@ -54,30 +32,20 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // Initialize database
     await dbService.init();
     
-    // *** ใช้ authOptions ที่สร้างไว้ ***
-    const session = await getServerSession(req, res, authOptions);
-
-    console.log('API Session user ID:', session?.user?.id); // Debug log
-
-    if (!session?.user?.id) {
+    // ตรวจสอบ session
+    const session = await getSession({ req });
+    if (!session) {
       return res.status(401).json({ 
         success: false, 
-        error: 'Unauthorized - Please login' 
+        error: 'Unauthorized' 
       });
     }
 
     const { id } = req.query;
     const userId = parseInt(id as string);
 
-    if (isNaN(userId)) {
-      return res.status(400).json({
-        success: false,
-        error: 'Invalid user ID'
-      });
-    }
-
     // ตรวจสอบว่า user สามารถเข้าถึงข้อมูลตัวเองได้เท่านั้น
-    const sessionUserId = parseInt(session.user.id);
+    const sessionUserId = parseInt(session.user?.id || '0');
     if (userId !== sessionUserId) {
       return res.status(403).json({ 
         success: false, 
@@ -86,9 +54,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     if (req.method === 'GET') {
+      // ดึงข้อมูลผู้ใช้
       try {
-        console.log('Fetching user data for ID:', userId);
-        
         const dbUser = await dbService.getUserById(userId);
         if (!dbUser) {
           return res.status(404).json({
@@ -98,8 +65,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         }
 
         const user = dbUserToFrontend(dbUser);
-        console.log('User data found:', user.email);
-        
         return res.status(200).json({
           success: true,
           user: user
@@ -114,10 +79,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     } 
     
     else if (req.method === 'PUT' || req.method === 'PATCH') {
+      // อัปเดตข้อมูลผู้ใช้
       try {
         const updateData = req.body;
-        console.log('Update request body:', updateData);
         
+        // ตรวจสอบว่ามีข้อมูลที่จะอัปเดต
         if (!updateData || Object.keys(updateData).length === 0) {
           return res.status(400).json({
             success: false,
@@ -125,25 +91,24 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           });
         }
 
+        // แปลง object เป็น arrays สำหรับ dbService.updateUser
         const updateFields: string[] = [];
         const updateValues: any[] = [];
 
         Object.entries(updateData).forEach(([key, value]) => {
-          if (value !== undefined && value !== null && value !== '') {
+          if (value !== undefined && value !== null) {
             const dbFieldName = camelToSnake(key);
-            updateFields.push(`${dbFieldName} = ?`);
+            updateFields.push(dbFieldName);
             updateValues.push(value);
           }
         });
 
-        console.log('Update fields:', updateFields);
-        console.log('Update values:', updateValues);
-
+        // อัปเดตข้อมูลในฐานข้อมูล
         if (updateFields.length > 0) {
           await dbService.updateUser(userId, updateFields, updateValues);
-          console.log('Database update completed');
         }
         
+        // ดึงข้อมูลล่าสุดหลังจากอัปเดต
         const updatedDbUser = await dbService.getUserById(userId);
         if (!updatedDbUser) {
           return res.status(404).json({
@@ -153,7 +118,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         }
 
         const updatedUser = dbUserToFrontend(updatedDbUser);
-        console.log('Updated user data:', updatedUser.email);
         
         return res.status(200).json({
           success: true,
@@ -170,6 +134,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
     
     else {
+      // Method not allowed
       res.setHeader('Allow', ['GET', 'PUT', 'PATCH']);
       return res.status(405).json({
         success: false,

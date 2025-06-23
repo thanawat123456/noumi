@@ -86,113 +86,106 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // ใช้ session จาก NextAuth
   const { data: session, status, update: updateSession } = useSession();
 
-  // *** เพิ่มฟังก์ชันสำหรับรีเฟรชข้อมูลผู้ใช้จาก database ***
-  const refreshUserData = async (): Promise<void> => {
-    try {
-      if (session?.user?.id) {
-        const response = await axios.get(`/api/users/${session.user.id}`);
-        if (response.data.success && response.data.user) {
-          const freshUser = response.data.user;
-          setUser(freshUser);
-          localStorage.setItem('user', JSON.stringify(freshUser));
+  // // *** เพิ่มฟังก์ชันสำหรับรีเฟรชข้อมูลผู้ใช้จาก database ***
+  // const refreshUserData = async (): Promise<void> => {
+  //   try {
+  //     if (session?.user?.id) {
+  //       const response = await axios.get(`/api/users/${session.user.id}`);
+  //       if (response.data.success && response.data.user) {
+  //         const freshUser = response.data.user;
+  //         setUser(freshUser);
+  //         localStorage.setItem('user', JSON.stringify(freshUser));
           
-          // *** อัปเดต session ด้วยข้อมูลใหม่ ***
-          await updateSession({
-            ...session,
-            user: {
-              ...session.user,
-              name: freshUser.fullName,
-              image: freshUser.avatar
-            }
-          });
+  //         // *** อัปเดต session ด้วยข้อมูลใหม่ ***
+  //         await updateSession({
+  //           ...session,
+  //           user: {
+  //             ...session.user,
+  //             name: freshUser.fullName,
+  //             image: freshUser.avatar
+  //           }
+  //         });
+  //       }
+  //     }
+  //   } catch (error) {
+  //     console.error('Failed to refresh user data:', error);
+  //   }
+  // };
+
+  // AuthContext.tsx - แก้ไขส่วน useEffect
+
+// AuthContext.tsx - แก้ไขส่วน useEffect
+
+useEffect(() => {
+  const init = async () => {
+    try {
+      // *** ตรวจสอบ session validity ก่อน ***
+      if (status === 'authenticated' && session && session.user?.id) {
+        console.log("Session authenticated, checking validity for user ID:", session.user.id);
+        
+        // *** ตรวจสอบว่า session ยังใช้ได้หรือไม่โดยเรียก API ***
+        try {
+          const response = await axios.get(`/api/users/${session.user.id}`);
+          if (response.data.success && response.data.user) {
+            const freshUser = response.data.user;
+            setUser(freshUser);
+            localStorage.setItem('user', JSON.stringify(freshUser));
+            setIsAuthenticated(true);
+            console.log("User data loaded from API:", freshUser.email);
+          } else {
+            console.warn("User not found in database, session invalid");
+            throw new Error('User not found');
+          }
+        } catch (apiError: any) {
+          console.error('Session validation failed:', apiError);
+          
+          // *** บังคับ logout เมื่อ session ไม่ valid ***
+          console.log("Forcing logout due to invalid session");
+          await signOut({ redirect: false });
+          localStorage.removeItem('user');
+          setUser(null);
+          setIsAuthenticated(false);
+          
+          // *** redirect ไปหน้า login ***
+          if (typeof window !== 'undefined') {
+            window.location.href = '/login';
+          }
+          return;
         }
+      } 
+      // ถ้าไม่มี session
+      else if (status === 'unauthenticated') {
+        console.log("No valid session found");
+        const savedUser = localStorage.getItem('user');
+        if (savedUser) {
+          console.log("Clearing expired localStorage data");
+          localStorage.removeItem('user');
+        }
+        setUser(null);
+        setIsAuthenticated(false);
       }
+      // ถ้า session status ยัง loading
+      else if (status === 'loading') {
+        console.log("Session is loading...");
+        return;
+      }
+      
     } catch (error) {
-      console.error('Failed to refresh user data:', error);
+      console.error('Failed to initialize auth:', error);
+      // *** ล้างข้อมูลและ logout เมื่อเกิด error ***
+      localStorage.removeItem('user');
+      setUser(null);
+      setIsAuthenticated(false);
+      await signOut({ redirect: false });
+    } finally {
+      if (status !== 'loading') {
+        setIsLoading(false);
+      }
     }
   };
 
-  useEffect(() => {
-    const init = async () => {
-      try {
-        // ถ้ามี session จาก NextAuth ให้ใช้ข้อมูลจาก session
-        if (status === 'authenticated' && session && session.user) {
-          console.log("Using session data:", session.user);
-          
-          // รับค่า user จาก session.user (เราต้อง cast เป็น CustomUser)
-          const sessionUser = session.user as CustomUser;
-          
-          // ถ้ามี id ใน sessionUser
-          if (sessionUser.id) {
-            // *** โหลดข้อมูลล่าสุดจาก database เสมอ ***
-            try {
-              const response = await axios.get(`/api/users/${sessionUser.id}`);
-              if (response.data.success && response.data.user) {
-                const freshUser = response.data.user;
-                setUser(freshUser);
-                localStorage.setItem('user', JSON.stringify(freshUser));
-                setIsAuthenticated(true);
-              } else {
-                // fallback ใช้ข้อมูลจาก session
-                const userFromSession: User = {
-                  id: typeof sessionUser.id === 'string' ? parseInt(sessionUser.id) : sessionUser.id as number,
-                  email: sessionUser.email || '',
-                  fullName: sessionUser.name || '',
-                  avatar: sessionUser.image || null,
-                };
-                setUser(userFromSession);
-                localStorage.setItem('user', JSON.stringify(userFromSession));
-                setIsAuthenticated(true);
-              }
-            } catch (apiError) {
-              console.warn('Failed to fetch fresh user data, using session data:', apiError);
-              // fallback ใช้ข้อมูลจาก session
-              const userFromSession: User = {
-                id: typeof sessionUser.id === 'string' ? parseInt(sessionUser.id) : sessionUser.id as number,
-                email: sessionUser.email || '',
-                fullName: sessionUser.name || '',
-                avatar: sessionUser.image || null,
-              };
-              setUser(userFromSession);
-              localStorage.setItem('user', JSON.stringify(userFromSession));
-              setIsAuthenticated(true);
-            }
-          } else {
-            // กรณีไม่มี id ใน session.user เราต้องขอข้อมูลเพิ่มเติมจาก API
-            try {
-              const response = await axios.get('/api/auth/session-user', {
-                params: { email: sessionUser.email }
-              });
-              
-              if (response.data.success && response.data.user) {
-                setUser(response.data.user);
-                localStorage.setItem('user', JSON.stringify(response.data.user));
-                setIsAuthenticated(true);
-              }
-            } catch (error) {
-              console.error("Failed to get user data from API:", error);
-            }
-          }
-        } 
-        // ถ้าไม่มี session แต่มีข้อมูลใน localStorage ให้ใช้ข้อมูลจาก localStorage
-        else if (status === 'unauthenticated' && typeof window !== 'undefined') {
-          const savedUser = localStorage.getItem('user');
-          if (savedUser) {
-            setUser(JSON.parse(savedUser));
-            setIsAuthenticated(true);
-          }
-        }
-      } catch (error) {
-        console.error('Failed to initialize auth:', error);
-      } finally {
-        if (status !== 'loading') {
-          setIsLoading(false);
-        }
-      }
-    };
-
-    init();
-  }, [session, status]);
+  init();
+}, [session, status]);
 
   // ฟังก์ชันสำหรับแปลง error ให้เป็นมิตรกับผู้ใช้
   const handleApiError = (error: any): AuthError => {
@@ -267,57 +260,60 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // ล็อกอินด้วย email/password
   const login = async (email: string, password: string) => {
-    try {
-      // เริ่มจากการใช้ API แบบเดิมก่อน
-      const response = await axios.post('/api/auth/login', {
-        email,
-        password
-      });
-  
-      if (response.data.success && response.data.user) {
-        setUser(response.data.user);
-        localStorage.setItem('user', JSON.stringify(response.data.user));
-        setIsAuthenticated(true);
-        return;
-      }
+  try {
+    console.log('🚀 Starting login for:', email);
+    
+    // ใช้ NextAuth เป็นหลัก เพราะมัน handle session ให้
+    const result = await signIn('credentials', {
+      email,
+      password,
+      redirect: false // สำคัญ! ไม่ให้ redirect อัตโนมัติ
+    });
+    
+    console.log('NextAuth signIn result:', result);
+    
+    if (result?.ok && !result?.error) {
+      console.log('✅ NextAuth login successful');
       
-      throw new AuthError('Login failed', 401, 'การเข้าสู่ระบบไม่สำเร็จ');
-    } catch (error: any) {
-      // จัดการ error ด้วย axios แล้วลอง NextAuth
-      if (error.response?.status === 401 || error.response?.status === 404) {
-        try {
-          const result = await signIn('credentials', {
-            email,
-            password,
-            redirect: false
-          });
-          
-          // ตรวจสอบผลลัพธ์จาก NextAuth
-          if (result?.ok) {
-            // NextAuth สำเร็จ - ควรเรียก API เพื่อรับข้อมูลผู้ใช้เพิ่มเติม
-            try {
-              const userResponse = await axios.get('/api/auth/session-user');
-              if (userResponse.data.success && userResponse.data.user) {
-                setUser(userResponse.data.user);
-                localStorage.setItem('user', JSON.stringify(userResponse.data.user));
-                setIsAuthenticated(true);
-                return;
-              }
-            } catch (userError) {
-              console.warn('Error fetching user data after NextAuth login');
-            }
-          } else if (result?.error) {
-            throw new AuthError(result.error, 401, 'การเข้าสู่ระบบไม่สำเร็จ');
-          }
-        } catch (nextAuthError) {
-          // ถ้า NextAuth ก็ไม่ได้ ให้ throw original error
-        }
-      }
+      // รอให้ session update และ middleware ไม่ block
+      await new Promise(resolve => setTimeout(resolve, 2000));
       
-      // แปลง error ให้เป็นมิตรกับผู้ใช้
-      throw handleApiError(error);
+      return; // สำเร็จแล้ว - ไม่ต้องจัดการ state ที่นี่
     }
-  };
+    
+    // ถ้า NextAuth ไม่สำเร็จ แสดง error
+    if (result?.error) {
+      console.log('❌ NextAuth error:', result.error);
+      if (result.error === 'CredentialsSignin') {
+        throw new AuthError('Invalid credentials', 401, 'อีเมลหรือรหัสผ่านไม่ถูกต้อง');
+      } else {
+        throw new AuthError(result.error, 401, 'การเข้าสู่ระบบไม่สำเร็จ');
+      }
+    }
+    
+    // fallback error
+    throw new AuthError('Login failed', 401, 'อีเมลหรือรหัสผ่านไม่ถูกต้อง');
+    
+  } catch (error: any) {
+    console.error('❌ Login failed:', error);
+    
+    // ล้างข้อมูล
+    setUser(null);
+    setIsAuthenticated(false);
+    localStorage.removeItem('user');
+    
+    // Re-throw error สำหรับ UI
+    if (error instanceof AuthError) {
+      throw error;
+    } else {
+      throw new AuthError(
+        error.message || 'Login failed',
+        500,
+        'เกิดข้อผิดพลาดในการเข้าสู่ระบบ'
+      );
+    }
+  }
+};
   
   // ล็อกอินด้วย Google
   const loginWithGoogle = async () => {
@@ -393,98 +389,148 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  // *** ปรับปรุง updateUser method ให้มี fallback และ error handling ที่ดีกว่า ***
-  const updateUser = async (userData: User): Promise<void> => {
-    try {
-      // อัปเดตใน local state และ localStorage ก่อน (เพื่อ UX ที่ดี)
-      setUser(userData);
-      localStorage.setItem('user', JSON.stringify(userData));
+// AuthContext.tsx - แก้ไขส่วน updateUser และ refreshUserData
+
+const updateUser = async (userData: User): Promise<void> => {
+  try {
+    console.log('AuthContext: Starting updateUser with:', userData);
+    
+    if (!userData.id) {
+      throw new Error('User ID is required for update');
+    }
+
+    // *** ใช้ API ที่มีอยู่แล้ว: /api/users/[id] ***
+    const response = await axios.put(`/api/users/${userData.id}`, {
+      email: userData.email,
+      phone: userData.phone,
+      fullName: userData.fullName,
+      birthDate: userData.birthDate,
+      dayOfBirth: userData.dayOfBirth,
+      elementType: userData.elementType,
+      zodiacSign: userData.zodiacSign,
+      bloodGroup: userData.bloodGroup,
+      avatar: userData.avatar
+    });
+
+    console.log('API Response:', response.data);
+
+    if (response.data.success && response.data.user) {
+      const updatedUser = response.data.user;
       
-      // พยายามอัปเดตข้อมูลในฐานข้อมูลผ่าน API
-      if (userData.id) {
-        try {
-          const response = await axios.put(`/api/users/${userData.id}`, userData);
-          if (response.data.success && response.data.user) {
-            const updatedUser = response.data.user;
-            
-            // อัปเดตด้วยข้อมูลจาก API response (อาจจะมีการแปลงหรือปรับปรุงจาก server)
-            setUser(updatedUser);
-            localStorage.setItem('user', JSON.stringify(updatedUser));
-            
-            // อัปเดต NextAuth session
-            if (session?.user) {
-              await updateSession({
-                ...session,
-                user: {
-                  ...session.user,
-                  name: updatedUser.fullName,
-                  image: updatedUser.avatar
-                }
-              });
-            }
-            return;
-          }
-        } catch (apiError: any) {
-          console.warn('Failed to update user via API, using local update only:', apiError.message);
-          
-          // ถ้า API ล้มเหลว แต่ยังมี session ให้ลองอัปเดต session
-          if (session?.user) {
-            try {
-              await updateSession({
-                ...session,
-                user: {
-                  ...session.user,
-                  name: userData.fullName,
-                  image: userData.avatar
-                }
-              });
-            } catch (sessionError) {
-              console.warn('Failed to update session after API failure:', sessionError);
-            }
-          }
-          
-          // ถ้า API endpoint ยังไม่พร้อม ให้ใช้ local state ไปก่อน
-          // (ในอนาคตเมื่อ API พร้อมแล้ว ข้อมูลจะถูก sync)
-          return;
-        }
-      }
+      // อัปเดต local state
+      setUser(updatedUser);
+      localStorage.setItem('user', JSON.stringify(updatedUser));
       
-      // fallback: อัปเดต NextAuth session ถ้าไม่มี user.id หรือ API ไม่พร้อม
+      console.log('Local state updated with:', updatedUser);
+      
+      // อัปเดต NextAuth session
       if (session?.user) {
         try {
           await updateSession({
             ...session,
             user: {
               ...session.user,
-              name: userData.fullName,
-              image: userData.avatar
+              name: updatedUser.fullName || session.user.name,
+              image: updatedUser.avatar || session.user.image,
+              email: updatedUser.email || session.user.email
             }
           });
+          console.log('NextAuth session updated successfully');
         } catch (sessionError) {
           console.warn('Failed to update session:', sessionError);
+          // ไม่ throw error เพราะข้อมูลหลักอัปเดตสำเร็จแล้ว
         }
       }
       
-    } catch (error) {
-      console.error('Failed to update user:', error);
-      // แม้ว่าจะเกิด error ก็ยังคงข้อมูลใน local state
-      // เพื่อให้ user เห็นการเปลี่ยนแปลงใน UI
+    } else {
+      throw new Error(response.data.error || 'Update failed');
     }
-  };
-
-  const logout = async () => {
+    
+  } catch (error: any) {
+    console.error('AuthContext: Failed to update user:', error);
+    
+    // รีโหลดข้อมูลเดิมจาก database เพื่อให้แน่ใจว่าข้อมูลตรงกัน
     try {
-      // ล็อกเอาท์จาก NextAuth
-      await signOut({ redirect: false });
-      
-      // ล้างข้อมูลผู้ใช้
-      setUser(null);
-      localStorage.removeItem('user');
-      setIsAuthenticated(false);
-    } catch (error) {
-      console.error('Logout error:', error);
+      await refreshUserData();
+    } catch (refreshError) {
+      console.error('Failed to refresh user data:', refreshError);
     }
-  };
+    
+    throw new Error(
+      error.response?.data?.error || 
+      error.message || 
+      'เกิดข้อผิดพลาดในการบันทึกข้อมูล'
+    );
+  }
+};
+
+const refreshUserData = async (): Promise<void> => {
+  try {
+    if (session?.user?.id) {
+      console.log('Refreshing user data for ID:', session.user.id);
+      
+      // *** ใช้ API ที่มีอยู่แล้ว ***
+      const response = await axios.get(`/api/users/${session.user.id}`);
+      if (response.data.success && response.data.user) {
+        const freshUser = response.data.user;
+        setUser(freshUser);
+        localStorage.setItem('user', JSON.stringify(freshUser));
+        console.log('User data refreshed:', freshUser.email);
+        
+        // อัปเดต session ด้วยข้อมูลใหม่
+        if (session?.user) {
+          await updateSession({
+            ...session,
+            user: {
+              ...session.user,
+              name: freshUser.fullName,
+              image: freshUser.avatar,
+              email: freshUser.email
+            }
+          });
+        }
+      }
+    }
+  } catch (error) {
+    console.error('Failed to refresh user data:', error);
+    // ไม่ throw error เพื่อไม่ให้กระทบ UX
+  }
+};
+
+// *** ปรับปรุง logout method เพื่อป้องกันปัญหา Google Login ***
+const logout = async () => {
+  try {
+    console.log('Starting logout process...');
+    
+    // ล้างข้อมูล localStorage และ state ก่อน
+    localStorage.removeItem('user');
+    setUser(null);
+    setIsAuthenticated(false);
+    
+    // ล็อกเอาท์จาก NextAuth พร้อมล้าง cookies ทั้งหมด
+    await signOut({ 
+      redirect: false,
+      callbackUrl: '/login'
+    });
+    
+    // *** เพิ่มการล้าง cookies เพิ่มเติมสำหรับ Google ***
+    if (typeof window !== 'undefined') {
+      // ล้าง cookies ที่เกี่ยวข้องกับ auth
+      document.cookie.split(";").forEach(function(c) { 
+        document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); 
+      });
+    }
+    
+    console.log('Logout completed successfully');
+    
+  } catch (error) {
+    console.error('Logout error:', error);
+    // แม้ logout ล้มเหลว ก็ยังล้างข้อมูล local
+    localStorage.removeItem('user');
+    setUser(null);
+    setIsAuthenticated(false);
+  }
+};
 
   return (
     <AuthContext.Provider

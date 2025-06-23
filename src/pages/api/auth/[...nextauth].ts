@@ -1,10 +1,11 @@
+// pages/api/auth/[...nextauth].ts - Complete file with login tracking and 6 hours session
+
 import NextAuth, { Session, User } from 'next-auth';
 import GoogleProvider from 'next-auth/providers/google';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import dbService from '@/lib/db';
 import { updateUserData } from '@/lib/userUpdateHelper';
 
-// ขยาย type สำหรับ session
 declare module "next-auth" {
   interface Session {
     user: {
@@ -18,20 +19,18 @@ declare module "next-auth" {
 
 export default NextAuth({
   providers: [
-    // Google Provider
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID || '',
       clientSecret: process.env.GOOGLE_CLIENT_SECRET || '',
       authorization: {
         params: {
-          prompt: "consent",
+          prompt: "select_account",
           access_type: "offline",
           response_type: "code"
         }
       }
     }),
     
-    // Credentials Provider
     CredentialsProvider({
       name: 'Credentials',
       credentials: {
@@ -44,7 +43,6 @@ export default NextAuth({
         }
         
         try {
-          // Initialize database
           await dbService.init();
           
           const user = await dbService.getUserByEmailAndPassword(
@@ -53,7 +51,7 @@ export default NextAuth({
           );
           
           if (user) {
-            // บันทึกการ login สำหรับ credentials provider
+            // *** บันทึกการ login ด้วย method ใหม่ ***
             await dbService.recordLogin(user.id!);
             console.log(`Login recorded for user ${user.email} (credentials)`);
             
@@ -73,31 +71,40 @@ export default NextAuth({
     })
   ],
   
+  // *** Session configuration - 6 hours ***
+  session: {
+    strategy: 'jwt',
+    maxAge: 6 * 60 * 60, // 6 ชั่วโมง (เปลี่ยนจาก 24 ชั่วโมง)
+    updateAge: 1 * 60 * 60, // อัปเดตทุก 1 ชั่วโมง
+  },
+  
+  // *** Cookie configuration - 6 hours ***
   cookies: {
     sessionToken: {
       name: `next-auth.session-token`,
       options: {
         httpOnly: true,
-        sameSite: 'none',
+        sameSite: 'lax',
         path: '/',
-        secure: true,
+        secure: process.env.NODE_ENV === 'production',
+        maxAge: 6 * 60 * 60, // 6 ชั่วโมง (เปลี่ยนจาก 24 ชั่วโมง)
       },
     },
     callbackUrl: {
       name: `next-auth.callback-url`,
       options: {
-        sameSite: 'none',
+        sameSite: 'lax',
         path: '/',
-        secure: true,
+        secure: process.env.NODE_ENV === 'production',
       },
     },
     csrfToken: {
       name: `next-auth.csrf-token`,
       options: {
         httpOnly: true,
-        sameSite: 'none',
+        sameSite: 'lax',
         path: '/',
-        secure: true,
+        secure: process.env.NODE_ENV === 'production',
       },
     },
   },
@@ -105,15 +112,11 @@ export default NextAuth({
   callbacks: {
     async signIn({ user, account, profile }) {
       try {
-        // Initialize database
         await dbService.init();
         
-        // ถ้าเป็นการล็อกอินด้วย Google
         if (account?.provider === 'google' && profile?.email) {
-          // ตรวจสอบว่ามีผู้ใช้นี้ในฐานข้อมูลหรือยัง
           let dbUser = await dbService.getUserByEmail(profile.email);
           
-          // ถ้ายังไม่มี ให้สร้างผู้ใช้ใหม่
           if (!dbUser) {
             const newUser = {
               email: profile.email,
@@ -125,33 +128,26 @@ export default NextAuth({
             const userId = await dbService.addUser(newUser);
             dbUser = await dbService.getUserById(userId);
           } else {
-            // *** แก้ไขส่วนนี้ - อัปเดตเฉพาะข้อมูลที่จำเป็นเท่านั้น ***
-            // อัปเดตเฉพาะ avatar ถ้าไม่มี หรือถ้า Google มีข้อมูลใหม่
             const shouldUpdateAvatar = !dbUser.avatar && profile.image;
             
             if (shouldUpdateAvatar) {
-              // ใช้ helper function สำหรับอัปเดตข้อมูล
               await updateUserData(dbUser.id!, {
                 avatar: profile.image
               });
-              // รีเฟรชข้อมูล user หลังจากอัปเดต
               dbUser = await dbService.getUserById(dbUser.id!);
             }
-            
-            // *** ไม่อัปเดต full_name เพราะ user อาจจะแก้ไขแล้ว ***
-            // *** ใช้ข้อมูลจาก database แทนข้อมูลจาก Google profile ***
           }
           
-          // บันทึกการ login สำหรับ Google provider
           if (dbUser && dbUser.id) {
+            // *** บันทึกการ login สำหรับ Google ***
             await dbService.recordLogin(dbUser.id);
             console.log(`Login recorded for user ${dbUser.email} (Google)`);
             
-            // *** ใช้ข้อมูลจาก database เป็นหลัก แทนการใช้ข้อมูลจาก Google profile ***
+            // *** ลดข้อมูลใน user object ***
             user.id = dbUser.id.toString();
-            user.name = dbUser.full_name || profile.name || '';  // ใช้ข้อมูลจาก database ก่อน
+            user.name = dbUser.full_name || profile.name || '';
             user.email = dbUser.email;
-            user.image = dbUser.avatar || profile.image || null;  // ใช้ avatar จาก database ก่อน
+            user.image = dbUser.avatar || profile.image || null;
           }
         }
         
@@ -162,36 +158,47 @@ export default NextAuth({
       }
     },
     
+    // *** Session callback - เฉพาะข้อมูลจำเป็น ***
     async session({ session, token }) {
-      // *** เพิ่มการโหลดข้อมูลล่าสุดจาก database ทุกครั้งที่สร้าง session ***
-      if (token?.sub && session.user) {
-        try {
-          await dbService.init();
-          const dbUser = await dbService.getUserById(parseInt(token.sub));
-          
-          if (dbUser) {
-            // ใช้ข้อมูลล่าสุดจาก database
-            session.user.id = dbUser.id?.toString() || token.sub;
-            session.user.name = dbUser.full_name || session.user.name;
-            session.user.email = dbUser.email || session.user.email;
-            session.user.image = dbUser.avatar || session.user.image;
-          } else {
-            // fallback ถ้าไม่เจอใน database
-            session.user.id = token.sub;
-          }
-        } catch (error) {
-          console.error('Error loading user data in session:', error);
-          // fallback to token data
-          session.user.id = token.sub || '';
-        }
+      console.log('👤 Session: Creating session for token:', token.id);
+      
+      if (token?.id && session.user) {
+        session.user.id = String(token.id);
       }
+      
       return session;
     },
     
+    // *** JWT callback - ตรวจสอบอายุ 6 ชั่วโมง ***
     async jwt({ token, user }) {
       if (user) {
+        // *** เก็บ id และ loginTime ใน token ***
         token.id = user.id;
+        token.loginTime = Math.floor(Date.now() / 1000); // สำคัญ! บันทึกเวลา login
+        token.iat = Math.floor(Date.now() / 1000); // issued at time
+        
+        console.log('🔐 JWT: Setting loginTime for user:', user.id, 'at:', token.loginTime);
+        
+        // *** ลบข้อมูลอื่นออกเพื่อลดขนาด ***
+        delete token.name;
+        delete token.email;
+        delete token.picture;
       }
+      
+      // *** ตรวจสอบว่า token หมดอายุหรือไม่ (6 ชั่วโมง) ***
+      const now = Math.floor(Date.now() / 1000);
+      const loginTime = Number(token.loginTime) || Number(token.iat) || 0;
+      const tokenAge = now - loginTime;
+      const maxAge = 6 * 60 * 60; // 6 ชั่วโมง (เปลี่ยนจาก 24 ชั่วโมง)
+      
+      console.log('🕐 JWT: Token age check - age:', tokenAge, 'max:', maxAge, 'hours:', (tokenAge / 3600).toFixed(1));
+      
+      if (tokenAge > maxAge) {
+        // Token หมดอายุแล้ว
+        console.log('❌ JWT: Token expired after 6 hours, forcing re-login');
+        return {}; // ส่ง empty token เพื่อให้ logout
+      }
+      
       return token;
     }
   },
@@ -201,9 +208,8 @@ export default NextAuth({
     error: '/login'
   },
   
-  session: {
-    strategy: 'jwt',
-  },
+  // *** ปิด debug ใน production ***
+  debug: false,
   
   secret: process.env.NEXTAUTH_SECRET
 });

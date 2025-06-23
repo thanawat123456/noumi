@@ -206,62 +206,73 @@ export default function Login() {
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    if (!email || !password) {
-      showError("ข้อมูลไม่ครบถ้วน", "กรุณากรอกอีเมลและรหัสผ่านให้ครบถ้วน");
-      return;
-    }
+  if (!email || !password) {
+    showError("ข้อมูลไม่ครบถ้วน", "กรุณากรอกอีเมลและรหัสผ่านให้ครบถ้วน");
+    return;
+  }
 
-    setIsSubmitting(true);
+  setIsSubmitting(true);
 
-    try {
-      await login(email, password);
-      // ลบ router.push('/dashboard') ออก เพราะ useEffect จะทำงานเมื่อ isAuthenticated เปลี่ยน
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (err: any) {
-      // ใช้ AuthError ที่มี userMessage แทน
-      if (err.name === "AuthError") {
-        if (err.statusCode === 401 || err.statusCode === 404) {
-          showError(
-            "ไม่พบข้อมูลผู้ใช้",
-            "ดูเหมือนว่าคุณยังไม่ได้สมัครสมาชิกหรืออีเมล/รหัสผ่านไม่ถูกต้อง กรุณาสมัครสมาชิกก่อนเข้าใช้งาน",
-            "สมัครสมาชิก",
-            "/signup"
-          );
-        } else if (err.statusCode === 400) {
-          showError(
-            "ข้อมูลไม่ถูกต้อง",
-            err.userMessage || "กรุณาตรวจสอบรูปแบบอีเมลและรหัสผ่านของคุณ"
-          );
-        } else if (err.statusCode >= 500) {
-          showError(
-            "เซิร์ฟเวอร์ขัดข้อง",
-            err.userMessage ||
-              "ระบบมีปัญหาชั่วคราว กรุณาลองใหม่อีกครั้งในภายหลัง"
-          );
-        } else if (err.statusCode === 0) {
-          showError(
-            "ปัญหาการเชื่อมต่อ",
-            err.userMessage || "ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้"
-          );
-        } else {
-          showError(
-            "เข้าสู่ระบบไม่สำเร็จ",
-            err.userMessage || "เกิดข้อผิดพลาดในการเข้าสู่ระบบ"
-          );
-        }
+  try {
+    console.log('🚀 Form: Starting login process...');
+    await login(email, password);
+    console.log('✅ Form: Login successful, redirecting...');
+    
+    // รอให้ NextAuth session อัปเดตสมบูรณ์
+    await new Promise(resolve => setTimeout(resolve, 3000));
+    
+    console.log('🏃‍♂️ Form: Attempting redirect to dashboard...');
+    
+    // ลอง redirect
+    router.push('/dashboard');
+    
+  } catch (err: any) {
+    console.error('❌ Form: Login failed:', err);
+    
+    // ใช้ AuthError ที่มี userMessage แทน
+    if (err.name === "AuthError") {
+      if (err.statusCode === 401 || err.statusCode === 404) {
+        showError(
+          "ไม่พบข้อมูลผู้ใช้",
+          "ดูเหมือนว่าคุณยังไม่ได้สมัครสมาชิกหรืออีเมล/รหัสผ่านไม่ถูกต้อง กรุณาสมัครสมาชิกก่อนเข้าใช้งาน",
+          "สมัครสมาชิก",
+          "/signup"
+        );
+      } else if (err.statusCode === 400) {
+        showError(
+          "ข้อมูลไม่ถูกต้อง",
+          err.userMessage || "กรุณาตรวจสอบรูปแบบอีเมลและรหัสผ่านของคุณ"
+        );
+      } else if (err.statusCode >= 500) {
+        showError(
+          "เซิร์ฟเวอร์ขัดข้อง",
+          err.userMessage ||
+            "ระบบมีปัญหาชั่วคราว กรุณาลองใหม่อีกครั้งในภายหลัง"
+        );
+      } else if (err.statusCode === 0) {
+        showError(
+          "ปัญหาการเชื่อมต่อ",
+          err.userMessage || "ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้"
+        );
       } else {
-        // Fallback สำหรับ error ที่ไม่ใช่ AuthError
         showError(
           "เข้าสู่ระบบไม่สำเร็จ",
-          "เกิดข้อผิดพลาดที่ไม่คาดคิด กรุณาลองใหม่อีกครั้ง"
+          err.userMessage || "เกิดข้อผิดพลาดในการเข้าสู่ระบบ"
         );
       }
-    } finally {
-      setIsSubmitting(false);
+    } else {
+      // Fallback สำหรับ error ที่ไม่ใช่ AuthError
+      showError(
+        "เข้าสู่ระบบไม่สำเร็จ",
+        "เกิดข้อผิดพลาดที่ไม่คาดคิด กรุณาลองใหม่อีกครั้ง"
+      );
     }
-  };
+  } finally {
+    setIsSubmitting(false);
+  }
+};
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
@@ -482,11 +493,13 @@ export default function Login() {
               <div style={styles.inputContainer}>
                 <input
                   id="email"
+                  name="email"
                   type="text"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   style={styles.input}
                   placeholder="example@example.com"
+                  autoComplete="username"
                 />
               </div>
             </div>
@@ -499,11 +512,13 @@ export default function Login() {
               <div style={styles.inputContainer}>
                 <input
                   id="password"
+                  name="password"
                   type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   style={styles.input}
                   placeholder="••••••••••••"
+                  autoComplete="current-password" 
                 />
                 <button
                   type="button"

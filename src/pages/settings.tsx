@@ -8,7 +8,7 @@ import { calculateAstrologyData, getAllZodiacSigns, getAllElements, getAllDaysOf
 
 export default function Settings() {
   const router = useRouter();
-  const { user, isAuthenticated, isLoading, updateUser } = useAuth();
+  const { user, isAuthenticated, isLoading, updateUser,refreshUserData } = useAuth();
   
   // Form state
   const [formData, setFormData] = useState({
@@ -132,90 +132,112 @@ export default function Settings() {
 
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!user || !user.id) {
-      setMessage({ type: 'error', text: 'ไม่พบข้อมูลผู้ใช้' });
-      return;
+  e.preventDefault();
+  
+  if (!user || !user.id) {
+    setMessage({ type: 'error', text: 'ไม่พบข้อมูลผู้ใช้ กรุณาเข้าสู่ระบบใหม่' });
+    return;
+  }
+  
+  // Validate passwords if changing
+  if (formData.password && formData.password !== formData.confirmPassword) {
+    setMessage({ type: 'error', text: 'รหัสผ่านไม่ตรงกัน' });
+    return;
+  }
+
+  setLoading(true);
+  setMessage({ type: '', text: '' });
+
+  try {
+    // *** เตรียมข้อมูลสำหรับ API ใหม่ (ไม่ต้องมี userId ใน body) ***
+    const updateData: any = {
+      email: formData.email,
+      phone: formData.phone,
+      fullName: formData.fullName,
+      birthDate: formData.birthDate,
+      dayOfBirth: formData.dayOfBirth,
+      elementType: formData.elementType,
+      zodiacSign: formData.zodiacSign,
+      bloodGroup: formData.bloodGroup,
+      avatar: formData.avatar
+    };
+
+    // Only include password if it's being changed
+    if (formData.password) {
+      updateData.password = formData.password;
     }
-    
-    // Validate passwords if changing
-    if (formData.password && formData.password !== formData.confirmPassword) {
-      setMessage({ type: 'error', text: 'รหัสผ่านไม่ตรงกัน' });
-      return;
+
+    console.log('Sending update data:', updateData);
+
+    // *** ใช้ API endpoint ใหม่ ***
+    const response = await axios.put(`/api/users/${user.id}`, updateData);
+
+    if (response.data.success) {
+      setMessage({ type: 'success', text: 'บันทึกข้อมูลสำเร็จ!' });
+      
+      // *** ใช้ updateUser จาก AuthContext ***
+      await updateUser(response.data.user);
+      
+      // Clear password fields
+      setFormData(prev => ({
+        ...prev,
+        password: '',
+        confirmPassword: ''
+      }));
+
+      // อัพเดท form data ด้วยข้อมูลใหม่
+      const updatedUser = response.data.user;
+      setFormData(prev => ({
+        ...prev,
+        email: updatedUser.email || '',
+        phone: updatedUser.phone || '',
+        fullName: updatedUser.fullName || '',
+        birthDate: updatedUser.birthDate || '',
+        dayOfBirth: updatedUser.dayOfBirth || '',
+        elementType: updatedUser.elementType || '',
+        zodiacSign: updatedUser.zodiacSign || '',
+        bloodGroup: updatedUser.bloodGroup || '',
+        avatar: updatedUser.avatar || '',
+        password: '',
+        confirmPassword: ''
+      }));
+
+      setAvatarPreview(updatedUser.avatar || '');
+      
+      // *** รีเฟรชข้อมูลผู้ใช้ล่าสุด ***
+      await refreshUserData();
+      
+    } else {
+      throw new Error(response.data.error || 'Failed to update');
     }
-
-    setLoading(true);
-    setMessage({ type: '', text: '' });
-
-    try {
-      const updateData: any = {
-        userId: user.id,
-        email: formData.email,
-        phone: formData.phone,
-        fullName: formData.fullName,
-        birthDate: formData.birthDate,
-        dayOfBirth: formData.dayOfBirth,
-        elementType: formData.elementType,
-        zodiacSign: formData.zodiacSign,
-        bloodGroup: formData.bloodGroup,
-        avatar: formData.avatar
-      };
-
-      // Only include password if it's being changed
-      if (formData.password) {
-        updateData.password = formData.password;
-      }
-
-      console.log('Sending update data:', updateData);
-
-      const response = await axios.put('/api/user/update', updateData);
-
-      if (response.data.success) {
-        setMessage({ type: 'success', text: 'บันทึกข้อมูลสำเร็จ' });
-        
-        // อัพเดทข้อมูลใน context และ localStorage
-        updateUser(response.data.user);
-        
-        // Clear password fields
-        setFormData(prev => ({
-          ...prev,
-          password: '',
-          confirmPassword: ''
-        }));
-
-        // อัพเดท form data ด้วยข้อมูลใหม่
-        const updatedUser = response.data.user;
-        setFormData(prev => ({
-          ...prev,
-          email: updatedUser.email || '',
-          phone: updatedUser.phone || '',
-          fullName: updatedUser.fullName || '',
-          birthDate: updatedUser.birthDate || '',
-          dayOfBirth: updatedUser.dayOfBirth || '',
-          elementType: updatedUser.elementType || '',
-          zodiacSign: updatedUser.zodiacSign || '',
-          bloodGroup: updatedUser.bloodGroup || '',
-          avatar: updatedUser.avatar || '',
-          password: '',
-          confirmPassword: ''
-        }));
-
-        setAvatarPreview(updatedUser.avatar || '');
-        
-      } else {
-        throw new Error(response.data.error || 'Failed to update');
-      }
-    } catch (error: any) {
-      console.error('Update error:', error);
-      setMessage({ 
-        type: 'error', 
-        text: error.response?.data?.error || 'เกิดข้อผิดพลาดในการบันทึกข้อมูล' 
+  } catch (error: any) {
+    console.error('Update error:', error);
+    setMessage({ 
+      type: 'error', 
+      text: error.response?.data?.error || error.message || 'เกิดข้อผิดพลาดในการบันทึกข้อมูล กรุณาลองใหม่อีกครั้ง' 
+    });
+    
+    // *** รีเฟรชข้อมูลเดิมกลับมาเมื่อเกิด error ***
+    if (user) {
+      setFormData({
+        email: user.email || '',
+        password: '',
+        confirmPassword: '',
+        phone: user.phone || '',
+        fullName: user.fullName || '',
+        birthDate: user.birthDate || '',
+        dayOfBirth: user.dayOfBirth || '',
+        elementType: user.elementType || '',
+        zodiacSign: user.zodiacSign || '',
+        bloodGroup: user.bloodGroup || '',
+        avatar: user.avatar || ''
       });
-    } finally {
-      setLoading(false);
+      setAvatarPreview(user.avatar || '');
     }
-  };
+  } finally {
+    setLoading(false);
+  }
+};
 
   if (isLoading) {
     return (
