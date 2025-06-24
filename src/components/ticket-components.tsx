@@ -437,7 +437,7 @@ export const TicketDetail: React.FC<TicketDetailProps> = ({
           <div className="w-11/12 h-1 bg-white/30 mb-8 mx-auto"></div>
 
           <div className="pt-4">
-            <h2 className="text-white text-2xl font-semibold mb-6">
+            <h2 className="text-white text-2xl font-semibold mb-6 text-center">
               {ticket.templeNameEn}
             </h2>
 
@@ -499,7 +499,7 @@ export const TicketDetail: React.FC<TicketDetailProps> = ({
         </div>
         <div className="w-11/12 h-1 bg-white/30 mb-8 mx-auto"></div>
         <div className="pt-4">
-          <h2 className="text-white text-2xl font-semibold mb-6">
+          <h2 className="text-white text-2xl font-semibold mb-6 text-center">
             {ticket.templeName}
           </h2>
           <p className="text-white mb-2">

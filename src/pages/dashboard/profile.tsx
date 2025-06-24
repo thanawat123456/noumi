@@ -148,7 +148,7 @@ const zodiacElementsData = {
       "มีความเข้มงวดและมั่นคง มีความเคร่งครัดและเสมอภาค ชอบความเรียบง่ายและเป็นระเบียบ",
     strength:
       " มีความรับผิดชอบและเน้นการปฏิบัติตามกฎเกณฑ์ มีความระมัดระวัง และ ประสานงานได้ดี",
-      zodiacImg: "/images/rasri/rs3-removebg-preview.png",
+    zodiacImg: "/images/rasri/rs3-removebg-preview.png",
   },
 };
 
@@ -156,7 +156,7 @@ const zodiacElementsData = {
 const zodiacTravelDestinationsData = {
   Aries: [
     {
-      name: "เทวสถานสำหรับพระนคร ท้าวเวสสุวรรณ ",
+      name: "เทวสถานสำหรับพระนคร \n ท้าวเวสสุวรรณ ",
       image: "/images/profile/travel/ท้าวเวสุวรรณ.jpeg",
       mapLink: "/information/7?type=buddha",
       description:
@@ -164,7 +164,7 @@ const zodiacTravelDestinationsData = {
       category: "การเงิน ธุรกิจ",
     },
     {
-      name: "เทวสถานสำหรับพระนคร พระพรหม",
+      name: "เทวสถานสำหรับพระนคร\n พระพรหม",
       image: "/images/profile/travel/รูปพระพรหม.webp",
       mapLink: "",
       description:
@@ -174,7 +174,7 @@ const zodiacTravelDestinationsData = {
   ],
   Taurus: [
     {
-      name: "วัดสุทัศนเทพวราราม พระพุทธศรีศากยมุนี",
+      name: "วัดสุทัศนเทพวราราม\n พระพุทธศรีศากยมุนี",
       image: "/images/profile/travel/พระศรีศากยมุนี.jpeg",
       mapLink: "/information/1?type=buddha",
       description:
@@ -182,7 +182,7 @@ const zodiacTravelDestinationsData = {
       category: "ภาพรวมทั่วไป",
     },
     {
-      name: "เทวสถานสำหรับพระนคร พระพิฆเนศ",
+      name: "เทวสถานสำหรับพระนคร\n พระพิฆเนศ",
       image: "/images/profile/travel/พระพิฆเนศ.jpeg",
       mapLink: "",
       description:
@@ -192,7 +192,7 @@ const zodiacTravelDestinationsData = {
   ],
   Gemini: [
     {
-      name: "วัดเทพมณเฑียร พระแม่ลักษมี",
+      name: "วัดเทพมณเฑียร\n พระแม่ลักษมี",
       image: "/images/profile/travel/พระแม่ลักษมี.jpg",
       mapLink: "",
       description:
@@ -200,7 +200,7 @@ const zodiacTravelDestinationsData = {
       category: "ความรัก\nคู่ครอง",
     },
     {
-      name: "เทวสถานสำหรับพระนคร พระพิฆเนศ",
+      name: "เทวสถานสำหรับพระนคร\n พระพิฆเนศ",
       image: "/images/profile/travel/พระพิฆเนศ.jpeg",
       mapLink: "",
       description:
@@ -210,7 +210,7 @@ const zodiacTravelDestinationsData = {
   ],
   Cancer: [
     {
-      name: "วัดสุทัศนเทพวราราม ท้าวเวสสุวรรณ",
+      name: "วัดสุทัศนเทพวราราม\n ท้าวเวสสุวรรณ",
       image: "/images/profile/travel/ท้าวเวสุวรรณ.jpeg",
       mapLink: "/information/7?type=buddha",
       description:
@@ -218,7 +218,7 @@ const zodiacTravelDestinationsData = {
       category: "ธุรกิจ\nการเงิน",
     },
     {
-      name: "วัดสุทัศนเทพวราราม พระสุนทรี วาณี",
+      name: "วัดสุทัศนเทพวราราม\n พระสุนทรี วาณี",
       image: "/images/profile/travel/พระสุนทรีวาณี.jpeg",
       mapLink: "/information/2?type=buddha",
       description:
@@ -228,7 +228,7 @@ const zodiacTravelDestinationsData = {
   ],
   Leo: [
     {
-      name: "ศาลเจ้าพ่อเสือ เจ้าพ่อเสือ",
+      name: "ศาลเจ้าพ่อเสือ\n เจ้าพ่อเสือ",
       image: "/images/profile/travel/ศาสเจ้าพ่อเสือ.jpg",
       mapLink: "",
       description:
@@ -236,7 +236,7 @@ const zodiacTravelDestinationsData = {
       category: "ภาพรวมทั่วไป",
     },
     {
-      name: "วัดเทพมณเฑียร พระแม่ลักษมี",
+      name: "วัดเทพมณเฑียร\n พระแม่ลักษมี",
       image: "/images/profile/travel/พระแม่ลักษมี.jpg",
       mapLink: "",
       description:
@@ -246,7 +246,7 @@ const zodiacTravelDestinationsData = {
   ],
   Virgo: [
     {
-      name: "วัดสุทัศนเทพวราราม ท้าวเวสสุวรรณ",
+      name: "วัดสุทัศนเทพวราราม\n ท้าวเวสสุวรรณ",
       image: "/images/profile/travel/ท้าวเวสุวรรณ.jpeg",
       mapLink: "/information/7?type=buddha",
       description:
@@ -256,7 +256,7 @@ const zodiacTravelDestinationsData = {
   ],
   Libra: [
     {
-      name: "วัดสุทัศนเทพวราราม พระสุนทรี วาณี",
+      name: "วัดสุทัศนเทพวราราม\n พระสุนทรี วาณี",
       image: "/images/profile/travel/พระสุนทรีวาณี.jpeg",
       mapLink: "/information/2?type=buddha",
       description:
@@ -264,7 +264,7 @@ const zodiacTravelDestinationsData = {
       category: "การเรียน\nการงาน",
     },
     {
-      name: "วัดเทพมณเฑียร พระแม่ลักษมี",
+      name: "วัดเทพมณเฑียร\n พระแม่ลักษมี",
       image: "/images/profile/travel/พระแม่ลักษมี.jpg",
       mapLink: "",
       description:
@@ -274,7 +274,7 @@ const zodiacTravelDestinationsData = {
   ],
   Scorpio: [
     {
-      name: "วัดสุทัศนเทพวราราม พระกริ่งใหญ่",
+      name: "วัดสุทัศนเทพวราราม\n พระกริ่งใหญ่",
       image: "/images/profile/travel/พระกริ่งใหญ่.jpeg",
       mapLink: "/information/6?type=buddha",
       description: "เป็นองค์พระประทานที่ช่วยในด้านสุขภาพ โรคภัย ไข้เจ็บ",
@@ -283,7 +283,7 @@ const zodiacTravelDestinationsData = {
   ],
   Sagittarius: [
     {
-      name: "วัดสุทัศนเทพวราราม พระพุทธตรีโลกเชษฐ์",
+      name: "วัดสุทัศนเทพวราราม\n พระพุทธตรีโลกเชษฐ์",
       image: "/images/profile/travel/พระพุทธตรีโลกเชษฐ์.jpeg",
       mapLink: "/information/5?type=buddha",
       description:
@@ -293,7 +293,7 @@ const zodiacTravelDestinationsData = {
   ],
   Capricorn: [
     {
-      name: "วัดเทพมณเฑียร พระแม่ลักษมี",
+      name: "วัดเทพมณเฑียร\n พระแม่ลักษมี",
       image: "/images/profile/travel/พระแม่ลักษมี.jpg",
       mapLink: "",
       description:
@@ -301,7 +301,7 @@ const zodiacTravelDestinationsData = {
       category: "ความรัก\nคู่ครอง",
     },
     {
-      name: "เทวสถานสำหรับพระนคร พระพิฆเนศ",
+      name: "เทวสถานสำหรับพระนคร\n พระพิฆเนศ",
       image: "/images/profile/travel/พระพิฆเนศ.jpeg",
       mapLink: "",
       description:
@@ -311,7 +311,7 @@ const zodiacTravelDestinationsData = {
   ],
   Aquarius: [
     {
-      name: "ศาลเจ้าพ่อเสือ เจ้าพ่อเสือ",
+      name: "ศาลเจ้าพ่อเสือ\n เจ้าพ่อเสือ",
       image: "/images/profile/travel/ศาสเจ้าพ่อเสือ.jpg",
       mapLink: "",
       description:
@@ -319,7 +319,7 @@ const zodiacTravelDestinationsData = {
       category: "ภาพรวมทั่วไป",
     },
     {
-      name: "เทวสถานสำหรับพระนคร พระพิฆเนศ",
+      name: "เทวสถานสำหรับพระนคร\n พระพิฆเนศ",
       image: "/images/profile/travel/พระพิฆเนศ.jpeg",
       mapLink: "",
       description:
@@ -329,7 +329,7 @@ const zodiacTravelDestinationsData = {
   ],
   Pisces: [
     {
-      name: "วัดสุทัศนเทพวราราม พระพุทธศรีศากยมุนี",
+      name: "วัดสุทัศนเทพวราราม\n พระพุทธศรีศากยมุนี",
       image: "/images/profile/travel/พระศรีศากยมุนี.jpeg",
       mapLink: "/information/1?type=buddha",
       description:
@@ -337,7 +337,7 @@ const zodiacTravelDestinationsData = {
       category: "ภาพรวมทั่วไป",
     },
     {
-      name: "ศาลเจ้าพ่อเสือ เจ้าพ่อเสือ",
+      name: "ศาลเจ้าพ่อเสือ\n เจ้าพ่อเสือ",
       image: "/images/profile/travel/ศาสเจ้าพ่อเสือ.jpg",
       mapLink: "",
       description:
@@ -488,20 +488,20 @@ export default function Profile() {
 
     if (user) {
       let userZodiacEnglish = "";
-      
+
       // ถ้ามีวันเกิด ให้คำนวณข้อมูลใหม่จาก astrology utils
       if (user.birthDate) {
         console.log("Calculating astrology data from birthDate:", user.birthDate);
         const astrologyData = calculateAstrologyData(user.birthDate);
         console.log("Calculated astrology data:", astrologyData);
-        
+
         // แปลงราศีไทยเป็นอังกฤษ
         userZodiacEnglish = getZodiacEnglishName(astrologyData.zodiacSign);
         console.log("English zodiac name:", userZodiacEnglish);
       } else {
         // fallback ใช้ข้อมูลเดิม
-        userZodiacEnglish = user.zodiacSign ? 
-          getZodiacEnglishName(user.zodiacSign) : 
+        userZodiacEnglish = user.zodiacSign ?
+          getZodiacEnglishName(user.zodiacSign) :
           getZodiacSignFallback(user.birthDate);
       }
 
@@ -516,7 +516,7 @@ export default function Profile() {
       const zodiacInfo =
         zodiacElementsData[userZodiacEnglish as keyof typeof zodiacElementsData] ||
         zodiacElementsData["Aries"];
-      
+
       setBgStyles({
         gradient: zodiacInfo.bgColor,
         textColor: zodiacInfo.color,
@@ -525,7 +525,7 @@ export default function Profile() {
 
       const destinationData =
         zodiacTravelDestinationsData[
-          userZodiacEnglish as keyof typeof zodiacTravelDestinationsData
+        userZodiacEnglish as keyof typeof zodiacTravelDestinationsData
         ] || zodiacTravelDestinationsData["Aries"];
       setDestinations(destinationData);
 
@@ -747,7 +747,7 @@ export default function Profile() {
                 {/* Lucky Colors - Right Side */}
                 <div className="w-1/2 pl-4">
                   <h3 className="text-white text-sm mb-4 opacity-80">สีมงคล</h3>
-                  <div className="flex flex-col space-y-4">
+                  <div className="flex flex-col space-y-2">
                     <div className="flex h-16 rounded-2xl overflow-hidden shadow-sm">
                       {luckyColors && luckyColors.length > 0 ? (
                         luckyColors.slice(0, 2).map((color, index) => (
@@ -756,8 +756,7 @@ export default function Profile() {
                             className="flex-1"
                             style={{
                               backgroundColor:
-                                colorStyles[color as keyof typeof colorStyles]
-                                  ?.bg || "#CCCCCC",
+                                colorStyles[color as keyof typeof colorStyles]?.bg || "#CCCCCC",
                             }}
                           />
                         ))
@@ -765,20 +764,19 @@ export default function Profile() {
                         <div className="w-full bg-gray-200" />
                       )}
                     </div>
-                    <div className="flex justify-between text-xs text-white opacity-80">
+                    <div className="flex justify-center text-xs text-white opacity-80 space-x-6">
                       {luckyColors && luckyColors.length > 0 ? (
                         luckyColors
                           .slice(0, 2)
                           .map((color, index) => (
-                            <span key={index}>
-                              {colorStyles[color as keyof typeof colorStyles]
-                                ?.text || color}
+                            <span key={index} className="px-2">
+                              {colorStyles[color as keyof typeof colorStyles]?.text || color}
                             </span>
                           ))
                       ) : (
                         <>
-                          <span>แดง</span>
-                          <span>เทา</span>
+                          <span className="px-2">เหลือง</span>
+                          <span className="px-2">ฟ้า</span>
                         </>
                       )}
                     </div>
@@ -862,37 +860,37 @@ export default function Profile() {
                     `}</style>
 
                     {destinations.map((destination: any, index: number) => (
-                      <div
-                        key={index}
-                        className="flex-shrink-0 w-80 relative rounded-2xl overflow-hidden"
-                        style={{ scrollSnapAlign: "start" }}
-                      >
-                        <img
-                          src={destination.image}
-                          alt={destination.name}
-                          className="w-full h-48 object-cover"
-                          onError={(e) => {
-                            (e.target as HTMLImageElement).src =
-                              "/images/profile/travel/default.jpg";
-                          }}
-                        />
-                        <div className="p-4">
-                          <div className="flex justify-between items-start mb-3">
-                            <Link href={destination.mapLink}>
-                              <h4 className="text-lg font-semibold text-white cursor-pointer hover:text-red-300">
-                                {destination.name}
-                              </h4>
-                            </Link>
-                            <span className="bg-[#40B828] text-white px-3 py-1 rounded-full text-xs font-medium text-center">
-                              {destination.category.replace(/\n/g, " ")}
-                            </span>
-                          </div>
-                          <p className="text-white text-sm mb-3">
-                            {destination.description}
-                          </p>
-                        </div>
-                      </div>
-                    ))}
+  <div
+    key={index}
+    className="flex-shrink-0 w-80 relative rounded-2xl overflow-hidden"
+    style={{ scrollSnapAlign: "start" }}
+  >
+    <img
+      src={destination.image}
+      alt={destination.name}
+      className="w-full h-48 object-cover"
+      onError={(e) => {
+        (e.target as HTMLImageElement).src =
+          "/images/profile/travel/default.jpg";
+      }}
+    />
+    <div className="p-4">
+      <div className="flex justify-between items-start mb-5">
+        <Link href={destination.mapLink}>
+          <h4 className="text-lg font-semibold text-white cursor-pointer hover:text-red-300 leading-relaxed whitespace-pre-line">
+            {destination.name}
+          </h4>
+        </Link>
+        <span className="bg-[#40B828] text-white px-3 py-1 rounded-full text-xs font-medium text-center whitespace-pre-line">
+          {destination.category}
+        </span>
+      </div>
+      <p className="text-white text-sm mb-3 whitespace-pre-line">
+        {destination.description}
+      </p>
+    </div>
+  </div>
+))}
                   </div>
 
                   <div className="flex justify-center space-x-2 mt-4">

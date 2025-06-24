@@ -97,29 +97,84 @@ export default function Settings() {
 
   // Handle avatar upload
   const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+  const file = e.target.files?.[0];
+  if (!file) return;
 
-    // Check file size (5MB limit)
-    if (file.size > 5 * 1024 * 1024) {
-      setMessage({ type: 'error', text: 'ไฟล์รูปภาพต้องมีขนาดไม่เกิน 5MB' });
-      return;
+  // ตรวจสอบประเภทไฟล์
+  if (!file.type.startsWith('image/')) {
+    setMessage({ type: 'error', text: 'กรุณาเลือกไฟล์รูปภาพเท่านั้น' });
+    return;
+  }
+
+  // Check file size (เพิ่มการตรวจสอบก่อนบีบอัด)
+  if (file.size > 10 * 1024 * 1024) { // 10MB
+    setMessage({ type: 'error', text: 'ไฟล์รูปภาพต้องมีขนาดไม่เกิน 10MB' });
+    return;
+  }
+
+  try {
+    // บีบอัดรูปภาพ
+    const compressedBase64 = await compressImage(file, 800, 0.7);
+    
+    // ตรวจสอบขนาดหลังบีบอัด
+    const compressedSize = (compressedBase64.length * 3) / 4; // คำนวณขนาดจาก base64
+    
+    if (compressedSize > 2 * 1024 * 1024) { // 2MB
+      // บีบอัดแรงกว่า
+      const moreCompressed = await compressImage(file, 600, 0.5);
+      setAvatarPreview(moreCompressed);
+      setFormData(prev => ({
+        ...prev,
+        avatar: moreCompressed
+      }));
+    } else {
+      setAvatarPreview(compressedBase64);
+      setFormData(prev => ({
+        ...prev,
+        avatar: compressedBase64
+      }));
     }
+    
+    // ล้าง error message ถ้ามี
+    setMessage({ type: '', text: '' });
+    
+  } catch (error) {
+    console.error('Image compression failed:', error);
+    setMessage({ type: 'error', text: 'ไม่สามารถประมวลผลรูปภาพได้ กรุณาลองใหม่' });
+  }
+};
 
-    // Preview
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setAvatarPreview(reader.result as string);
+  const compressImage = (file: File, maxWidth: number = 800, quality: number = 0.8): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    const img = new Image();
+    
+    img.onload = () => {
+      // คำนวณขนาดใหม่ให้เหมาะสม
+      let { width, height } = img;
+      
+      if (width > maxWidth) {
+        height = (height * maxWidth) / width;
+        width = maxWidth;
+      }
+      
+      canvas.width = width;
+      canvas.height = height;
+      
+      // วาดรูปลงใน canvas
+      ctx?.drawImage(img, 0, 0, width, height);
+      
+      // แปลงเป็น base64 พร้อมบีบอัด
+      const compressedBase64 = canvas.toDataURL('image/jpeg', quality);
+      resolve(compressedBase64);
     };
-    reader.readAsDataURL(file);
+    
+    img.onerror = reject;
+    img.src = URL.createObjectURL(file);
+  });
+};
 
-    // Convert to base64
-    const base64 = await convertToBase64(file);
-    setFormData(prev => ({
-      ...prev,
-      avatar: base64
-    }));
-  };
 
   const convertToBase64 = (file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
@@ -212,9 +267,22 @@ export default function Settings() {
     }
   } catch (error: any) {
     console.error('Update error:', error);
+    let errorMessage = 'เกิดข้อผิดพลาดในการบันทึกข้อมูล กรุณาลองใหม่อีกครั้ง';
+  
+  // จัดการ error codes ต่างๆ
+  if (error.response?.status === 413) {
+    errorMessage = 'รูปภาพมีขนาดใหญ่เกินไป กรุณาเลือกรูปที่มีขนาดเล็กกว่า';
+  } else if (error.response?.status === 400) {
+    errorMessage = 'ข้อมูลไม่ถูกต้อง กรุณาตรวจสอบข้อมูลและลองใหม่';
+  } else if (error.response?.status === 500) {
+    errorMessage = 'เซิร์ฟเวอร์มีปัญหา กรุณาลองใหม่ในภายหลัง';
+  } else if (error.code === 'NETWORK_ERROR') {
+    errorMessage = 'ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้ กรุณาตรวจสอบอินเทอร์เน็ต';
+  }
+    
     setMessage({ 
       type: 'error', 
-      text: error.response?.data?.error || error.message || 'เกิดข้อผิดพลาดในการบันทึกข้อมูล กรุณาลองใหม่อีกครั้ง' 
+      text: error.response?.data?.error || errorMessage
     });
     
     // *** รีเฟรชข้อมูลเดิมกลับมาเมื่อเกิด error ***

@@ -15,6 +15,7 @@ interface Temple {
   address?: string;
   description?: string;
   highlighted: boolean;
+  type: number;
 }
 
 // interface BuddhaStatue {
@@ -65,6 +66,7 @@ export default function SacredPlaces() {
             description:
               "วัดสุทัศน์เทพวรารามเป็นพระอารามหลวงชั้นเอก ชนิดราชวรมหาวิหาร เป็นวัดที่พระบาทสมเด็จพระพุทธยอดฟ้าจุฬาโลกมหาราช รัชกาลที่ 1 โปรดให้สร้างขึ้น",
             highlighted: true,
+            type: 1,
           },
           {
             id: 2,
@@ -74,6 +76,7 @@ export default function SacredPlaces() {
             description:
               "ศาลเจ้าโบราณที่มีความสำคัญและเก่าแก่ของชุมชนจีนในย่านเจริญกรุง",
             highlighted: false,
+            type: 1,
           },
           {
             id: 3,
@@ -84,6 +87,7 @@ export default function SacredPlaces() {
             description:
               'วัดพระศรีรัตนศาสดาราม หรือที่เรียกกันทั่วไปว่า "วัดพระแก้ว" เป็นวัดที่มีความสำคัญมากที่สุดแห่งหนึ่งในประเทศไทย',
             highlighted: false,
+            type: 2,
           },
           {
             id: 4,
@@ -92,6 +96,7 @@ export default function SacredPlaces() {
             address: "ถนนราชดำเนินนอก เขตป้อมปราบศัตรูพ่าย กรุงเทพมหานคร",
             description: "สถานที่สำหรับเข้าปฏิบัติธรรมและสวดมนตร์",
             highlighted: false,
+            type: 0,
           },
         ]);
 
@@ -117,10 +122,10 @@ export default function SacredPlaces() {
       return matchesSearch;
     } else if (activeTab === "นิยม") {
       // This would normally use a popularity metric from your API
-      return matchesSearch && temple.highlighted;
+      return matchesSearch && temple.type == 1;
     } else if (activeTab === "ใหม่") {
       // This would normally use a creation date from your API
-      return matchesSearch && !temple.highlighted;
+       return matchesSearch && temple.type == 2;
     }
 
     return matchesSearch;
