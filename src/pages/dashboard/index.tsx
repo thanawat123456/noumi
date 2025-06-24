@@ -62,6 +62,8 @@ export default function Dashboard() {
 
   const [current] = useState(0);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+
 
   // เช็คการล็อกอิน (ใช้โค้ดเดิมที่คุณมี)
   useEffect(() => {
@@ -157,42 +159,49 @@ export default function Dashboard() {
 
           {/* Search Bar */}
           <div className="mt-6 relative">
-            <div className="flex items-center bg-white rounded-full px-4 py-2">
-              <svg
-                className="w-6 h-6 [#FF7A05]"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M4 6h16M4 12h16m-7 6h7"
-                />
-              </svg>
-              <input
-                type="text"
-                placeholder="ค้นหา..."
-                className="flex-1 bg-transparent border-none focus:outline-none px-3 text-gray-700"
-              />
-              <svg
-                className="w-6 h-6 [#FF7A05]"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                />
-              </svg>
-            </div>
-          </div>
+  <div 
+    className="flex items-center bg-white rounded-full px-4 py-2 cursor-pointer"
+    onClick={() => router.push('/search')}
+  >
+    <svg
+      className="w-6 h-6 text-[#FF7A05]"
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={2}
+        d="M4 6h16M4 12h16m-7 6h7"
+      />
+    </svg>
+    <input
+      type="text"
+      placeholder="ค้นหาวัด สถานที่ศักดิ์สิทธิ์..."
+      className="flex-1 bg-transparent border-none focus:outline-none px-3 text-gray-700 cursor-pointer"
+      value={searchQuery}
+      onChange={(e) => setSearchQuery(e.target.value)}
+      onFocus={() => router.push('/search')}
+      readOnly
+    />
+    <svg
+      className="w-6 h-6 text-[#FF7A05]"
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={2}
+        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+      />
+    </svg>
+  </div>
+</div>
 
           {/* Categories */}
           <div
