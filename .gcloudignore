@@ -70,10 +70,6 @@ next-env.d.ts
 # Certificates
 certificates/
 
-# Large assets (ถ้ามี)
-public/images/
-public/videos/
-public/assets/
 
 # Vercel
 .vercel
