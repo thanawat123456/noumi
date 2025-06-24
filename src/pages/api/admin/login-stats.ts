@@ -1,4 +1,4 @@
-// pages/api/admin/login-stats.ts - API สำหรับดึงสถิติการ login
+// pages/api/admin/login-stats.ts - Fixed for PostgreSQL
 import type { NextApiRequest, NextApiResponse } from 'next';
 import dbService from '@/lib/db';
 
@@ -29,7 +29,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // *** ใช้ method ที่มีอยู่แล้วในระบบ ***
     const visitStats = await dbService.getVisitStats();
 
-    // *** ดึงข้อมูลเพิ่มเติมจาก login_history และ users ***
+    // *** ดึงข้อมูลเพิ่มเติมจาก login_history และ users - แก้ไข SQL สำหรับ PostgreSQL ***
     
     // นับจำนวน login ทั้งหมดจาก login_history table
     const totalLoginResult = await dbService.runQuery(`
@@ -42,28 +42,29 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const weekStart = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString();
     const monthStart = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000).toISOString();
 
+    // *** แก้ไข SQL queries ให้ใช้ PostgreSQL syntax ($1, $2, $3) ***
     const [todayLoginResult, weekLoginResult, monthLoginResult] = await Promise.all([
       dbService.runQuery(`
         SELECT COUNT(*) as count FROM login_history 
-        WHERE login_at >= ?
+        WHERE login_at >= $1
       `, [todayStart]),
       
       dbService.runQuery(`
         SELECT COUNT(*) as count FROM login_history 
-        WHERE login_at >= ?
+        WHERE login_at >= $1
       `, [weekStart]),
       
       dbService.runQuery(`
         SELECT COUNT(*) as count FROM login_history 
-        WHERE login_at >= ?
+        WHERE login_at >= $1
       `, [monthStart])
     ]);
 
     const stats: LoginStats = {
-      totalLogins: totalLoginResult[0]?.count || 0,
-      todayLogins: todayLoginResult[0]?.count || 0,
-      weeklyLogins: weekLoginResult[0]?.count || 0,
-      monthlyLogins: monthLoginResult[0]?.count || 0,
+      totalLogins: parseInt(totalLoginResult[0]?.count) || 0,
+      todayLogins: parseInt(todayLoginResult[0]?.count) || 0,
+      weeklyLogins: parseInt(weekLoginResult[0]?.count) || 0,
+      monthlyLogins: parseInt(monthLoginResult[0]?.count) || 0,
     };
 
     console.log('📊 Login stats from login_history:', stats);

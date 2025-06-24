@@ -125,7 +125,10 @@ useEffect(() => {
         
         // *** ตรวจสอบว่า session ยังใช้ได้หรือไม่โดยเรียก API ***
         try {
-          const response = await axios.get(`/api/users/${session.user.id}`);
+         const response = await axios.get(`/api/users/${session.user.id}`, {
+            withCredentials: true
+          });
+
           if (response.data.success && response.data.user) {
             const freshUser = response.data.user;
             setUser(freshUser);
@@ -410,7 +413,11 @@ const updateUser = async (userData: User): Promise<void> => {
       zodiacSign: userData.zodiacSign,
       bloodGroup: userData.bloodGroup,
       avatar: userData.avatar
-    });
+      },
+      {
+        withCredentials: true
+      }
+    );
 
     console.log('API Response:', response.data);
 
@@ -470,7 +477,10 @@ const refreshUserData = async (): Promise<void> => {
       console.log('Refreshing user data for ID:', session.user.id);
       
       // *** ใช้ API ที่มีอยู่แล้ว ***
-      const response = await axios.get(`/api/users/${session.user.id}`);
+      const response = await axios.get(`/api/users/${session.user.id}`, {
+        withCredentials: true
+      });
+
       if (response.data.success && response.data.user) {
         const freshUser = response.data.user;
         setUser(freshUser);

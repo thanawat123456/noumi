@@ -285,7 +285,7 @@ export default function AdminDashboard() {
                 <span className="text-sm text-gray-500">วันนี้</span>
               </div>
               <p className="text-2xl font-bold text-gray-800">{stats.todayLogins}</p>
-              <p className="text-sm text-gray-600">เข้าชม</p>
+              <p className="text-sm text-gray-600">การเข้าชม</p>
             </div>
 
             <div className="bg-white p-6 rounded-xl shadow-sm">
@@ -294,7 +294,7 @@ export default function AdminDashboard() {
                 <span className="text-sm text-gray-500">สัปดาห์นี้</span>
               </div>
               <p className="text-2xl font-bold text-gray-800">{stats.weeklyLogins}</p>
-              <p className="text-sm text-gray-600">เข้าชม</p>
+              <p className="text-sm text-gray-600">การเข้าชม</p>
             </div>
 
             <div className="bg-white p-6 rounded-xl shadow-sm">
@@ -303,7 +303,7 @@ export default function AdminDashboard() {
                 <span className="text-sm text-gray-500">รวมทั้งหมด</span>
               </div>
               <p className="text-2xl font-bold text-gray-800">{stats.totalLogins}</p>
-              <p className="text-sm text-gray-600">เข้าชม</p>
+              <p className="text-sm text-gray-600">การเข้าชม</p>
             </div>
           </div>
 

@@ -1,6 +1,4 @@
-// pages/api/admin/database-status.ts
-// API สำหรับตรวจสอบสถานะ database
-
+// pages/api/admin/database-status.ts - Fixed for PostgreSQL
 import type { NextApiRequest, NextApiResponse } from 'next';
 import dbService from '@/lib/db';
 
@@ -27,6 +25,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // ดึงข้อมูลสถิติการเข้าชม
     const visitStats = await dbService.getVisitStats();
     
+    // *** แก้ไข SQL query สำหรับ PostgreSQL ***
     // ดึงข้อมูล users ล่าสุด
     const recentUsers = await dbService.runQuery(`
       SELECT id, email, full_name, last_login, login_count, created_at
@@ -55,6 +54,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(500).json({
       success: false,
       error: 'Failed to check database status',
+      details: process.env.NODE_ENV === 'development' 
     });
   }
 }
