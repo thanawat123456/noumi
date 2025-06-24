@@ -15,6 +15,7 @@ interface Temple {
   address?: string;
   description?: string;
   highlighted: boolean;
+  type: number;
 }
 
 // Search Page (shows all temples with search functionality)
@@ -57,6 +58,7 @@ export default function SearchPage() {
             description:
               "วัดสุทัศน์เทพวรารามเป็นพระอารามหลวงชั้นเอก ชนิดราชวรมหาวิหาร เป็นวัดที่พระบาทสมเด็จพระพุทธยอดฟ้าจุฬาโลกมหาราช รัชกาลที่ 1 โปรดให้สร้างขึ้น",
             highlighted: true,
+            type: 1,
           },
           {
             id: 2,
@@ -66,6 +68,7 @@ export default function SearchPage() {
             description:
               "ศาลเจ้าโบราณที่มีความสำคัญและเก่าแก่ของชุมชนจีนในย่านเจริญกรุง",
             highlighted: false,
+            type: 1,
           },
           {
             id: 3,
@@ -76,6 +79,7 @@ export default function SearchPage() {
             description:
               'วัดพระศรีรัตนศาสดาราม หรือที่เรียกกันทั่วไปว่า "วัดพระแก้ว" เป็นวัดที่มีความสำคัญมากที่สุดแห่งหนึ่งในประเทศไทย',
             highlighted: false,
+            type: 2,
           },
           {
             id: 4,
@@ -84,6 +88,7 @@ export default function SearchPage() {
             address: "ถนนราชดำเนินนอก เขตป้อมปราบศัตรูพ่าย กรุงเทพมหานคร",
             description: "สถานที่สำหรับเข้าปฏิบัติธรรมและสวดมนตร์",
             highlighted: false,
+            type: 0,
           },
         
         ]);
@@ -111,9 +116,9 @@ export default function SearchPage() {
     if (activeTab === "ทั้งหมด") {
       return matchesSearch;
     } else if (activeTab === "นิยม") {
-      return matchesSearch && temple.highlighted;
+      return matchesSearch && temple.type == 1;
     } else if (activeTab === "ใหม่") {
-      return matchesSearch && !temple.highlighted;
+      return matchesSearch && temple.type == 2;
     }
 
     return matchesSearch;
