@@ -32,6 +32,7 @@ interface BuddhaStatueDetail {
   history: string;
   popular: boolean;
   views360Available: boolean;
+  panorama?: string; // เพิ่ม panorama property
 }
 
 const ARViewer = ({
@@ -312,6 +313,8 @@ export default function BuddhaStatueInfo() {
   const [loading, setLoading] = useState(true);
   // const [isLiked, setIsLiked] = useState(false);
   const [showAR, setShowAR] = useState(false);
+  // เพิ่ม state สำหรับ panorama
+  const [showPanorama, setShowPanorama] = useState(false);
 
   // Redirect to login if not authenticated
   useEffect(() => {
@@ -339,7 +342,7 @@ export default function BuddhaStatueInfo() {
     fetchStatueData();
   }, [id, isAuthenticated]);
 
-  // Simulated data function
+  // Simulated data function - เพิ่ม panorama ในข้อมูล
   const getStatueById = (statueId: number): BuddhaStatueDetail | null => {
     const statues: BuddhaStatueDetail[] = [
       {
@@ -349,7 +352,8 @@ export default function BuddhaStatueInfo() {
         templeName: "วัดสุทัศน์เทพวราราม",
         image: "/images/temple-list/พระศรีศากยมุนี.jpeg",
         glbModel:
-          "https://storage.googleapis.com/noumi-3d-models/พระพุทธศรีศากยมุนี.glb", // ใช้ไฟล์ที่มี
+          "https://storage.googleapis.com/noumi-3d-models/พระพุทธศรีศากยมุนี.glb",
+        panorama: "https://storage.googleapis.com/noumi-3d-models/พระศรีศากยมุนี360.mov", // เพิ่ม panorama
         benefits: ["ภาพรวมทั่วไป"],
         description: "พระพุทธรูปประธานในพระอุโบสถ",
         category: "พระสุขกรวัตตี์",
@@ -368,7 +372,8 @@ export default function BuddhaStatueInfo() {
         templeName: "วัดสุทัศน์เทพวราราม",
         image: "/images/temple-list/พระสุนทรีวาณี.jpeg",
         glbModel:
-          "https://storage.googleapis.com/noumi-3d-models/พระสุนทรีวาณี.glb", // ใช้ไฟล์ที่มี
+          "https://storage.googleapis.com/noumi-3d-models/พระสุนทรีวาณี.glb",
+        panorama: "https://storage.googleapis.com/noumi-3d-models/พระสุนทรีวาณี360.mov", // เพิ่ม panorama
         benefits: ["การงานการเรียน"],
         description: "พระพุทธรูปประจำวิหารด้านทิศตะวันออก",
         category: "พระพุทธรักษาวนมี",
@@ -388,6 +393,7 @@ export default function BuddhaStatueInfo() {
         image: "/images/temple-list/พระพุทธรังสีมุทราภัย.jpeg",
         glbModel:
           "https://storage.googleapis.com/noumi-3d-models/พระพุทธรังสีมุทราภัย.glb",
+        panorama: "", // ไม่มี panorama สำหรับรายการนี้
         benefits: ["การเรียนการงาน"],
         description: "พระพุทธรูปประจำวิหารด้านทิศใต้",
         category: "พระพุทธรังสีมุทราภัย",
@@ -407,6 +413,7 @@ export default function BuddhaStatueInfo() {
         image: "/images/temple-list/พระพุทธเสฏฐมุนี.jpeg",
         glbModel:
           "https://storage.googleapis.com/noumi-3d-models/พระพุทธเสฏฐมุนี2.glb",
+        panorama: "https://storage.googleapis.com/noumi-3d-models/หลวงพ่อกลักฝิ่น-พระพุทธเสฏฐมุนี(จำลอง)360.mov", // เพิ่ม panorama
         benefits: ["คู่รักคู่ครอง"],
         description: "พระพุทธรูปประจำวิหารด้านทิศใต้",
         category: "พระพุทธรังสีมุทราภัย",
@@ -414,7 +421,7 @@ export default function BuddhaStatueInfo() {
         openingHours: "08.00 - 20.00 น.",
         location: "ช่วงเวลา เปิด-ปิด",
         history:
-          "พระพุทธรูปปางมารวิชัยสร้างขึ้นในสมัยพระบาทสมเด็จพระนั่งเกล้าเจ้าอยู่หัว รัชกาลที่ 3 ปี พ.ศ.2382 สร้างโดยการนำกลักสูบฝิ่นมาหลอมเป็นองค์พร เรียกกันว่าหลวงพ่อกลัดฝิ่นและในเวลาต่อมา พระบาทสมเด็จพระจอมเกล้าเจ้าอยู่หัว รัชกาลที่ 4 ทรงพระราชทาน นามว่า 'พระพุทธเสรฏฐมุนี' ขึ้นชื่อในการขอขมากรรม",
+          "พระพุทธรูปปางมารวิชัยสร้างขึ้นในสมัยพระบาทสมเด็จพระนั่งเกล้าเจ้าอยู่หัว รัชกาลที่ 3 ปี พ.ศ.2382 สร้างโดยการนำกลักสูบฝิ่นมาหลอมเป็นองค์พร เรียกกันว่าหลวงพ่อกลัดฝิ่นและในเวลาต่อมา พระบาทสมเด็จพระจอมเกล้าเจ้าอยู่หัว รัชกาลที่ 4 ทรงพระราชทาน นามว่า 'พระพุทธเสรฏฐมุนี' ขึ้นชื่อในการขอขมากรรม",
         popular: false,
         views360Available: true,
       },
@@ -426,6 +433,7 @@ export default function BuddhaStatueInfo() {
         image: "/images/temple-list/พระพุทธตรีโลกเชษฐ์.jpg",
         glbModel:
           "https://storage.googleapis.com/noumi-3d-models/พระพุทธตรีโลกเชษฐ์.glb",
+        panorama: "https://storage.googleapis.com/noumi-3d-models/พระพุทธตรีโลกเชษฐ์360.mov", // เพิ่ม panorama
         benefits: ["การเรียนการงาน"],
         description: "พระพุทธรูปประจำวิหารด้านทิศใต้",
         category: "พระพุทธรังสีมุทราภัย",
@@ -445,6 +453,7 @@ export default function BuddhaStatueInfo() {
         image: "/images/temple-list/พระกริ่งใหญ่.jpeg",
         glbModel:
           "https://storage.googleapis.com/noumi-3d-models/พระกริ่งใหญ่.glb",
+        panorama: "https://storage.googleapis.com/noumi-3d-models/พระกริ่งใหญ่360.mov", // เพิ่ม panorama
         benefits: ["สุขภาพโรคภัย"],
         description: "พระพุทธรูปประจำวิหารด้านทิศใต้",
         category: "พระพุทธรังสีมุทราภัย",
@@ -464,6 +473,7 @@ export default function BuddhaStatueInfo() {
         image: "/images/temple-list/ท้าวเวสุวรรณ.jpg",
         glbModel:
           "https://storage.googleapis.com/noumi-3d-models/ท้าวเวสสุวรรณ.glb",
+        panorama: "https://storage.googleapis.com/noumi-3d-models/ท้าวเวสุวรรณ360.mov", // เพิ่ม panorama
         benefits: ["การเงินธุรกิจ"],
         description: "พระพุทธรูปประจำวิหารด้านทิศใต้",
         category: "พระพุทธรังสีมุทราภัย",
@@ -483,6 +493,7 @@ export default function BuddhaStatueInfo() {
         image: "/images/temple-list/พระรูปสมเด็จพระสังฆราช.jpeg",
         glbModel:
           "https://storage.googleapis.com/noumi-3d-models/พระรูปสมเด็จพระสังฆราช.glb",
+        panorama: "https://storage.googleapis.com/noumi-3d-models/พระรูปสมเด็จพระสังฆราช(แพติสสเทโวป.ธ.5)360.mov", // เพิ่ม panorama
         benefits: ["การเรียนการงาน"],
         description: "พระพุทธรูปประจำวิหารด้านทิศใต้",
         category: "พระพุทธรังสีมุทราภัย",
@@ -511,8 +522,13 @@ export default function BuddhaStatueInfo() {
     setShowAR(false);
   };
 
+  // เพิ่มฟังก์ชันสำหรับ panorama
   const handleView360Click = () => {
-    console.log("Opening 360° view for", statue?.name);
+    if (statue?.panorama) {
+      setShowPanorama(true);
+    } else {
+      console.log("No panorama available for", statue?.name);
+    }
   };
 
   if (isLoading || loading) {
@@ -571,7 +587,6 @@ export default function BuddhaStatueInfo() {
             }}
           />
           {/* Header */}
-          {/* Header */}
           <div className="absolute top-0 left-0 right-0" style={{ zIndex: 20 }}>
             <div className="flex items-center justify-between relative pt-8 pb-4 px-5">
               <button
@@ -616,15 +631,18 @@ export default function BuddhaStatueInfo() {
         {/* Information Section */}
         <div className="flex-1">
           <div className="bg-white rounded-t-3xl -mt-8 relative z-10 p-6 h-full flex flex-col">
-            {/* View 360° Button */}
+            {/* View 360° Button - แก้ไขให้แสดงเฉพาะเมื่อมี panorama */}
             <div className="flex justify-end mb-4">
-              <button
-                onClick={handleView360Click}
-                className="text-gray-400 text-base font-medium"
-              >
-                View 360°
-              </button>
+              {statue.panorama && (
+                <button
+                  onClick={handleView360Click}
+                  className="text-gray-400 text-base font-medium hover:text-orange-600 transition"
+                >
+                  View 360°
+                </button>
+              )}
             </div>
+            
             {/* Title and Subcategory */}
             <div className="flex justify-between items-start mb-4">
               <div className="flex-1">
@@ -665,31 +683,31 @@ export default function BuddhaStatueInfo() {
                 {statue.history}
               </p>
             </div>
-
-            {/* Temple Information */}
-            {/* <div className="mb-6">
-                        <h4 className="text-base font-bold text-gray-800 mb-2">ข้อมูลวัด</h4>
-                        <p className="text-orange-600 font-bold text-base">{statue.templeName}</p>
-                        <p className="text-gray-600 text-sm mt-1">{statue.description}</p>
-                    </div> */}
-
-            {/* Action Buttons */}
-            {/* <div className="grid grid-cols-2 gap-3">
-                        <button
-                            onClick={handleARClick}
-                            className="bg-pink-500 hover:bg-pink-600 text-white py-3 rounded-xl font-bold text-sm shadow-md transition-colors"
-                        >
-                            เปิด AR
-                        </button>
-                        <button
-                            onClick={() => router.push(`/sacred-places-moo/${statue.templeId}`)}
-                            className="bg-orange-500 hover:bg-orange-600 text-white py-3 rounded-xl font-bold text-sm shadow-md transition-colors"
-                        >
-                            ดูวัดนี้
-                        </button>
-                    </div> */}
           </div>
         </div>
+
+        {/* Panorama Popup - เพิ่ม panorama popup เหมือนใน InformationPage */}
+        {showPanorama && statue.panorama && (
+          <div className="fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center p-4">
+            <div className="relative w-full max-w-md max-h-[90vh] bg-black rounded-lg shadow-lg overflow-hidden">
+              {/* ปุ่มปิด */}
+              <button
+                onClick={() => setShowPanorama(false)}
+                className="absolute top-2 right-2 text-white text-3xl z-50"
+              >
+                ✕
+              </button>
+
+              {/* วิดีโอ */}
+              <video
+                src={statue.panorama}
+                controls
+                autoPlay
+                className="w-full h-auto max-h-[80vh] object-contain"
+              />
+            </div>
+          </div>
+        )}
 
         <BottomNavigation activePage="ar" />
       </div>
