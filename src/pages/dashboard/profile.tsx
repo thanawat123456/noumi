@@ -161,7 +161,7 @@ const zodiacTravelDestinationsData = {
       mapLink: "/information/7?type=buddha",
       description:
         "ท่านช่วยให้การเริ่มต้นนั้นมีความมั่นคง และปกป้องจากสิ่งไม่ดี เป็นช่วงเวลาที่ดีในการสร้างเสริมความสำเร็จ โดยเฉพาะการเงิน",
-      category: "การเงิน ธุรกิจ",
+      category: "การเงิน\nธุรกิจ",
     },
     {
       name: "เทวสถานสำหรับพระนคร\n พระพรหม",
