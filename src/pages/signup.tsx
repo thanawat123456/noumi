@@ -85,16 +85,85 @@ export default function SignUp() {
     }
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setAvatar(reader.result as string);
+  const compressImage = (file: File, maxWidth: number = 800, quality: number = 0.8): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      const img = new Image();
+
+      img.onload = () => {
+        // คำนวณขนาดใหม่ให้เหมาะสม
+        let { width, height } = img;
+
+        if (width > maxWidth) {
+          height = (height * maxWidth) / width;
+          width = maxWidth;
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+
+        // วาดรูปลงใน canvas
+        ctx?.drawImage(img, 0, 0, width, height);
+
+        // แปลงเป็น base64 พร้อมบีบอัด
+        const compressedBase64 = canvas.toDataURL('image/jpeg', quality);
+        resolve(compressedBase64);
       };
-      reader.readAsDataURL(file);
-    }
+
+      img.onerror = reject;
+      img.src = URL.createObjectURL(file);
+    });
   };
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
+
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const file = e.target.files?.[0];
+  if (!file) return;
+
+  // ตรวจสอบประเภทไฟล์
+  if (!file.type.startsWith('image/')) {
+    setError('กรุณาเลือกไฟล์รูปภาพเท่านั้น');
+    return;
+  }
+
+  // ตรวจสอบขนาดไฟล์ก่อนบีบอัด
+  if (file.size > 10 * 1024 * 1024) { // 10MB
+    setError('ไฟล์รูปภาพต้องมีขนาดไม่เกิน 10MB');
+    return;
+  }
+
+  try {
+    // แสดง loading (ถ้าต้องการ)
+    // setIsSubmitting(true);
+    
+    // บีบอัดรูปภาพ
+    const compressedBase64 = await compressImage(file, 600, 0.7);
+    
+    // ตรวจสอบขนาดหลังบีบอัด
+    const compressedSize = (compressedBase64.length * 3) / 4;
+    
+    if (compressedSize > 1.5 * 1024 * 1024) { // 1.5MB
+      // บีบอัดแรงกว่าถ้าไฟล์ยังใหญ่
+      const moreCompressed = await compressImage(file, 400, 0.5);
+      setAvatar(moreCompressed);
+    } else {
+      setAvatar(compressedBase64);
+    }
+    
+    // ล้าง error ถ้ามี
+    setError('');
+    
+  } catch (error) {
+    console.error('Image compression failed:', error);
+    setError('ไม่สามารถประมวลผลรูปภาพได้ กรุณาลองใหม่');
+  } finally {
+    // setIsSubmitting(false);
+  }
+};
+
+
   const [isHovered, setIsHovered] = useState(false);
   const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setBirthDate(e.target.value);
@@ -109,49 +178,78 @@ export default function SignUp() {
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    if (!fullName || !email || !phone || !birthDate) {
-      setError("กรุณากรอกข้อมูลสำคัญให้ครบถ้วน");
-      return;
-    }
+  if (!fullName || !email || !phone || !birthDate) {
+    setError("กรุณากรอกข้อมูลสำคัญให้ครบถ้วน");
+    return;
+  }
 
-    if (!agreeToTerms) {
-      setError("กรุณายอมรับข้อตกลงและเงื่อนไขการใช้งาน");
-      return;
-    }
+  if (!agreeToTerms) {
+    setError("กรุณายอมรับข้อตกลงและเงื่อนไขการใช้งาน");
+    return;
+  }
 
-    setIsSubmitting(true);
-    setError("");
-
-    try {
-      // ส่งข้อมูลให้กับ API ผ่าน AuthContext
-      const userData = {
-        fullName,
-        email,
-        phone,
-        birthDate,
-        dayOfBirth,
-        elementType,
-        zodiacSign,
-        bloodGroup,
-        avatar,
-      };
-
-      await signup(userData);
-      router.push("/set-password");
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (err: any) {
-      // จัดการกับข้อผิดพลาด - ตรวจสอบว่าเป็น axios error และมี response หรือไม่
-      if (err.response && err.response.data && err.response.data.error) {
-        setError(err.response.data.error);
-      } else {
-        setError("เกิดข้อผิดพลาดในการสมัครสมาชิก");
-      }
-    } finally {
-      setIsSubmitting(false);
-    }
+  // ตรวจสอบขนาดข้อมูลรวม
+  const userData = {
+    fullName,
+    email,
+    phone,
+    birthDate,
+    dayOfBirth,
+    elementType,
+    zodiacSign,
+    bloodGroup,
+    avatar,
   };
+
+  // ประมาณขนาดข้อมูลที่จะส่ง
+  const dataSize = JSON.stringify(userData).length;
+  if (dataSize > 5 * 1024 * 1024) { // 5MB
+    setError("ข้อมูลมีขนาดใหญ่เกินไป กรุณาลดขนาดรูปภาพ");
+    return;
+  }
+
+  setIsSubmitting(true);
+  setError("");
+
+  try {
+    await signup(userData);
+    router.push("/set-password");
+  } catch (err: any) {
+    console.error('Signup error:', err);
+    
+    // จัดการ error codes ต่างๆ
+    let errorMessage = "เกิดข้อผิดพลาดในการสมัครสมาชิก";
+    
+    if (err.response) {
+      const status = err.response.status;
+      
+      switch (status) {
+        case 413:
+          errorMessage = "ข้อมูลมีขนาดใหญ่เกินไป กรุณาลดขนาดรูปภาพหรือลองใหม่โดยไม่ใส่รูป";
+          break;
+        case 400:
+          errorMessage = err.response.data?.error || "ข้อมูลไม่ถูกต้อง กรุณาตรวจสอบและลองใหม่";
+          break;
+        case 409:
+          errorMessage = "อีเมลนี้ถูกใช้งานแล้ว กรุณาใช้อีเมลอื่น";
+          break;
+        case 500:
+          errorMessage = "เซิร์ฟเวอร์มีปัญหา กรุณาลองใหม่ในภายหลัง";
+          break;
+        default:
+          errorMessage = err.response.data?.error || errorMessage;
+      }
+    } else if (err.code === 'NETWORK_ERROR') {
+      errorMessage = "ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้ กรุณาตรวจสอบอินเทอร์เน็ต";
+    }
+    
+    setError(errorMessage);
+  } finally {
+    setIsSubmitting(false);
+  }
+};
 
   const styles: { [key: string]: CSSProperties } = {
     container: {
