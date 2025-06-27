@@ -1,4 +1,4 @@
-// pages/api/auth/[...nextauth].ts - Fixed for Cloud Run
+// pages/api/auth/[...nextauth].ts - Fixed for GCP Production
 
 import NextAuth, { Session, User } from 'next-auth';
 import GoogleProvider from 'next-auth/providers/google';
@@ -17,9 +17,18 @@ declare module "next-auth" {
   }
 }
 
-// *** Environment-based configuration ***
+// *** ปรับปรุง Environment configuration ***
 const isProduction = process.env.NODE_ENV === 'production';
-const cloudRunUrl = process.env.NEXTAUTH_URL || process.env.NEXTAUTH_URL_INTERNAL;
+const nextAuthUrl = process.env.NEXTAUTH_URL || process.env.NEXTAUTH_URL_INTERNAL;
+
+// *** เพิ่ม debugging ***
+console.log('🔧 NextAuth Config:', {
+  NODE_ENV: process.env.NODE_ENV,
+  NEXTAUTH_URL: nextAuthUrl,
+  isProduction,
+  hasGoogleId: !!process.env.GOOGLE_CLIENT_ID,
+  hasSecret: !!process.env.NEXTAUTH_SECRET
+});
 
 export default NextAuth({
   providers: [
@@ -42,7 +51,10 @@ export default NextAuth({
         password: { label: "Password", type: "password" }
       },
       async authorize(credentials, req) {
+        console.log('🔐 Credentials authorize called for:', credentials?.email);
+        
         if (!credentials?.email || !credentials?.password) {
+          console.log('❌ Missing credentials');
           return null;
         }
         
@@ -56,7 +68,7 @@ export default NextAuth({
           
           if (user) {
             await dbService.recordLogin(user.id!);
-            console.log(`Login recorded for user ${user.email} (credentials)`);
+            console.log(`✅ Login successful for user ${user.email} (credentials)`);
             
             return {
               id: user.id?.toString() || '',
@@ -65,23 +77,25 @@ export default NextAuth({
               image: user.avatar || null
             };
           }
+          
+          console.log('❌ Invalid credentials for:', credentials.email);
           return null;
         } catch (error) {
-          console.error('Login error:', error);
+          console.error('❌ Login error:', error);
           return null;
         }
       }
     })
   ],
   
-  // *** Session configuration - 6 hours ***
+  // *** ปรับปรุง Session configuration ***
   session: {
     strategy: 'jwt',
     maxAge: 6 * 60 * 60, // 6 ชั่วโมง
     updateAge: 1 * 60 * 60, // อัปเดตทุก 1 ชั่วโมง
   },
   
-  // *** Cookie configuration - Fixed for Cloud Run ***
+  // *** ปรับปรุง Cookie configuration สำหรับ GCP ***
   cookies: {
     sessionToken: {
       name: isProduction ? '__Secure-next-auth.session-token' : 'next-auth.session-token',
@@ -89,23 +103,30 @@ export default NextAuth({
         httpOnly: true,
         sameSite: 'lax', // เปลี่ยนจาก 'none' เป็น 'lax'
         path: '/',
-        secure: isProduction, // Environment-based
+        secure: isProduction,
         maxAge: 6 * 60 * 60, // 6 ชั่วโมง
+        // *** เพิ่ม domain config สำหรับ GCP ***
+        ...(isProduction && nextAuthUrl && {
+          domain: new URL(nextAuthUrl).hostname
+        })
       },
     },
     callbackUrl: {
       name: isProduction ? '__Secure-next-auth.callback-url' : 'next-auth.callback-url',
       options: {
-        sameSite: 'lax', // เปลี่ยนจาก 'none'
+        sameSite: 'lax',
         path: '/',
         secure: isProduction,
+        ...(isProduction && nextAuthUrl && {
+          domain: new URL(nextAuthUrl).hostname
+        })
       },
     },
     csrfToken: {
       name: isProduction ? '__Host-next-auth.csrf-token' : 'next-auth.csrf-token',
       options: {
         httpOnly: true,
-        sameSite: 'lax', // เปลี่ยนจาก 'none'
+        sameSite: 'lax',
         path: '/',
         secure: isProduction,
       },
@@ -114,6 +135,11 @@ export default NextAuth({
   
   callbacks: {
     async signIn({ user, account, profile }) {
+      console.log('🚪 SignIn callback:', { 
+        provider: account?.provider, 
+        email: user.email 
+      });
+      
       try {
         await dbService.init();
         
@@ -130,6 +156,7 @@ export default NextAuth({
             
             const userId = await dbService.addUser(newUser);
             dbUser = await dbService.getUserById(userId);
+            console.log('✅ New Google user created:', profile.email);
           } else {
             const shouldUpdateAvatar = !dbUser.avatar && profile.image;
             
@@ -138,12 +165,13 @@ export default NextAuth({
                 avatar: profile.image
               });
               dbUser = await dbService.getUserById(dbUser.id!);
+              console.log('✅ Google user avatar updated:', profile.email);
             }
           }
           
           if (dbUser && dbUser.id) {
             await dbService.recordLogin(dbUser.id);
-            console.log(`Login recorded for user ${dbUser.email} (Google)`);
+            console.log(`✅ Login recorded for user ${dbUser.email} (Google)`);
             
             user.id = dbUser.id.toString();
             user.name = dbUser.full_name || profile.name || '';
@@ -154,28 +182,45 @@ export default NextAuth({
         
         return true;
       } catch (error) {
-        console.error('Sign-in error:', error);
+        console.error('❌ Sign-in error:', error);
         return false;
       }
     },
     
-    // *** Redirect callback - Fixed for Cloud Run ***
+    // *** ปรับปรุง Redirect callback สำหรับ GCP ***
     async redirect({ url, baseUrl }) {
-      // ใช้ Cloud Run URL เป็น baseUrl
-      const actualBaseUrl = cloudRunUrl || baseUrl;
+      console.log('🔄 Redirect callback:', { url, baseUrl, nextAuthUrl });
+      
+      // ใช้ NEXTAUTH_URL เป็น baseUrl หลัก
+      const actualBaseUrl = nextAuthUrl || baseUrl;
       
       // ถ้า url เป็น relative path
-      if (url.startsWith("/")) return `${actualBaseUrl}${url}`;
+      if (url.startsWith("/")) {
+        const redirectUrl = `${actualBaseUrl}${url}`;
+        console.log('✅ Redirecting to:', redirectUrl);
+        return redirectUrl;
+      }
       
       // ถ้า url เป็น same origin
-      else if (new URL(url).origin === actualBaseUrl) return url;
+      try {
+        const urlObj = new URL(url);
+        const baseUrlObj = new URL(actualBaseUrl);
+        
+        if (urlObj.origin === baseUrlObj.origin) {
+          console.log('✅ Same origin redirect:', url);
+          return url;
+        }
+      } catch (error) {
+        console.error('❌ URL parsing error:', error);
+      }
       
       // Default กลับไป baseUrl
+      console.log('✅ Default redirect to:', actualBaseUrl);
       return actualBaseUrl;
     },
     
     async session({ session, token }) {
-      console.log('👤 Session: Creating session for token:', token.id);
+      console.log('👤 Session callback: Creating session for token:', token.id);
       
       if (token?.id && session.user) {
         session.user.id = String(token.id);
@@ -192,7 +237,7 @@ export default NextAuth({
         
         console.log('🔐 JWT: Setting loginTime for user:', user.id, 'at:', token.loginTime);
         
-        // ลบข้อมูลอื่นออกเพื่อลดขนาด
+        // ลบข้อมูลอื่นออกเพื่อลดขนาด token
         delete token.name;
         delete token.email;
         delete token.picture;
@@ -220,7 +265,22 @@ export default NextAuth({
     error: '/login'
   },
   
-  debug: !isProduction, // Debug เฉพาะ development
+  // *** เพิ่ม debug สำหรับ production troubleshooting ***
+  debug: process.env.NEXTAUTH_DEBUG === 'true', // ใช้ env variable แทน
   
-  secret: process.env.NEXTAUTH_SECRET
+  secret: process.env.NEXTAUTH_SECRET,
+  
+  // *** เพิ่ม events สำหรับ monitoring ***
+  events: {
+    async signIn(message) {
+      console.log('📝 NextAuth Event - SignIn:', message);
+    },
+    async signOut(message) {
+      console.log('📝 NextAuth Event - SignOut:', message);
+    },
+    async session(message) {
+      console.log('📝 NextAuth Event - Session:', message);
+    },
+
+  }
 });
