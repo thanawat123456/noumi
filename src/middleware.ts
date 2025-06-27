@@ -1,4 +1,4 @@
-// middleware.ts - Fixed for GCP Production
+// middleware.ts - Conditional approach
 
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
@@ -6,22 +6,16 @@ import { getToken } from 'next-auth/jwt';
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  
-  // *** เพิ่ม debugging ***
-  console.log('🔍 Middleware:', pathname);
 
-  // *** ปล่อย static files และ API routes ***
+  // *** ปล่อย static files ทั้งหมดไปเลย ***
   if (
     pathname.startsWith('/_next') ||
     pathname.startsWith('/api') ||
     pathname.startsWith('/static') ||
-    pathname.startsWith('/public') ||
     pathname.includes('.') ||
     pathname === '/manifest.json' ||
     pathname === '/sw.js' ||
-    pathname === '/favicon.ico' ||
-    pathname === '/robots.txt' ||
-    pathname === '/sitemap.xml'
+    pathname === '/favicon.ico'
   ) {
     return NextResponse.next();
   }
@@ -36,67 +30,33 @@ export async function middleware(request: NextRequest) {
   try {
     const token = await getToken({ 
       req: request, 
-      secret: process.env.NEXTAUTH_SECRET,
-      // *** เพิ่ม configuration สำหรับ GCP ***
-      secureCookie: process.env.NODE_ENV === 'production',
-      cookieName: process.env.NODE_ENV === 'production' 
-        ? '__Secure-next-auth.session-token' 
-        : 'next-auth.session-token'
+      secret: process.env.NEXTAUTH_SECRET 
     });
 
-    console.log('🔐 Middleware check:', {
-      pathname,
-      hasToken: !!token,
-      tokenId: token?.id,
-      userAgent: request.headers.get('user-agent')?.substring(0, 50)
-    });
+    console.log('🔐 Middleware check:', pathname, 'Has token:', !!token);
 
-    if (!token || !token.id) {
-      console.log('❌ No valid token, redirecting to login');
+    if (!token) {
+      console.log('❌ No token, redirecting to login');
       const loginUrl = new URL('/login', request.url);
       loginUrl.searchParams.set('callbackUrl', pathname);
-      loginUrl.searchParams.set('reason', 'no-session');
-      
-      const response = NextResponse.redirect(loginUrl);
-      
-      // *** ล้าง cookies ที่อาจจะ corrupted ***
-      response.cookies.delete('next-auth.session-token');
-      response.cookies.delete('__Secure-next-auth.session-token');
-      response.cookies.delete('next-auth.callback-url');
-      response.cookies.delete('__Secure-next-auth.callback-url');
-      response.cookies.delete('next-auth.csrf-token');
-      response.cookies.delete('__Host-next-auth.csrf-token');
-      
-      return response;
+      return NextResponse.redirect(loginUrl);
     }
 
-    // *** ตรวจสอบอายุ token ***
+    // ตรวจสอบอายุ token
     const now = Math.floor(Date.now() / 1000);
     const loginTime = Number(token.loginTime) || Number(token.iat) || 0;
     const sessionAge = now - loginTime;
     const maxAge = 6 * 60 * 60; // 6 ชั่วโมง
 
-    console.log('🕐 Token age check:', {
-      sessionAge,
-      maxAge,
-      hoursOld: (sessionAge / 3600).toFixed(1),
-      isExpired: sessionAge > maxAge
-    });
-
     if (sessionAge > maxAge) {
       console.log('❌ Token expired, redirecting to login');
-      const loginUrl = new URL('/login', request.url);
-      loginUrl.searchParams.set('reason', 'expired');
-      
+      const loginUrl = new URL('/login?reason=expired', request.url);
       const response = NextResponse.redirect(loginUrl);
       
-      // *** ล้าง cookies ทั้งหมด ***
+      // ล้าง cookies
       response.cookies.delete('next-auth.session-token');
-      response.cookies.delete('__Secure-next-auth.session-token');
       response.cookies.delete('next-auth.callback-url');
-      response.cookies.delete('__Secure-next-auth.callback-url');
       response.cookies.delete('next-auth.csrf-token');
-      response.cookies.delete('__Host-next-auth.csrf-token');
       
       return response;
     }
@@ -106,36 +66,21 @@ export async function middleware(request: NextRequest) {
 
   } catch (error) {
     console.error('❌ Middleware error:', error);
-    
-    // *** ถ้า error ให้ redirect ไป login ***
-    const loginUrl = new URL('/login', request.url);
-    loginUrl.searchParams.set('callbackUrl', pathname);
-    loginUrl.searchParams.set('reason', 'middleware-error');
-    
-    const response = NextResponse.redirect(loginUrl);
-    
-    // *** ล้าง cookies ที่อาจจะมีปัญหา ***
-    response.cookies.delete('next-auth.session-token');
-    response.cookies.delete('__Secure-next-auth.session-token');
-    response.cookies.delete('next-auth.callback-url');
-    response.cookies.delete('__Secure-next-auth.callback-url');
-    response.cookies.delete('next-auth.csrf-token');
-    response.cookies.delete('__Host-next-auth.csrf-token');
-    
-    return response;
+    // ถ้าเกิด error ให้ผ่านไปเลย เพื่อไม่ให้แอพเสีย
+    return NextResponse.next();
   }
 }
 
 export const config = {
   matcher: [
     /*
-     * Match all request paths except:
+     * Match all request paths except for the ones starting with:
      * - api (API routes)
      * - _next/static (static files)
      * - _next/image (image optimization files)
-     * - favicon.ico, robots.txt, etc.
+     * - favicon.ico (favicon file)
      * - files with extensions
      */
-    '/((?!api|_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml|manifest.json|sw.js|.*\\..*).*)',
+    '/((?!api|_next/static|_next/image|favicon.ico|.*\\..*).*)',
   ],
 };
