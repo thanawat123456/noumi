@@ -30,11 +30,20 @@ export default async function handler(
     }
 
     // บันทึกการ login
-    await dbService.recordLogin(
-      user.id!, 
-      req.headers['x-forwarded-for'] as string || req.socket.remoteAddress,
-      req.headers['user-agent'] as string
-    );
+    const ipHeader = req.headers['x-forwarded-for'];
+const ipAddress =
+  typeof ipHeader === 'string'
+    ? ipHeader.split(',')[0].trim()
+    : Array.isArray(ipHeader)
+    ? ipHeader[0]
+    : req.socket?.remoteAddress || null;
+
+    const userAgent = req.headers['user-agent'] || 'unknown';
+
+    await dbService.recordLogin(String(user.id), ipAddress, userAgent);
+    console.log(`Login recorded for user: ${user.email}`);
+
+
     console.log(`Login recorded for user: ${user.email}`);
 
     // สร้าง user object ที่จะส่งกลับไปให้ client

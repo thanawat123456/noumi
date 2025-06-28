@@ -102,11 +102,22 @@ export default async function handler(
     }
 
     // บันทึกการ login
-    await dbService.recordLogin(
-      dbUser.id,
-      req.headers['x-forwarded-for'] as string || req.socket.remoteAddress,
-      req.headers['user-agent'] as string
-    );
+    const ipAddress = (
+      typeof req.headers['x-forwarded-for'] === 'string'
+        ? req.headers['x-forwarded-for'].split(',')[0].trim()
+        : Array.isArray(req.headers['x-forwarded-for'])
+        ? req.headers['x-forwarded-for'][0]
+        : req.socket?.remoteAddress
+    ) || '0.0.0.0';
+
+    const userAgent =
+      typeof req.headers['user-agent'] === 'string'
+        ? req.headers['user-agent']
+        : 'unknown';
+
+    await dbService.recordLogin(dbUser.id, ipAddress, userAgent);
+
+
     console.log(`Login recorded for user: ${dbUser.email} (Google)`);
 
     // สร้าง user object ที่จะส่งกลับ (เหมือนกับ login API เดิม)

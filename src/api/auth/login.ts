@@ -32,10 +32,19 @@ export default async function handler(
       });
     }
 
-    const ipAddress = req.headers['x-forwarded-for'] as string || req.socket.remoteAddress;
-    const userAgent = req.headers['user-agent'];
-    
+    const ipHeader = req.headers['x-forwarded-for'];
+    const ipAddress =
+      typeof ipHeader === 'string'
+        ? ipHeader.split(',')[0].trim()
+        : Array.isArray(ipHeader)
+        ? ipHeader[0]
+        : req.socket?.remoteAddress || null;
+
+    const userAgent = req.headers['user-agent'] || 'unknown';
+
     await dbService.recordLogin(user.id, ipAddress, userAgent);
+    console.log(`Login recorded for user: ${user.email}`);
+
 
     const { password: _, ...userWithoutPassword } = user;
 
