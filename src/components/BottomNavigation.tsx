@@ -28,7 +28,7 @@ const BottomNavigation: React.FC<BottomNavigationProps> = ({ activePage }) => {
       ? "ar"
       : currentPath === "/profile"
       ? "profile"
-      : "home");
+      : "");
       console.log('currentPath:', currentPath);
       console.log('activePage prop:', activePage);
 
