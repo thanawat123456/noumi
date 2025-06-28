@@ -1,15 +1,16 @@
 // db.ts - Cloud SQL PostgreSQL Version
-import { Pool } from 'pg';
+import { Pool, PoolClient } from 'pg';
+import { setTimeout } from 'timers/promises';
 
-// Types (คงเดิม)
+// Types
 export interface UserType {
   id?: number;
   email: string;
   password?: string;
   phone?: string;
-  full_name?: string; 
+  full_name?: string;
   birth_date?: string;
-  day_of_birth?: string; 
+  day_of_birth?: string;
   element_type?: string;
   zodiac_sign?: string;
   blood_group?: string;
@@ -57,22 +58,43 @@ class CloudSQLDatabase {
     return CloudSQLDatabase.instance;
   }
 
+  private async withRetry<T>(operation: () => Promise<T>, maxAttempts: number = 3, delayMs: number = 1000): Promise<T> {
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+      try {
+        return await operation();
+      } catch (error: any) { // ใช้ any เพื่อแก้ ts(1196)
+        console.warn(`⚠️ Retry attempt ${attempt} failed:`, {
+          message: error.message || 'Unknown error',
+          stack: error.stack,
+          code: error.code,
+          errno: error.errno,
+        });
+        if (attempt === maxAttempts) throw new Error(`Operation failed after ${maxAttempts} attempts: ${error.message || 'Unknown error'}`);
+        await setTimeout(delayMs * attempt); // Exponential backoff
+      }
+    }
+    throw new Error('Operation failed after maximum retries');
+  }
+
   public async init(): Promise<void> {
-    // Skip initialization in browser
     if (typeof window !== 'undefined') {
       console.warn('Cloud SQL database cannot be initialized in browser environment');
       return;
     }
-    
-    if (this.initialized) return;
-    
-    if (this.initPromise) {
-      return this.initPromise;
-    }
 
-    this.initPromise = new Promise(async (resolve, reject) => {
+    if (this.initialized) return;
+    if (this.initPromise) return this.initPromise;
+
+    this.initPromise = this.withRetry(async () => {
       try {
-        // กำหนดค่าการเชื่อมต่อ Cloud SQL
+        // ตรวจสอบตัวแปรสภาพแวดล้อม
+        const requiredEnvVars = ['DB_HOST', 'DB_NAME', 'DB_USER', 'DB_PASSWORD'];
+        for (const envVar of requiredEnvVars) {
+          if (!process.env[envVar]) {
+            throw new Error(`ตัวแปรสภาพแวดล้อมที่จำเป็นขาดหายไป: ${envVar}`);
+          }
+        }
+
         const dbConfig = {
           host: process.env.DB_HOST || 'localhost',
           port: parseInt(process.env.DB_PORT || '5432'),
@@ -80,9 +102,9 @@ class CloudSQLDatabase {
           user: process.env.DB_USER || 'postgres',
           password: process.env.DB_PASSWORD,
           ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
-          max: 30, 
-          idleTimeoutMillis: 10000, 
-          connectionTimeoutMillis: 5000, 
+          max: 30, // รองรับ traffic สูง
+          idleTimeoutMillis: 5000, // ตรวจจับ idle connections เร็วขึ้น
+          connectionTimeoutMillis: 5000, // ตรวจจับปัญหาการเชื่อมต่อ
           query_timeout: 5000,
           statement_timeout: 5000,
         };
@@ -91,34 +113,34 @@ class CloudSQLDatabase {
         console.log(`📍 Host: ${dbConfig.host}:${dbConfig.port}`);
         console.log(`📊 Database: ${dbConfig.database}`);
         console.log(`👤 User: ${dbConfig.user}`);
-        
+
         this.pool = new Pool(dbConfig);
 
         // ทดสอบการเชื่อมต่อ
         const client = await this.pool.connect();
-        const result = await client.query('SELECT NOW() as current_time, version() as pg_version');
-        console.log('✅ Cloud SQL connection successful');
-        console.log(`⏰ Server time: ${result.rows[0].current_time}`);
-        console.log(`🐘 PostgreSQL version: ${result.rows[0].pg_version.split(' ')[0]}`);
-        client.release();
+        try {
+          const result = await client.query('SELECT NOW() as current_time, version() as pg_version');
+          console.log('✅ Cloud SQL connection successful');
+          console.log(`⏰ Server time: ${result.rows[0].current_time}`);
+          console.log(`🐘 PostgreSQL version: ${result.rows[0].pg_version.split(' ')[0]}`);
+        } finally {
+          client.release();
+        }
 
-        // ปรับแต่ง connection pool
         await this.optimizeConnectionPool();
-        
-        // สร้างตาราง
         console.log('📋 Creating tables if they don\'t exist...');
         await this.createTables();
-        
         this.initialized = true;
         console.log('🚀 Cloud SQL Database initialization complete');
-        
-        // Log current database stats
         await this.logDatabaseStats();
-        
-        resolve();
-      } catch (error) {
-        console.error('💥 Cloud SQL initialization failed:', error);
-        reject(error);
+      } catch (error: any) { // ใช้ any เพื่อแก้ ts(1196)
+        console.error('❌ Cloud SQL initialization failed:', {
+          message: error.message || 'Unknown error',
+          stack: error.stack,
+          code: error.code,
+          errno: error.errno,
+        });
+        throw error;
       }
     });
 
@@ -129,29 +151,33 @@ class CloudSQLDatabase {
     if (!this.pool) return;
 
     console.log('⚡ Optimizing PostgreSQL connection pool...');
-
-    // สำหรับ PostgreSQL เราปรับแต่งได้น้อยกว่า SQLite
-    // แต่สามารถตั้งค่า connection pool ได้
-    this.pool.on('connect', (client) => {
-      console.log('🔗 New client connected to PostgreSQL');
-    });
-
-    this.pool.on('error', (err, client) => {
-      console.error('💥 PostgreSQL client error:', err);
-    });
-
+    this.pool.on('connect', () => console.log('🔗 New client connected to PostgreSQL'));
+    this.pool.on('error', (err: any) => console.error('💥 PostgreSQL client error:', {
+      message: err.message || 'Unknown error',
+      stack: err.stack,
+      code: err.code,
+      errno: err.errno,
+    }));
     console.log('✅ Connection pool optimized');
+  }
+
+  private async logPoolStats(): Promise<void> {
+    if (this.pool) {
+      console.log('📊 Pool Stats:', {
+        totalCount: this.pool.totalCount,
+        idleCount: this.pool.idleCount,
+        waitingCount: this.pool.waitingCount,
+      });
+    }
   }
 
   private async createTables(): Promise<void> {
     if (!this.pool) return;
 
     const client = await this.pool.connect();
-    
     try {
       await client.query('BEGIN');
 
-      // สร้างตาราง users
       await client.query(`
         CREATE TABLE IF NOT EXISTS users (
           id SERIAL PRIMARY KEY,
@@ -171,7 +197,6 @@ class CloudSQLDatabase {
         )
       `);
 
-      // สร้างตาราง appointments
       await client.query(`
         CREATE TABLE IF NOT EXISTS appointments (
           id SERIAL PRIMARY KEY,
@@ -185,7 +210,6 @@ class CloudSQLDatabase {
         )
       `);
 
-      // สร้างตาราง predictions
       await client.query(`
         CREATE TABLE IF NOT EXISTS predictions (
           id SERIAL PRIMARY KEY,
@@ -197,7 +221,6 @@ class CloudSQLDatabase {
         )
       `);
 
-      // สร้างตาราง todos
       await client.query(`
         CREATE TABLE IF NOT EXISTS todos (
           id SERIAL PRIMARY KEY,
@@ -208,7 +231,6 @@ class CloudSQLDatabase {
         )
       `);
 
-      // สร้างตาราง temples
       await client.query(`
         CREATE TABLE IF NOT EXISTS temples (
           id SERIAL PRIMARY KEY,
@@ -220,8 +242,7 @@ class CloudSQLDatabase {
           created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
       `);
-      
-      // สร้างตาราง buddha_statues
+
       await client.query(`
         CREATE TABLE IF NOT EXISTS buddha_statues (
           id SERIAL PRIMARY KEY,
@@ -235,7 +256,6 @@ class CloudSQLDatabase {
         )
       `);
 
-      // สร้างตาราง login_history
       await client.query(`
         CREATE TABLE IF NOT EXISTS login_history (
           id SERIAL PRIMARY KEY,
@@ -246,7 +266,6 @@ class CloudSQLDatabase {
         )
       `);
 
-      // สร้าง indexes สำหรับการค้นหา
       await client.query(`
         CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
         CREATE INDEX IF NOT EXISTS idx_login_history_user_id ON login_history(user_id);
@@ -259,60 +278,62 @@ class CloudSQLDatabase {
 
       await client.query('COMMIT');
       console.log('📋 All PostgreSQL tables created successfully');
-
-    } catch (error) {
+    } catch (error: any) { // ใช้ any เพื่อแก้ ts(1196)
       await client.query('ROLLBACK');
-      console.error('❌ Error creating tables:', error);
+      console.error('❌ Error creating tables:', {
+        message: error.message || 'Unknown error',
+        stack: error.stack,
+        code: error.code,
+        errno: error.errno,
+      });
       throw error;
     } finally {
       client.release();
     }
   }
 
-  // *** Enhanced recordLogin with better error handling ***
-  public async recordLogin(userId: number, ipAddress?: string, userAgent?: string): Promise<void> {
+  async recordLogin(userId: number | string, ipAddress: string | null, userAgent: string) {
     await this.init();
     if (!this.pool) throw new Error('Database not initialized');
-    
-    const client = await this.pool.connect();
-    try {
-      await client.query('BEGIN');
-      
-      const now = new Date().toISOString();
-      
-      console.log(`📊 Recording login for user ID: ${userId}`);
-      
-      // อัพเดท last_login และ login_count ในตาราง users
-      const updateResult = await client.query(`
-        UPDATE users 
-        SET last_login = $1,
-            login_count = COALESCE(login_count, 0) + 1
-        WHERE id = $2
-      `, [now, userId]);
-      
-      if (updateResult.rowCount === 0) {
-        console.warn(`⚠️ No user found with ID: ${userId}`);
+
+    return this.withRetry(async () => {
+      const client = await this.pool!.connect();
+      try {
+        await client.query('BEGIN');
+        const now = new Date().toISOString();
+        console.log(`📊 Recording login for user ID: ${userId}`);
+
+        const updateResult = await client.query(
+          `UPDATE users SET last_login = $1, login_count = COALESCE(login_count, 0) + 1 WHERE id = $2`,
+          [now, userId]
+        );
+
+        if (updateResult.rowCount === 0) {
+          console.warn(`⚠️ No user found with ID: ${userId}`);
+          await client.query('ROLLBACK');
+          return;
+        }
+
+        const insertResult = await client.query(
+          `INSERT INTO login_history (user_id, login_at, ip_address, user_agent) VALUES ($1, $2, $3, $4) RETURNING id`,
+          [userId, now, ipAddress || null, userAgent || null]
+        );
+
+        await client.query('COMMIT');
+        console.log(`✅ Login recorded for user ID: ${userId} at ${now} (history ID: ${insertResult.rows[0].id})`);
+      } catch (error: any) { // ใช้ any เพื่อแก้ ts(1196)
         await client.query('ROLLBACK');
-        return;
+        console.error('❌ Error recording login:', {
+          message: error.message || 'Unknown error',
+          stack: error.stack,
+          code: error.code,
+          errno: error.errno,
+        });
+        throw error;
+      } finally {
+        client.release();
       }
-      
-      // บันทึกใน login_history
-      const insertResult = await client.query(`
-        INSERT INTO login_history (user_id, login_at, ip_address, user_agent)
-        VALUES ($1, $2, $3, $4)
-        RETURNING id
-      `, [userId, now, ipAddress || null, userAgent || null]);
-      
-      await client.query('COMMIT');
-      console.log(`✅ Login recorded for user ID: ${userId} at ${now} (history ID: ${insertResult.rows[0].id})`);
-      
-    } catch (error) {
-      await client.query('ROLLBACK');
-      console.error('❌ Error recording login:', error);
-      throw error;
-    } finally {
-      client.release();
-    }
+    });
   }
 
   public async healthCheck(): Promise<boolean> {
@@ -321,59 +342,26 @@ class CloudSQLDatabase {
         console.log('❌ Database pool not connected');
         return false;
       }
-      
       const client = await this.pool.connect();
-      const result = await client.query('SELECT 1 as health_check');
-      client.release();
-      
-      console.log('✅ Database health check passed');
-      return result.rows.length > 0;
-    } catch (error) {
-      console.error('❌ Database health check failed:', error);
+      try {
+        const result = await client.query('SELECT 1 as health_check');
+        console.log('✅ Database health check passed');
+        await this.logPoolStats();
+        return result.rows.length > 0;
+      } finally {
+        client.release();
+      }
+    } catch (error: any) { // ใช้ any เพื่อแก้ ts(1196)
+      console.error('❌ Database health check failed:', {
+        message: error.message || 'Unknown error',
+        stack: error.stack,
+        code: error.code,
+        errno: error.errno,
+      });
       return false;
     }
   }
 
-  // *** Enhanced recordLoginForNextAuth ***
-  public async recordLoginForNextAuth(userId: number, userEmail: string, loginMethod: 'credentials' | 'google', ipAddress?: string, userAgent?: string): Promise<void> {
-    await this.init();
-    if (!this.pool) throw new Error('Database not initialized');
-    
-    const client = await this.pool.connect();
-    try {
-      await client.query('BEGIN');
-      
-      const now = new Date().toISOString();
-      
-      console.log(`🔐 Recording ${loginMethod} login for: ${userEmail}`);
-      
-      // อัพเดท last_login และ login_count ในตาราง users
-      await client.query(`
-        UPDATE users 
-        SET last_login = $1,
-            login_count = COALESCE(login_count, 0) + 1
-        WHERE id = $2
-      `, [now, userId]);
-      
-      // บันทึกใน login_history พร้อม login method info
-      await client.query(`
-        INSERT INTO login_history (user_id, login_at, ip_address, user_agent)
-        VALUES ($1, $2, $3, $4)
-      `, [userId, now, ipAddress || null, userAgent ? `${loginMethod}:${userAgent}` : loginMethod]);
-      
-      await client.query('COMMIT');
-      console.log(`✅ ${loginMethod} login recorded for ${userEmail} at ${now}`);
-      
-    } catch (error) {
-      await client.query('ROLLBACK');
-      console.error('❌ Error recording login for NextAuth:', error);
-      throw error;
-    } finally {
-      client.release();
-    }
-  }
-
-  // Method สำหรับดึงสถิติการเข้าชม (แบบละเอียด)
   public async getVisitStats(): Promise<{
     todayVisits: number;
     weeklyVisits: number;
@@ -383,130 +371,95 @@ class CloudSQLDatabase {
   }> {
     await this.init();
     if (!this.pool) throw new Error('Database not initialized');
-    
-    try {
+
+    return this.withRetry(async () => {
       const now = new Date();
       const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
       const weekStart = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString();
       const monthStart = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000).toISOString();
-      
-      // Use Promise.all for concurrent queries
+
       const [todayResult, weekResult, monthResult, totalResult, activeResult] = await Promise.all([
-        this.pool.query(`
-          SELECT COUNT(DISTINCT user_id) as count 
-          FROM login_history 
-          WHERE login_at >= $1
-        `, [todayStart]),
-        
-        this.pool.query(`
-          SELECT COUNT(DISTINCT user_id) as count 
-          FROM login_history 
-          WHERE login_at >= $1
-        `, [weekStart]),
-        
-        this.pool.query(`
-          SELECT COUNT(DISTINCT user_id) as count 
-          FROM login_history 
-          WHERE login_at >= $1
-        `, [monthStart]),
-        
-        this.pool.query(`SELECT COUNT(*) as count FROM users`),
-        
-        this.pool.query(`
-          SELECT COUNT(*) as count 
-          FROM users 
-          WHERE last_login >= $1
-        `, [todayStart])
+        this.pool!.query(`SELECT COUNT(DISTINCT user_id) as count FROM login_history WHERE login_at >= $1`, [todayStart]),
+        this.pool!.query(`SELECT COUNT(DISTINCT user_id) as count FROM login_history WHERE login_at >= $1`, [weekStart]),
+        this.pool!.query(`SELECT COUNT(DISTINCT user_id) as count FROM login_history WHERE login_at >= $1`, [monthStart]),
+        this.pool!.query(`SELECT COUNT(*) as count FROM users`),
+        this.pool!.query(`SELECT COUNT(*) as count FROM users WHERE last_login >= $1`, [todayStart]),
       ]);
-      
+
       return {
         todayVisits: parseInt(todayResult.rows[0].count) || 0,
         weeklyVisits: parseInt(weekResult.rows[0].count) || 0,
         monthlyVisits: parseInt(monthResult.rows[0].count) || 0,
         totalUsers: parseInt(totalResult.rows[0].count) || 0,
-        activeToday: parseInt(activeResult.rows[0].count) || 0
+        activeToday: parseInt(activeResult.rows[0].count) || 0,
       };
-    } catch (error) {
-      console.error('❌ Error getting visit stats:', error);
-      return {
-        todayVisits: 0,
-        weeklyVisits: 0,
-        monthlyVisits: 0,
-        totalUsers: 0,
-        activeToday: 0
-      };
-    }
+    });
   }
 
-  // *** Method เพื่อ log database stats ***
   private async logDatabaseStats(): Promise<void> {
     try {
       const stats = await this.getVisitStats();
       console.log('📊 Database Stats:', {
         totalUsers: stats.totalUsers,
         activeToday: stats.activeToday,
-        todayVisits: stats.todayVisits
+        todayVisits: stats.todayVisits,
       });
-    } catch (error) {
-      console.log('⚠️ Could not retrieve database stats');
+    } catch (error: any) { // ใช้ any เพื่อแก้ ts(1196)
+      console.error('⚠️ Could not retrieve database stats:', {
+        message: error.message || 'Unknown error',
+        stack: error.stack,
+        code: error.code,
+        errno: error.errno,
+      });
     }
   }
 
-  // *** Enhanced getUserByEmail with logging ***
   public async getUserByEmail(email: string): Promise<UserType | null> {
     await this.init();
     if (!this.pool) throw new Error('Database not initialized');
-    
-    try {
-      console.log(`🔍 Looking up user by email: ${email}`);
-      
-      const result = await this.pool.query(`
-        SELECT * FROM users WHERE email = $1
-      `, [email]);
-      
-      if (result.rows.length > 0) {
-        const user = result.rows[0];
-        console.log(`✅ User found: ID ${user.id}, Name: ${user.full_name}`);
-        return user;
-      } else {
-        console.log(`❌ No user found with email: ${email}`);
-        return null;
+
+    return this.withRetry(async () => {
+      const client = await this.pool!.connect();
+      try {
+        console.log(`🔍 Looking up user by email: ${email}`);
+        const result = await client.query(`SELECT * FROM users WHERE email = $1`, [email]);
+        if (result.rows.length > 0) {
+          const user = result.rows[0];
+          console.log(`✅ User found: ID ${user.id}, Name: ${user.full_name}`);
+          return user;
+        } else {
+          console.log(`❌ No user found with email: ${email}`);
+          return null;
+        }
+      } finally {
+        client.release();
       }
-      
-    } catch (error) {
-      console.error('❌ Error getting user by email:', error);
-      throw error;
-    }
+    });
   }
 
-  // *** Enhanced getUserByEmailAndPassword ***
   public async getUserByEmailAndPassword(email: string, password: string): Promise<UserType | null> {
     await this.init();
     if (!this.pool) throw new Error('Database not initialized');
-    
-    try {
-      console.log(`🔐 Authenticating user: ${email}`);
-      
-      const result = await this.pool.query(`
-        SELECT * FROM users WHERE email = $1 AND password = $2
-      `, [email, password]);
-      
-      if (result.rows.length > 0) {
-        const user = result.rows[0];
-        console.log(`✅ Authentication successful for: ${user.full_name} (ID: ${user.id})`);
-        return user;
-      } else {
-        console.log(`❌ Authentication failed for email: ${email}`);
-        return null;
+
+    return this.withRetry(async () => {
+      const client = await this.pool!.connect();
+      try {
+        console.log(`🔐 Authenticating user: ${email}`);
+        const result = await client.query(`SELECT * FROM users WHERE email = $1 AND password = $2`, [email, password]);
+        if (result.rows.length > 0) {
+          const user = result.rows[0];
+          console.log(`✅ Authentication successful for: ${user.full_name} (ID: ${user.id})`);
+          return user;
+        } else {
+          console.log(`❌ Authentication failed for email: ${email}`);
+          return null;
+        }
+      } finally {
+        client.release();
       }
-      
-    } catch (error) {
-      console.error('❌ Error authenticating user:', error);
-      throw error;
-    }
+    });
   }
 
-  // *** Method เพื่อตรวจสอบสถานะ database ***
   public async getDatabaseInfo(): Promise<{
     type: string;
     host: string;
@@ -516,247 +469,215 @@ class CloudSQLDatabase {
     lastLoginTime: string | null;
   }> {
     await this.init();
-    
-    try {
-      const [userCountResult, loginCountResult, lastLoginResult] = await Promise.all([
-        this.pool?.query(`SELECT COUNT(*) as count FROM users`),
-        this.pool?.query(`SELECT COUNT(*) as count FROM login_history`),
-        this.pool?.query(`
-          SELECT login_at FROM login_history 
-          ORDER BY login_at DESC 
-          LIMIT 1
-        `)
-      ]);
-      
-      return {
-        type: 'Cloud SQL (PostgreSQL)',
-        host: process.env.DB_HOST || 'localhost',
-        database: process.env.DB_NAME || 'nummu_app',
-        userCount: parseInt(userCountResult?.rows[0]?.count) || 0,
-        loginHistoryCount: parseInt(loginCountResult?.rows[0]?.count) || 0,
-        lastLoginTime: lastLoginResult?.rows[0]?.login_at || null
-      };
-    } catch (error) {
-      console.error('❌ Error getting database info:', error);
-      return {
-        type: 'Cloud SQL (PostgreSQL)',
-        host: process.env.DB_HOST || 'localhost',
-        database: process.env.DB_NAME || 'nummu_app',
-        userCount: 0,
-        loginHistoryCount: 0,
-        lastLoginTime: null
-      };
-    }
+    if (!this.pool) throw new Error('Database not initialized');
+
+    return this.withRetry(async () => {
+      const client = await this.pool!.connect();
+      try {
+        const [userCountResult, loginCountResult, lastLoginResult] = await Promise.all([
+          client.query(`SELECT COUNT(*) as count FROM users`),
+          client.query(`SELECT COUNT(*) as count FROM login_history`),
+          client.query(`SELECT login_at FROM login_history ORDER BY login_at DESC LIMIT 1`),
+        ]);
+
+        return {
+          type: 'Cloud SQL (PostgreSQL)',
+          host: process.env.DB_HOST || 'localhost',
+          database: process.env.DB_NAME || 'nummu_app',
+          userCount: parseInt(userCountResult?.rows[0]?.count) || 0,
+          loginHistoryCount: parseInt(loginCountResult?.rows[0]?.count) || 0,
+          lastLoginTime: lastLoginResult?.rows[0]?.login_at || null,
+        };
+      } finally {
+        client.release();
+      }
+    });
   }
 
-  // Users methods
   public async addUser(user: UserType): Promise<number> {
     await this.init();
     if (!this.pool) throw new Error('Database not initialized');
-    
-    try {
-      console.log(`👤 Adding new user: ${user.email}`);
-      
-      const result = await this.pool.query(`
-        INSERT INTO users (
-          email, password, phone, full_name, birth_date, day_of_birth, 
-          element_type, zodiac_sign, blood_group, avatar, created_at
-        ) 
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
-        RETURNING id
-      `, [
-        user.email, 
-        user.password || null, 
-        user.phone || null, 
-        user.full_name || null, 
-        user.birth_date || null, 
-        user.day_of_birth || null, 
-        user.element_type || null, 
-        user.zodiac_sign || null, 
-        user.blood_group || null, 
-        user.avatar || null, 
-        user.created_at || new Date().toISOString()
-      ]);
-      
-      const userId = result.rows[0].id;
-      console.log(`✅ User added successfully with ID: ${userId}`);
-      
-      return userId;
-    } catch (error) {
-      console.error('❌ Error adding user:', error);
-      throw error;
-    }
+
+    return this.withRetry(async () => {
+      const client = await this.pool!.connect();
+      try {
+        console.log(`👤 Adding new user: ${user.email}`);
+        const result = await client.query(
+          `INSERT INTO users (
+            email, password, phone, full_name, birth_date, day_of_birth, 
+            element_type, zodiac_sign, blood_group, avatar, created_at
+          ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING id`,
+          [
+            user.email,
+            user.password || null,
+            user.phone || null,
+            user.full_name || null,
+            user.birth_date || null,
+            user.day_of_birth || null,
+            user.element_type || null,
+            user.zodiac_sign || null,
+            user.blood_group || null,
+            user.avatar || null,
+            user.created_at || new Date().toISOString(),
+          ]
+        );
+        const userId = result.rows[0].id;
+        console.log(`✅ User added successfully with ID: ${userId}`);
+        return userId;
+      } finally {
+        client.release();
+      }
+    });
   }
 
   public async getUserById(id: number): Promise<UserType | null> {
     await this.init();
     if (!this.pool) throw new Error('Database not initialized');
-    
-    try {
-      const result = await this.pool.query(`
-        SELECT * FROM users WHERE id = $1
-      `, [id]);
-      
-      return result.rows[0] || null;
-    } catch (error) {
-      console.error('❌ Error getting user by ID:', error);
-      throw error;
-    }
+
+    return this.withRetry(async () => {
+      const client = await this.pool!.connect();
+      try {
+        const result = await client.query(`SELECT * FROM users WHERE id = $1`, [id]);
+        return result.rows[0] || null;
+      } finally {
+        client.release();
+      }
+    });
   }
 
   public async updateUser(id: number, updates: string[], values: any[]): Promise<void> {
     await this.init();
     if (!this.pool) throw new Error('Database not initialized');
-    
+
     if (updates.length === 0) {
       console.log('No updates to apply');
       return;
     }
-    
-    try {
-      // แปลง SQL สำหรับ PostgreSQL (ใช้ $1, $2, ... แทน ?)
-      const setClause = updates.map((update, index) => {
-        const field = update.split(' = ')[0];
-        return `${field} = $${index + 1}`;
-      }).join(', ');
-      
-      const query = `UPDATE users SET ${setClause} WHERE id = $${values.length + 1}`;
-      const queryValues = [...values, id];
-      
-      console.log('Executing SQL:', query);
-      console.log('With values:', queryValues);
-      
-      const result = await this.pool.query(query, queryValues);
-      
-      console.log('Update result rowCount:', result.rowCount);
-      
-      if (result.rowCount === 0) {
-        console.warn('No rows were updated - user might not exist');
+
+    return this.withRetry(async () => {
+      const client = await this.pool!.connect();
+      try {
+        const setClause = updates.map((update, index) => {
+          const field = update.split(' = ')[0];
+          return `${field} = $${index + 1}`;
+        }).join(', ');
+        const query = `UPDATE users SET ${setClause} WHERE id = $${values.length + 1}`;
+        const queryValues = [...values, id];
+
+        console.log('Executing SQL:', query);
+        console.log('With values:', queryValues);
+
+        const result = await client.query(query, queryValues);
+        if (result.rowCount === 0) {
+          console.warn('No rows were updated - user might not exist');
+        }
+      } finally {
+        client.release();
       }
-      
-    } catch (error) {
-      console.error('Database update error:', error);
-      throw error;
-    }
+    });
   }
 
-  // Todos methods
   public async addTodo(todo: TodoType): Promise<number> {
     await this.init();
     if (!this.pool) throw new Error('Database not initialized');
-    
-    try {
-      const result = await this.pool.query(`
-        INSERT INTO todos (title, completed, created_at, user_id) 
-        VALUES ($1, $2, $3, $4)
-        RETURNING id
-      `, [
-        todo.title, 
-        todo.completed, 
-        todo.created_at, 
-        todo.user_id
-      ]);
-      
-      return result.rows[0].id;
-    } catch (error) {
-      console.error('❌ Error adding todo:', error);
-      throw error;
-    }
+
+    return this.withRetry(async () => {
+      const client = await this.pool!.connect();
+      try {
+        const result = await client.query(
+          `INSERT INTO todos (title, completed, created_at, user_id) VALUES ($1, $2, $3, $4) RETURNING id`,
+          [todo.title, todo.completed, todo.created_at, todo.user_id]
+        );
+        return result.rows[0].id;
+      } finally {
+        client.release();
+      }
+    });
   }
 
   public async updateTodo(id: number, completed: boolean): Promise<void> {
     await this.init();
     if (!this.pool) throw new Error('Database not initialized');
-    
-    try {
-      await this.pool.query(`
-        UPDATE todos SET completed = $1 WHERE id = $2
-      `, [completed, id]);
-    } catch (error) {
-      console.error('❌ Error updating todo:', error);
-      throw error;
-    }
+
+    return this.withRetry(async () => {
+      const client = await this.pool!.connect();
+      try {
+        await client.query(`UPDATE todos SET completed = $1 WHERE id = $2`, [completed, id]);
+      } finally {
+        client.release();
+      }
+    });
   }
 
   public async deleteTodo(id: number): Promise<void> {
     await this.init();
     if (!this.pool) throw new Error('Database not initialized');
-    
-    try {
-      await this.pool.query(`
-        DELETE FROM todos WHERE id = $1
-      `, [id]);
-    } catch (error) {
-      console.error('❌ Error deleting todo:', error);
-      throw error;
-    }
+
+    return this.withRetry(async () => {
+      const client = await this.pool!.connect();
+      try {
+        await client.query(`DELETE FROM todos WHERE id = $1`, [id]);
+      } finally {
+        client.release();
+      }
+    });
   }
 
   public async getAllUsers(): Promise<any[]> {
     await this.init();
     if (!this.pool) throw new Error('Database not initialized');
-    
-    try {
-      const result = await this.pool.query(`
-        SELECT 
-          id,
-          email,
-          phone,
-          full_name,
-          birth_date,
-          day_of_birth,
-          element_type,
-          zodiac_sign,
-          blood_group,
-          avatar,
-          created_at,
-          last_login,
-          login_count
-        FROM users 
-        ORDER BY created_at DESC
-      `);
-      
-      return result.rows || [];
-    } catch (error) {
-      console.error('Error getting all users:', error);
-      return [];
-    }
+
+    return this.withRetry(async () => {
+      const client = await this.pool!.connect();
+      try {
+        const result = await client.query(`
+          SELECT 
+            id, email, phone, full_name, birth_date, day_of_birth, 
+            element_type, zodiac_sign, blood_group, avatar, created_at, 
+            last_login, login_count
+          FROM users 
+          ORDER BY created_at DESC
+        `);
+        return result.rows || [];
+      } finally {
+        client.release();
+      }
+    });
   }
 
-  // หรือถ้าต้องการ method ทั่วไปสำหรับ query ใดๆ:
   public async runQuery(query: string, params?: any[]): Promise<any> {
     await this.init();
     if (!this.pool) throw new Error('Database not initialized');
-    
-    try {
-      const result = await this.pool.query(query, params);
-      return result.rows;
-    } catch (error) {
-      console.error('❌ Error running query:', error);
-      throw error;
-    }
+
+    return this.withRetry(async () => {
+      const client = await this.pool!.connect();
+      try {
+        const result = await client.query(query, params);
+        return result.rows;
+      } finally {
+        client.release();
+      }
+    });
   }
 
   public async getTodosByUserId(userId: number): Promise<TodoType[]> {
     await this.init();
     if (!this.pool) throw new Error('Database not initialized');
-    
-    try {
-      const result = await this.pool.query(`
-        SELECT id, title, completed, created_at, user_id 
-        FROM todos 
-        WHERE user_id = $1 
-        ORDER BY created_at DESC
-      `, [userId]);
-      
-      return result.rows;
-    } catch (error) {
-      console.error('❌ Error getting todos:', error);
-      throw error;
-    }
+
+    return this.withRetry(async () => {
+      const client = await this.pool!.connect();
+      try {
+        const result = await client.query(
+          `SELECT id, title, completed, created_at, user_id FROM todos WHERE user_id = $1 ORDER BY created_at DESC`,
+          [userId]
+        );
+        return result.rows;
+      } finally {
+        client.release();
+      }
+    });
   }
 
-  // ปิดการเชื่อมต่อ
   public async close(): Promise<void> {
     if (this.pool) {
       await this.pool.end();
@@ -771,40 +692,29 @@ export const updateUserData = async (userId: number, updates: UserUpdateData): P
   const updateFields: string[] = [];
   const updateValues: any[] = [];
 
-  // แปลง object เป็น arrays สำหรับ SQL UPDATE
   Object.entries(updates).forEach(([key, value]) => {
     if (value !== undefined && value !== null) {
-      // แปลง camelCase เป็น snake_case สำหรับฐานข้อมูล
       const dbFieldName = camelToSnake(key);
-      updateFields.push(`${dbFieldName} = ?`); // จะถูกแปลงเป็น $1, $2 ใน updateUser method
+      updateFields.push(`${dbFieldName} = ?`);
       updateValues.push(value);
     }
   });
 
-  // เรียกฟังก์ชัน updateUser ด้วย parameters ที่ถูกต้อง
   if (updateFields.length > 0) {
     await dbService.updateUser(userId, updateFields, updateValues);
   }
 };
 
-/**
- * แปลง camelCase เป็น snake_case
- */
 const camelToSnake = (str: string): string => {
   return str.replace(/[A-Z]/g, (letter) => `_${letter.toLowerCase()}`);
 };
 
-/**
- * ดึงข้อมูลผู้ใช้จากฐานข้อมูลและแปลงเป็น User interface
- */
 export const getUserFromDatabase = async (userId: number): Promise<any> => {
   const dbUser = await dbService.getUserById(userId);
-  
   if (!dbUser) {
     throw new Error('User not found');
   }
 
-  // แปลง database fields เป็น camelCase สำหรับ frontend
   return {
     id: dbUser.id,
     email: dbUser.email,
@@ -819,19 +729,18 @@ export const getUserFromDatabase = async (userId: number): Promise<any> => {
   };
 };
 
-// Export singleton instance
 const dbService = CloudSQLDatabase.getInstance();
 
-// ตรวจสอบว่าเราอยู่ในสภาพแวดล้อมของ server (ไม่ใช่ browser)
 if (typeof window === 'undefined') {
   console.log('🏗️ Starting Cloud SQL database initialization on server...');
   dbService.init()
-    .then(() => {
-      console.log('🎉 Cloud SQL Database service ready!');
-    })
-    .catch(err => {
-      console.error('💥 Failed to initialize Cloud SQL database:', err);
-    });
+    .then(() => console.log('🎉 Cloud SQL Database service ready!'))
+    .catch((error: any) => console.error('💥 Failed to initialize Cloud SQL database:', { // ใช้ any เพื่อแก้ ts(1196)
+      message: error.message || 'Unknown error',
+      stack: error.stack,
+      code: error.code,
+      errno: error.errno,
+    }));
 }
 
 export default dbService;
