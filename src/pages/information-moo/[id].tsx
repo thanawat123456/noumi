@@ -357,7 +357,7 @@ export default function BuddhaStatueInfo() {
         benefits: ["ภาพรวมทั่วไป"],
         description: "พระพุทธรูปประธานในพระอุโบสถ",
         category: "พระสุขกรวัตตี์",
-        subcategory: "ภาพรวม/ทั่วไป",
+        subcategory: "ภาพรวม / ทั่วไป",
         openingHours: "08.00 - 20.00 น.",
         location: "ช่วงเวลา เปิด-ปิด",
         history:
@@ -397,7 +397,7 @@ export default function BuddhaStatueInfo() {
         benefits: ["การเรียนการงาน"],
         description: "พระพุทธรูปประจำวิหารด้านทิศใต้",
         category: "พระพุทธรังสีมุทราภัย",
-        subcategory: "การเรียน / การงาน",
+        subcategory: "โชคลาภ / วาสนา",
         openingHours: "08.00 - 20.00 น.",
         location: "ช่วงเวลา เปิด-ปิด",
         history:
@@ -417,7 +417,7 @@ export default function BuddhaStatueInfo() {
         benefits: ["คู่รักคู่ครอง"],
         description: "พระพุทธรูปประจำวิหารด้านทิศใต้",
         category: "พระพุทธรังสีมุทราภัย",
-        subcategory: "คู่รัก/คู่ครอง",
+        subcategory: "ภาพรวม / ทั่วไป",
         openingHours: "08.00 - 20.00 น.",
         location: "ช่วงเวลา เปิด-ปิด",
         history:
@@ -437,7 +437,7 @@ export default function BuddhaStatueInfo() {
         benefits: ["การเรียนการงาน"],
         description: "พระพุทธรูปประจำวิหารด้านทิศใต้",
         category: "พระพุทธรังสีมุทราภัย",
-        subcategory: "การเรียน / การงาน",
+        subcategory: "โชคลาภ / วาสนา",
         openingHours: "08.00 - 20.00 น.",
         location: "ช่วงเวลา เปิด-ปิด",
         history:
@@ -635,7 +635,7 @@ export default function BuddhaStatueInfo() {
             <div className="flex justify-end mb-4">
               {statue.panorama && (
                 <button
-                  onClick={handleView360Click}
+                onClick={() => setShowPanorama(true)}
                   className="text-gray-400 text-base font-medium hover:text-orange-600 transition"
                 >
                   View 360°
@@ -687,27 +687,27 @@ export default function BuddhaStatueInfo() {
         </div>
 
         {/* Panorama Popup - เพิ่ม panorama popup เหมือนใน InformationPage */}
-        {showPanorama && statue.panorama && (
-          <div className="fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center p-4">
-            <div className="relative w-full max-w-md max-h-[90vh] bg-black rounded-lg shadow-lg overflow-hidden">
-              {/* ปุ่มปิด */}
-              <button
-                onClick={() => setShowPanorama(false)}
-                className="absolute top-2 right-2 text-white text-3xl z-50"
-              >
-                ✕
-              </button>
+        {showPanorama && (
+            <div className="fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center p-4">
+              <div className="relative w-full max-w-md max-h-[90vh] bg-black rounded-lg shadow-lg overflow-hidden">
+                {/* ปุ่มปิด */}
+                <button
+                  onClick={() => setShowPanorama(false)}
+                  className="absolute top-2 right-2 text-white text-3xl z-50"
+                >
+                  ✕
+                </button>
 
-              {/* วิดีโอ */}
-              <video
-                src={statue.panorama}
-                controls
-                autoPlay
-                className="w-full h-auto max-h-[80vh] object-contain"
-              />
+                {/* วิดีโอ */}
+                <video
+                  src={statue.panorama}
+                  controls
+                  autoPlay
+                  className="w-full h-auto max-h-[80vh] object-contain"
+                />
+              </div>
             </div>
-          </div>
-        )}
+          )}
 
         <BottomNavigation activePage="ar" />
       </div>

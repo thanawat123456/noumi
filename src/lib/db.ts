@@ -74,21 +74,17 @@ class CloudSQLDatabase {
       try {
         // กำหนดค่าการเชื่อมต่อ Cloud SQL
         const dbConfig = {
-          // สำหรับ development ใช้ localhost
-          // สำหรับ production ใช้ Cloud SQL Proxy
           host: process.env.DB_HOST || 'localhost',
           port: parseInt(process.env.DB_PORT || '5432'),
           database: process.env.DB_NAME || 'nummu_app',
           user: process.env.DB_USER || 'postgres',
           password: process.env.DB_PASSWORD,
-          
-          // การตั้งค่าสำหรับ Production - เพิ่ม timeout
           ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
-          max: 10, // จำนวด connection สูงสุดใน pool
-          idleTimeoutMillis: 30000,
-          connectionTimeoutMillis: 60000, // เพิ่มเป็น 60 วินาที
-          query_timeout: 30000, // timeout สำหรับ query
-          statement_timeout: 30000, // timeout สำหรับ statement
+          max: 30, 
+          idleTimeoutMillis: 10000, 
+          connectionTimeoutMillis: 5000, 
+          query_timeout: 5000,
+          statement_timeout: 5000,
         };
 
         console.log('🔌 Connecting to Cloud SQL PostgreSQL...');

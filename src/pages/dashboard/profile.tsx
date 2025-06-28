@@ -5,7 +5,10 @@ import { useAuth } from "@/contexts/AuthContext";
 import Link from "next/link";
 import BottomNavigation from "@/components/BottomNavigation";
 import ProfileSlideMenu from "@/components/ProfileSlideMenu";
-import { calculateAstrologyData, getZodiacEnglishName } from "@/utils/astrology";
+import {
+  calculateAstrologyData,
+  getZodiacEnglishName,
+} from "@/utils/astrology";
 
 // ข้อมูลธาตุประจำราศี (12 ราศี) - ข้อมูลสมบูรณ์
 const zodiacElementsData = {
@@ -399,7 +402,6 @@ const getLuckyColorsByZodiac = (zodiacSign: string) => {
   return colorMap[zodiacSign as keyof typeof colorMap] || defaultColors;
 };
 
-
 const getZodiacSignFallback = (birthDate: string | undefined) => {
   if (!birthDate) return "Aries";
   try {
@@ -491,7 +493,10 @@ export default function Profile() {
 
       // ถ้ามีวันเกิด ให้คำนวณข้อมูลใหม่จาก astrology utils
       if (user.birthDate) {
-        console.log("Calculating astrology data from birthDate:", user.birthDate);
+        console.log(
+          "Calculating astrology data from birthDate:",
+          user.birthDate
+        );
         const astrologyData = calculateAstrologyData(user.birthDate);
         console.log("Calculated astrology data:", astrologyData);
 
@@ -500,9 +505,9 @@ export default function Profile() {
         console.log("English zodiac name:", userZodiacEnglish);
       } else {
         // fallback ใช้ข้อมูลเดิม
-        userZodiacEnglish = user.zodiacSign ?
-          getZodiacEnglishName(user.zodiacSign) :
-          getZodiacSignFallback(user.birthDate);
+        userZodiacEnglish = user.zodiacSign
+          ? getZodiacEnglishName(user.zodiacSign)
+          : getZodiacSignFallback(user.birthDate);
       }
 
       // ถ้าไม่พบราศีภาษาอังกฤษ ให้ใช้ fallback
@@ -514,8 +519,9 @@ export default function Profile() {
       setZodiacSign(userZodiacEnglish);
 
       const zodiacInfo =
-        zodiacElementsData[userZodiacEnglish as keyof typeof zodiacElementsData] ||
-        zodiacElementsData["Aries"];
+        zodiacElementsData[
+          userZodiacEnglish as keyof typeof zodiacElementsData
+        ] || zodiacElementsData["Aries"];
 
       setBgStyles({
         gradient: zodiacInfo.bgColor,
@@ -525,13 +531,14 @@ export default function Profile() {
 
       const destinationData =
         zodiacTravelDestinationsData[
-        userZodiacEnglish as keyof typeof zodiacTravelDestinationsData
+          userZodiacEnglish as keyof typeof zodiacTravelDestinationsData
         ] || zodiacTravelDestinationsData["Aries"];
       setDestinations(destinationData);
 
       const numbers =
-        luckyNumbersByZodiac[userZodiacEnglish as keyof typeof luckyNumbersByZodiac] ||
-        luckyNumbersByZodiac["Aries"];
+        luckyNumbersByZodiac[
+          userZodiacEnglish as keyof typeof luckyNumbersByZodiac
+        ] || luckyNumbersByZodiac["Aries"];
       setLuckyNumbers(numbers);
 
       const colors = getLuckyColorsByZodiac(userZodiacEnglish);
@@ -713,7 +720,7 @@ export default function Profile() {
               </p>
             )}
           </div>
-          <div className="px-6 pt-8">
+          <div className="px-4 pt-8">
             {/* Lucky Numbers and Colors Section */}
             <div
               className="mb-6 bg-opacity-95 backdrop-blur-sm rounded-3xl p-6 shadow-lg"
@@ -756,7 +763,8 @@ export default function Profile() {
                             className="flex-1"
                             style={{
                               backgroundColor:
-                                colorStyles[color as keyof typeof colorStyles]?.bg || "#CCCCCC",
+                                colorStyles[color as keyof typeof colorStyles]
+                                  ?.bg || "#CCCCCC",
                             }}
                           />
                         ))
@@ -766,13 +774,12 @@ export default function Profile() {
                     </div>
                     <div className="flex justify-center text-xs text-white opacity-80 space-x-6">
                       {luckyColors && luckyColors.length > 0 ? (
-                        luckyColors
-                          .slice(0, 2)
-                          .map((color, index) => (
-                            <span key={index} className="px-2">
-                              {colorStyles[color as keyof typeof colorStyles]?.text || color}
-                            </span>
-                          ))
+                        luckyColors.slice(0, 2).map((color, index) => (
+                          <span key={index} className="px-2">
+                            {colorStyles[color as keyof typeof colorStyles]
+                              ?.text || color}
+                          </span>
+                        ))
                       ) : (
                         <>
                           <span className="px-2">เหลือง</span>
@@ -831,13 +838,13 @@ export default function Profile() {
 
             {/* Travel Destinations Section */}
             <div
-              className="mb-8 rounded-3xl p-6 shadow-lg"
+              className="mb-8 rounded-3xl p-3 shadow-lg"
               style={{
                 backgroundColor: hexToRgba(bgStyles.gradient, 55),
                 backdropFilter: "blur(10px)",
               }}
             >
-              <h3 className="text-white text-lg font-semibold mb-6">
+              <h3 className="text-white text-lg font-semibold mb-6 pt-3 pl-3">
                 สถานที่แนะนำ
                 <br />
                 ประจำราศี
@@ -851,6 +858,7 @@ export default function Profile() {
                       scrollSnapType: "x mandatory",
                       scrollbarWidth: "none",
                       msOverflowStyle: "none",
+                      overflowX: "hidden",
                     }}
                   >
                     <style jsx>{`
@@ -860,37 +868,37 @@ export default function Profile() {
                     `}</style>
 
                     {destinations.map((destination: any, index: number) => (
-  <div
-    key={index}
-    className="flex-shrink-0 w-80 relative rounded-2xl overflow-hidden"
-    style={{ scrollSnapAlign: "start" }}
-  >
-    <img
-      src={destination.image}
-      alt={destination.name}
-      className="w-full h-48 object-cover"
-      onError={(e) => {
-        (e.target as HTMLImageElement).src =
-          "/images/profile/travel/default.jpg";
-      }}
-    />
-    <div className="p-4">
-      <div className="flex justify-between items-start mb-5">
-        <Link href={destination.mapLink}>
-          <h4 className="text-lg font-semibold text-white cursor-pointer hover:text-red-300 leading-relaxed whitespace-pre-line">
-            {destination.name}
-          </h4>
-        </Link>
-        <span className="bg-[#40B828] text-white px-3 py-1 rounded-full text-xs font-medium text-center whitespace-pre-line">
-          {destination.category}
-        </span>
-      </div>
-      <p className="text-white text-sm mb-3 whitespace-pre-line">
-        {destination.description}
-      </p>
-    </div>
-  </div>
-))}
+                      <div
+                        key={index}
+                        className="flex-shrink-0 w-80 relative rounded-2xl overflow-hidden"
+                        style={{ scrollSnapAlign: "start" }}
+                      >
+                        <img
+                          src={destination.image}
+                          alt={destination.name}
+                          className="w-full h-45 object-cover rounded-2xl"
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).src =
+                              "/images/profile/travel/default.jpg";
+                          }}
+                        />
+                        <div className="p-4">
+                          <div className="flex justify-between items-start mb-5">
+                            <Link href={destination.mapLink}>
+                              <h4 className="text-lg font-semibold text-white cursor-pointer hover:text-red-300 leading-relaxed whitespace-pre-line">
+                                {destination.name}
+                              </h4>
+                            </Link>
+                            <span className="bg-[#40B828] text-white px-3 py-1 rounded-full text-xs font-medium text-center whitespace-pre-line">
+                              {destination.category}
+                            </span>
+                          </div>
+                          <p className="text-white text-sm mb-3 whitespace-pre-line">
+                            {destination.description}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
                   </div>
 
                   <div className="flex justify-center space-x-2 mt-4">

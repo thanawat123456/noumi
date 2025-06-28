@@ -164,24 +164,25 @@ const JourneyDetailScreen = () => {
   };
 
   const getLocationImage = (index: number, currentPoint: number) => {
+    const activeImages = [
+      "/images/loca1.png", // point 0 → สีดำ
+      "/images/loca3.png", // point 1 → สีส้ม
+      "/images/loca4.png", // point 2 → สีเหลือง
+    ];
+
     if (index === currentPoint) {
-      // Active point - ใช้สีตาม currentPoint
-      const activeImages = [
-        "/images/local2.png", // สีดำ - point 0
-        "/images/local2.png", // สีส้ม - point 1
-        "/images/local2.png", // สีเหลือง - point 2
-      ];
+      // จุดปัจจุบัน
       return activeImages[currentPoint] || "/images/loca1.png";
     } else if (index < currentPoint) {
-      // Completed point - ใช้สีส้ม
-      return "/images/local2.png";
+      // จุดที่ผ่านมาแล้ว → ใช้ภาพตอนที่เคยเป็น current
+      return activeImages[index] || "/images/loca1.png";
     } else {
-      // Future point - ใช้สีขาว
-      return "/images/loca3.png";
+      // จุดที่ยังไม่ถึง
+      return "/images/local2.png";
     }
   };
 
-    const getBottomSectionColor = (pointIndex: number) => {
+  const getBottomSectionColor = (pointIndex: number) => {
     const colors = ["#594A42", "#FCF3E5", "#FFD22D"]; // เส้นทาง 1, 2, 3
     return colors[pointIndex] || "#FCF3E5"; // default เป็นสี FCF3E5
   };
@@ -255,7 +256,7 @@ const JourneyDetailScreen = () => {
         </div>
       </div>
 
-       <div 
+      <div
         className="px-6 py-8"
         style={{ backgroundColor: getBottomSectionColor(currentPoint) }}
       >
