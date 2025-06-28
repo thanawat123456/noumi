@@ -1023,7 +1023,7 @@ export const TicketScreen: React.FC<TicketScreenProps> = ({
         <TicketSuccess ticket={selectedTicket} language={language} />
       )}
 
-      {step === "list" && <BottomNavigation activePage="profile" />}
+      {step === "list" && <BottomNavigation  />}
     </div>
   );
 };

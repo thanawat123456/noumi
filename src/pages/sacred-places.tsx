@@ -312,7 +312,7 @@ export default function SacredPlaces() {
           )}
         </div>
 
-        <BottomNavigation activePage="profile" />
+        <BottomNavigation />
         <ProfileSlideMenu 
           isOpen={isMenuOpen} 
           onClose={() => setIsMenuOpen(false)}

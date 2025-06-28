@@ -392,7 +392,7 @@ export const CeremonyActivityScreen: React.FC<CeremonyActivityScreenProps> = ({
           </div>
         )}
 
-        <BottomNavigation activePage="profile" />
+        <BottomNavigation />
       </div>
     </div>
   );

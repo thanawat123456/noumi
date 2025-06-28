@@ -1411,7 +1411,7 @@ const InformationPage: React.FC<InformationProps> = ({ type, id }) => {
           </div>
         )}
 
-        <BottomNavigation activePage="profile" />
+        <BottomNavigation />
       </div>
     </>
   );

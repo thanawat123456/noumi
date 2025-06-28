@@ -202,7 +202,7 @@ export default function CeremonyCalendarPanel() {
             )}
         </div>
 
-        <BottomNavigation activePage="profile" />
+        <BottomNavigation />
       </div>
     </>
   );

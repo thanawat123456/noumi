@@ -720,7 +720,7 @@ export default function Profile() {
               </p>
             )}
           </div>
-          <div className="px-4 pt-8">
+          <div className="px-6 pt-8">
             {/* Lucky Numbers and Colors Section */}
             <div
               className="mb-6 bg-opacity-95 backdrop-blur-sm rounded-3xl p-6 shadow-lg"
@@ -838,13 +838,13 @@ export default function Profile() {
 
             {/* Travel Destinations Section */}
             <div
-              className="mb-8 rounded-3xl p-3 shadow-lg"
+              className="mb-8 rounded-3xl p-6 shadow-lg"
               style={{
                 backgroundColor: hexToRgba(bgStyles.gradient, 55),
                 backdropFilter: "blur(10px)",
               }}
             >
-              <h3 className="text-white text-lg font-semibold mb-6 pt-3 pl-3">
+              <h3 className="text-white text-lg font-semibold mb-6">
                 สถานที่แนะนำ
                 <br />
                 ประจำราศี
@@ -858,7 +858,6 @@ export default function Profile() {
                       scrollSnapType: "x mandatory",
                       scrollbarWidth: "none",
                       msOverflowStyle: "none",
-                      overflowX: "hidden",
                     }}
                   >
                     <style jsx>{`
@@ -876,7 +875,7 @@ export default function Profile() {
                         <img
                           src={destination.image}
                           alt={destination.name}
-                          className="w-full h-45 object-cover rounded-2xl"
+                          className="w-full h-48 object-cover rounded-2xl"
                           onError={(e) => {
                             (e.target as HTMLImageElement).src =
                               "/images/profile/travel/default.jpg";

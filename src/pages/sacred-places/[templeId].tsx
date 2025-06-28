@@ -337,7 +337,7 @@ export default function TempleBuddhaStatues() {
           )}
         </div>
 
-        <BottomNavigation activePage="profile" />
+        <BottomNavigation />
          <ProfileSlideMenu 
           isOpen={isMenuOpen} 
           onClose={() => setIsMenuOpen(false)}

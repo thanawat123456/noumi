@@ -455,7 +455,7 @@ const BuddhaInformation = () => {
           </div>
         </div> */}
         
-        <BottomNavigation activePage="profile" />
+        <BottomNavigation />
       </div>
     </>
   );

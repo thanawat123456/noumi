@@ -260,7 +260,7 @@ export default function ActivityCalendarPanel() {
             )}
         </div>
 
-        <BottomNavigation activePage="profile" />
+        <BottomNavigation />
       </div>
     </>
   );

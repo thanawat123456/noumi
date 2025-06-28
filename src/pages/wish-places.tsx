@@ -174,7 +174,7 @@ const WishPlaces: React.FC = () => {
           )}
         </div>
         
-        <BottomNavigation activePage="profile" />
+        <BottomNavigation />
       </div>
     </>
   );

@@ -169,7 +169,7 @@ const Favorites: React.FC = () => {
           )}
         </div>
         
-        <BottomNavigation activePage="profile" />
+        <BottomNavigation />
       </div>
     </>
   );
